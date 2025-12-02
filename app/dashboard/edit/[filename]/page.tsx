@@ -1,7 +1,8 @@
-import { updateDocument } from "../../../actions";
+import { saveDocument } from "../../../actions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { initDriveService, operations } from "gdrivekit";
+import JsonTableEditor from "./JsonTableEditor";
 
 export default async function EditDocument({
   params,
@@ -43,8 +44,21 @@ export default async function EditDocument({
 
   let content = "{}";
   try {
-    const data = await operations.readJsonFileData(id);
-    content = JSON.stringify(data, null, 2);
+    let response = await operations.readJsonFileData(id);
+
+    // Recursively unwrap if response has { success: true, data: ... } structure
+    // This handles cases where the API returns a wrapper AND the file content itself is wrapped
+    while (
+      response &&
+      typeof response === "object" &&
+      "data" in response &&
+      "success" in response &&
+      response.success === true
+    ) {
+      response = response.data;
+    }
+
+    content = JSON.stringify(response, null, 2);
   } catch (error) {
     console.error("Error reading file:", error);
     content = JSON.stringify({ error: "Failed to load content" }, null, 2);
@@ -52,47 +66,16 @@ export default async function EditDocument({
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-8 flex items-center justify-center">
-      <div className="w-full max-w-2xl bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
+      <div className="w-full max-w-7xl bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
         <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
           Edit Document: {decodedFilename}
         </h1>
 
-        <form action={updateDocument} className="space-y-6">
-          <input type="hidden" name="fileId" value={id} />
-          <input type="hidden" name="filename" value={decodedFilename} />
-
-          <div className="space-y-2">
-            <label
-              htmlFor="content"
-              className="text-sm font-medium text-neutral-300"
-            >
-              JSON Content
-            </label>
-            <textarea
-              id="content"
-              name="content"
-              required
-              rows={15}
-              className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm font-mono focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
-              defaultValue={content}
-            />
-          </div>
-
-          <div className="flex gap-4">
-            <button
-              type="submit"
-              className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium py-3 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/25"
-            >
-              Save Changes
-            </button>
-            <a
-              href="/dashboard"
-              className="px-6 py-3 rounded-lg border border-neutral-800 hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-white"
-            >
-              Cancel
-            </a>
-          </div>
-        </form>
+        <JsonTableEditor
+          initialContent={content}
+          fileId={id}
+          filename={decodedFilename}
+        />
       </div>
     </div>
   );
