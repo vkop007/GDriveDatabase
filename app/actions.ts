@@ -145,7 +145,7 @@ export async function deleteDocument(formData: FormData) {
   redirect("/dashboard");
 }
 
-export async function updateDocument(formData: FormData) {
+export async function saveDocument(formData: FormData) {
   const filename = formData.get("filename") as string;
   const fileId = formData.get("fileId") as string;
   const content = formData.get("content") as string;
@@ -166,7 +166,7 @@ export async function updateDocument(formData: FormData) {
 
   const tokens = JSON.parse(tokensStr);
 
-  initDriveService(
+  const driveService = initDriveService(
     {
       client_id: clientId,
       client_secret: clientSecret,
@@ -184,9 +184,15 @@ export async function updateDocument(formData: FormData) {
       throw new Error("Invalid JSON content");
     }
 
-    // Delete and recreate to ensure full update
-    await operations.deleteFile(fileId);
-    await operations.createJsonFile(filename, jsonContent);
+    // Use updateJsonContent to update the file in place
+    // This preserves the File ID and is more efficient/safer than delete+create
+    // Note: We do NOT wrap the content in { success: true, data: ... } here
+    // because the API might do it, or we want clean files.
+    const response = await driveService.updateJsonContent(fileId, jsonContent);
+
+    if (!response.success) {
+      throw new Error(response.error || "Failed to update file");
+    }
   } catch (error) {
     console.error("Error updating file:", error);
     throw error;
