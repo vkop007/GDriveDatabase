@@ -1,40 +1,57 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { listDatabases, createDatabase, deleteDatabase } from "../actions";
+import {
+  listCollections,
+  createTable,
+  deleteCollection,
+} from "../../../actions";
 
-export default async function Dashboard() {
+export default async function DatabasePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const cookieStore = await cookies();
   const tokensStr = cookieStore.get("gdrive_tokens")?.value;
-  const clientId = cookieStore.get("gdrive_client_id")?.value;
-  const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
-  const projectId = cookieStore.get("gdrive_project_id")?.value;
 
-  if (!tokensStr || !clientId || !clientSecret || !projectId) {
+  if (!tokensStr) {
     redirect("/");
   }
 
-  const files = await listDatabases();
+  const files = await listCollections(id);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <header className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-              Databases
+            <div className="flex items-center gap-2 mb-2">
+              <a
+                href="/dashboard"
+                className="text-neutral-400 hover:text-white transition-colors"
+              >
+                Databases
+              </a>
+              <span className="text-neutral-600">/</span>
+              <span className="text-purple-400">Collections</span>
+            </div>
+            <h1 className="text-3xl font-bold bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+              Collections
             </h1>
-            <p className="text-neutral-400">Manage your NoSQL Databases</p>
+            <p className="text-neutral-400">Manage Tables in this Database</p>
           </div>
-          <form action={createDatabase} className="flex gap-2">
+          <form action={createTable} className="flex gap-2">
+            <input type="hidden" name="parentId" value={id} />
             <input
               type="text"
               name="name"
-              placeholder="Database Name"
+              placeholder="Table Name (e.g. users)"
               className="bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-purple-500"
               required
             />
             <button className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium">
-              Create Database
+              Create Table
             </button>
           </form>
         </header>
@@ -42,7 +59,7 @@ export default async function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {files.length === 0 ? (
             <div className="col-span-full text-center py-12 text-neutral-500 bg-neutral-900/50 rounded-xl border border-neutral-800">
-              No databases found. Create a new database to get started.
+              No collections found. Create a new collection to get started.
             </div>
           ) : (
             files.map((file: any) => (
@@ -62,7 +79,7 @@ export default async function Dashboard() {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"
+                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
                   </div>
@@ -75,13 +92,14 @@ export default async function Dashboard() {
                 </h3>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-neutral-800">
                   <a
-                    href={`/dashboard/database/${file.id}`}
+                    href={`/dashboard/table/${file.id}`}
                     className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors"
                   >
-                    Open
+                    Open Table
                   </a>
-                  <form action={deleteDatabase}>
+                  <form action={deleteCollection}>
                     <input type="hidden" name="fileId" value={file.id} />
+                    <input type="hidden" name="parentId" value={id} />
                     <button
                       type="submit"
                       className="text-xs font-medium text-red-500 hover:text-red-400 transition-colors"
