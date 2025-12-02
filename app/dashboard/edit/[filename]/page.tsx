@@ -2,7 +2,7 @@ import { saveDocument } from "../../../actions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { initDriveService, operations } from "gdrivekit";
-import JsonTableEditor from "./JsonTableEditor";
+import JsonTableEditor from "./editor";
 
 export default async function EditDocument({
   params,

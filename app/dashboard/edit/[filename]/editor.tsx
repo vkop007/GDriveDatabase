@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { saveDocument } from "../../../actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 interface JsonTableEditorProps {
   initialContent: string;
@@ -22,6 +24,7 @@ export default function JsonTableEditor({
   const [viewMode, setViewMode] = useState<"table" | "raw">("table");
   const [rawContent, setRawContent] = useState(initialContent);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   // Helper to parse value safely
   const parseValue = (val: string) => {
@@ -425,8 +428,27 @@ export default function JsonTableEditor({
       )}
 
       {/* Footer Actions */}
+      {/* Footer Actions */}
       <form
-        action={saveDocument}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          const formData = new FormData(e.currentTarget);
+
+          const toastId = toast.loading("Saving changes...");
+
+          try {
+            const result = await saveDocument(formData);
+
+            if (result.success) {
+              toast.success("Saved successfully!", { id: toastId });
+              router.push("/dashboard");
+            } else {
+              toast.error(result.error || "Failed to save", { id: toastId });
+            }
+          } catch (err) {
+            toast.error("An unexpected error occurred", { id: toastId });
+          }
+        }}
         className="flex items-center justify-end gap-4 pt-4 border-t border-neutral-800"
       >
         <input type="hidden" name="fileId" value={fileId} />

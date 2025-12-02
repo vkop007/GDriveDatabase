@@ -191,12 +191,15 @@ export async function saveDocument(formData: FormData) {
     const response = await driveService.updateJsonContent(fileId, jsonContent);
 
     if (!response.success) {
-      throw new Error(response.error || "Failed to update file");
+      return {
+        success: false,
+        error: response.error || "Failed to update file",
+      };
     }
+
+    return { success: true };
   } catch (error) {
     console.error("Error updating file:", error);
-    throw error;
+    return { success: false, error: "Failed to update file" };
   }
-
-  redirect("/dashboard");
 }
