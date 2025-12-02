@@ -1,5 +1,6 @@
-import { deleteDocument, TableFile } from "../../../actions";
-import AddRowForm from "./AddRowForm";
+import { deleteDocument } from "../../../actions";
+import { TableFile } from "../../../../types";
+import AddRowForm from "../../../../components/AddRowForm";
 
 export default function DataView({
   table,

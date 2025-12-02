@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { addDocument, ColumnDefinition } from "../../../actions";
+import { addDocument } from "../app/actions";
+import { ColumnDefinition } from "../types";
 
 export default function AddRowForm({
   fileId,
@@ -63,14 +64,14 @@ export default function AddRowForm({
         </div>
 
         <form
-          action={async (formData) => {
+          action={async () => {
             // Action logic handled in onSubmit
           }}
           onSubmit={(e) => {
             e.preventDefault();
             const form = e.currentTarget;
             const formData = new FormData(form);
-            const data: any = {};
+            const data: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
 
             inputColumns.forEach((col) => {
               const val = formData.get(col.key);

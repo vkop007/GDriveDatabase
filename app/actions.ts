@@ -190,27 +190,7 @@ export async function listCollections(databaseId: string) {
   }
 }
 
-// Types for Table Structure
-export interface ColumnDefinition {
-  key: string;
-  type: "string" | "integer" | "boolean" | "datetime";
-  required: boolean;
-  default?: any;
-  array?: boolean;
-}
-
-export interface RowData {
-  $id: string;
-  $createdAt: string;
-  $updatedAt: string;
-  [key: string]: any;
-}
-
-export interface TableFile {
-  name: string;
-  schema: ColumnDefinition[];
-  documents: RowData[];
-}
+import { ColumnDefinition, RowData, TableFile } from "../types";
 
 import { revalidatePath } from "next/cache";
 
@@ -247,8 +227,10 @@ export async function createTable(formData: FormData) {
       await moveFile(result.data.id, parentId);
       console.log("Move successful");
     } else {
-      console.error("Failed to create file:", result.error);
-      throw new Error(`Failed to create file: ${result.error}`);
+      console.error("Failed to create file:", result);
+      throw new Error(
+        `Failed to create file: ${(result as any).error || "Unknown error"}`
+      );
     }
   } catch (error) {
     console.error("Error creating table:", error);

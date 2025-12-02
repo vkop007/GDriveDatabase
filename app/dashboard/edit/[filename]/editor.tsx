@@ -5,13 +5,7 @@ import { saveDocument } from "../../../actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-interface JsonTableEditorProps {
-  initialContent: string;
-  fileId: string;
-  filename: string;
-}
-
-type JsonType = "array" | "object";
+import { JsonTableEditorProps, JsonType } from "../../../../types";
 
 export default function JsonTableEditor({
   initialContent,
@@ -443,7 +437,7 @@ export default function JsonTableEditor({
               toast.success("Saved successfully!", { id: toastId });
               router.push("/dashboard");
             } else {
-              toast.error(result.error || "Failed to save", { id: toastId });
+              toast.error("Failed to save", { id: toastId });
             }
           } catch (err) {
             toast.error("An unexpected error occurred", { id: toastId });
