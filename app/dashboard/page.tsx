@@ -29,6 +29,12 @@ export default async function Dashboard() {
             <div className="flex items-center gap-4">
               <p className="text-neutral-400">Manage your NoSQL Databases</p>
               <ApiAccess />
+              <a
+                href="/dashboard/settings"
+                className="text-sm text-neutral-400 hover:text-white transition-colors"
+              >
+                Settings
+              </a>
             </div>
           </div>
           <form action={createDatabase} className="flex gap-2">

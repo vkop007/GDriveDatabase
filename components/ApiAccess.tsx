@@ -46,8 +46,8 @@ export default function ApiAccess({
       <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 max-w-md w-full shadow-2xl">
         <h2 className="text-xl font-bold mb-4">API Access</h2>
         <p className="text-neutral-400 text-sm mb-6">
-          Use this API Key to access your database programmatically. Include it
-          in the <code>x-api-key</code> header.
+          Use your API Key to access your database programmatically. Include it
+          in the <code>x-api-key</code> header or query parameter.
         </p>
 
         <div className="space-y-4">
@@ -92,18 +92,17 @@ export default function ApiAccess({
             <label className="text-xs font-medium text-neutral-500 uppercase block mb-2">
               API Key
             </label>
-            {apiKey ? (
-              <div className="bg-neutral-950 border border-neutral-800 rounded p-3 text-sm font-mono text-green-400 break-all">
-                {apiKey}
-              </div>
-            ) : (
-              <button
-                onClick={handleGenerate}
-                className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg transition-colors text-sm font-medium"
+            <div className="bg-neutral-950 border border-neutral-800 rounded p-4 text-center">
+              <p className="text-sm text-neutral-400 mb-3">
+                Manage your API Key in Settings
+              </p>
+              <a
+                href="/dashboard/settings"
+                className="inline-block bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
               >
-                Generate New API Key
-              </button>
-            )}
+                Go to Settings
+              </a>
+            </div>
           </div>
         </div>
 
