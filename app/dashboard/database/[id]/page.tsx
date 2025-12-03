@@ -5,6 +5,8 @@ import {
   createTable,
   deleteCollection,
 } from "../../../actions";
+import CopyButton from "../../../../components/CopyButton";
+import ApiAccess from "../../../../components/ApiAccess";
 
 export default async function DatabasePage({
   params,
@@ -40,6 +42,9 @@ export default async function DatabasePage({
               Collections
             </h1>
             <p className="text-neutral-400">Manage Tables in this Database</p>
+            <div className="mt-2">
+              <ApiAccess databaseId={id} />
+            </div>
           </div>
           <form action={createTable} className="flex gap-2">
             <input type="hidden" name="parentId" value={id} />
@@ -90,6 +95,9 @@ export default async function DatabasePage({
                 <h3 className="font-medium truncate mb-1" title={file.name}>
                   {file.name}
                 </h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <CopyButton text={file.id} label="Collection ID" />
+                </div>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-neutral-800">
                   <a
                     href={`/dashboard/table/${file.id}`}

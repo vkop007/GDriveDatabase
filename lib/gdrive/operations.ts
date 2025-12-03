@@ -12,17 +12,17 @@ export async function getOrCreateRootFolder() {
     // This is often more reliable than search queries for immediate consistency
     const response = await operations.listFoldersInFolder("root");
 
-    console.log(
-      "Root folders list:",
-      JSON.stringify(
-        response.data?.files?.map((f: any) => ({
-          name: f.name,
-          id: f.id,
-          mimeType: f.mimeType,
-          trashed: f.trashed,
-        }))
-      )
-    );
+    // console.log(
+    //   "Root folders list:",
+    //   JSON.stringify(
+    //     response.data?.files?.map((f: any) => ({
+    //       name: f.name,
+    //       id: f.id,
+    //       mimeType: f.mimeType,
+    //       trashed: f.trashed,
+    //     }))
+    //   )
+    // );
 
     const folder = response.data?.files?.find(
       (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed

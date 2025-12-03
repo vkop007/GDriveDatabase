@@ -3,8 +3,11 @@
 import { operations, initDriveService } from "gdrivekit";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import fs from "fs/promises";
+import path from "path";
 
 const ROOT_FOLDER_NAME = "GDriveDatabase";
+const SECRETS_FILE = path.join(process.cwd(), "api-secrets.json");
 
 async function getAuth() {
   const cookieStore = await cookies();
@@ -19,7 +22,7 @@ async function getAuth() {
 
   const tokens = JSON.parse(tokensStr);
 
-  initDriveService(
+  const driveService = initDriveService(
     {
       client_id: clientId,
       client_secret: clientSecret,
@@ -29,7 +32,118 @@ async function getAuth() {
     tokens
   );
 
-  return { tokens, clientId, clientSecret, projectId };
+  return { tokens, clientId, clientSecret, projectId, driveService };
+}
+
+const API_CONFIG_FILE = "api-config.json";
+
+export async function generateApiKey() {
+  const { tokens, clientId, clientSecret, projectId, driveService } =
+    await getAuth();
+  const apiKey = "sk_" + crypto.randomUUID().replace(/-/g, "");
+
+  const secretData = {
+    apiKey,
+    tokens,
+    clientId,
+    clientSecret,
+    projectId,
+  };
+
+  // Save locally
+  await fs.writeFile(SECRETS_FILE, JSON.stringify(secretData, null, 2));
+
+  // Sync to Drive
+  try {
+    const rootId = await getOrCreateRootFolder();
+    const files = await operations.listFilesInFolder(rootId);
+    const existingConfig = files.data?.files?.find(
+      (f: any) => f.name === API_CONFIG_FILE && !f.trashed
+    );
+
+    if (existingConfig) {
+      await driveService.updateJsonContent(existingConfig.id, secretData);
+    } else {
+      const result = await operations.createJsonFile(
+        secretData,
+        API_CONFIG_FILE
+      );
+      if (result.success && result.data.id) {
+        await moveFile(result.data.id, rootId);
+      }
+    }
+  } catch (e) {
+    console.error("Failed to sync API config to Drive:", e);
+  }
+
+  return apiKey;
+}
+
+export async function getApiKey() {
+  try {
+    const data = await fs.readFile(SECRETS_FILE, "utf-8");
+    const secrets = JSON.parse(data);
+    return secrets.apiKey as string;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function deleteApiKey() {
+  const { tokens, clientId, clientSecret, projectId, driveService } =
+    await getAuth();
+
+  try {
+    // Read existing secrets to keep other data if needed, but for now we just clear the file or remove the key
+    // Actually, we should probably keep the auth tokens but remove the apiKey
+    const data = await fs.readFile(SECRETS_FILE, "utf-8");
+    const secrets = JSON.parse(data);
+
+    const newSecrets = { ...secrets };
+    delete newSecrets.apiKey;
+
+    // Save locally
+    await fs.writeFile(SECRETS_FILE, JSON.stringify(newSecrets, null, 2));
+
+    // Sync to Drive
+    const rootId = await getOrCreateRootFolder();
+    const files = await operations.listFilesInFolder(rootId);
+    const existingConfig = files.data?.files?.find(
+      (f: any) => f.name === API_CONFIG_FILE && !f.trashed
+    );
+
+    if (existingConfig) {
+      await driveService.updateJsonContent(existingConfig.id, newSecrets);
+    }
+  } catch (e) {
+    console.error("Failed to delete API key:", e);
+    throw e;
+  }
+}
+
+export async function getApiAuth(apiKey: string) {
+  try {
+    const data = await fs.readFile(SECRETS_FILE, "utf-8");
+    const secrets = JSON.parse(data);
+
+    if (secrets.apiKey !== apiKey) {
+      throw new Error("Invalid API Key");
+    }
+
+    const driveService = initDriveService(
+      {
+        client_id: secrets.clientId,
+        client_secret: secrets.clientSecret,
+        project_id: secrets.projectId,
+        redirect_uris: ["http://localhost:3000/oauth2callback"],
+      },
+      secrets.tokens
+    );
+
+    return { ...secrets, driveService };
+  } catch (error) {
+    throw new Error("API Authentication failed");
+  }
 }
 
 async function getOrCreateRootFolder() {
@@ -40,17 +154,17 @@ async function getOrCreateRootFolder() {
     // This is often more reliable than search queries for immediate consistency
     const response = await operations.listFoldersInFolder("root");
 
-    console.log(
-      "Root folders list:",
-      JSON.stringify(
-        response.data?.files?.map((f: any) => ({
-          name: f.name,
-          id: f.id,
-          mimeType: f.mimeType,
-          trashed: f.trashed,
-        }))
-      )
-    );
+    // console.log(
+    //   "Root folders list:",
+    //   JSON.stringify(
+    //     response.data?.files?.map((f: any) => ({
+    //       name: f.name,
+    //       id: f.id,
+    //       mimeType: f.mimeType,
+    //       trashed: f.trashed,
+    // }))
+    // )
+    // );
 
     const folder = response.data?.files?.find(
       (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
@@ -256,6 +370,23 @@ export async function getTableData(fileId: string) {
 
   const response = await driveService.selectJsonContent(fileId);
   return response as TableFile;
+}
+
+export async function getParentId(fileId: string) {
+  const { tokens, clientId, clientSecret, projectId } = await getAuth();
+
+  const driveService = initDriveService(
+    {
+      client_id: clientId,
+      client_secret: clientSecret,
+      project_id: projectId,
+      redirect_uris: ["http://localhost:3000/oauth2callback"],
+    },
+    tokens
+  );
+
+  const response = await driveService.getFile(fileId);
+  return response.data?.parents?.[0];
 }
 
 export async function updateTableSchema(formData: FormData) {

@@ -2,6 +2,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { listDatabases, createDatabase, deleteDatabase } from "../actions";
 
+import ApiAccess from "../../components/ApiAccess";
+import CopyButton from "../../components/CopyButton";
+
 export default async function Dashboard() {
   const cookieStore = await cookies();
   const tokensStr = cookieStore.get("gdrive_tokens")?.value;
@@ -23,7 +26,10 @@ export default async function Dashboard() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               Databases
             </h1>
-            <p className="text-neutral-400">Manage your NoSQL Databases</p>
+            <div className="flex items-center gap-4">
+              <p className="text-neutral-400">Manage your NoSQL Databases</p>
+              <ApiAccess />
+            </div>
           </div>
           <form action={createDatabase} className="flex gap-2">
             <input
@@ -73,6 +79,9 @@ export default async function Dashboard() {
                 <h3 className="font-medium truncate mb-1" title={file.name}>
                   {file.name}
                 </h3>
+                <div className="flex items-center gap-2 mb-4">
+                  <CopyButton text={file.id} label="Database ID" />
+                </div>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-neutral-800">
                   <a
                     href={`/dashboard/database/${file.id}`}
