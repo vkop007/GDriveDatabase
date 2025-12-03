@@ -26,6 +26,9 @@ export default function Sidebar({ treeData }: SidebarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [expandedDbs, setExpandedDbs] = useState<Set<string>>(new Set());
+  const [expandedCollections, setExpandedCollections] = useState<Set<string>>(
+    new Set()
+  );
 
   const toggleDb = (dbId: string) => {
     const newExpanded = new Set(expandedDbs);
@@ -35,6 +38,16 @@ export default function Sidebar({ treeData }: SidebarProps) {
       newExpanded.add(dbId);
     }
     setExpandedDbs(newExpanded);
+  };
+
+  const toggleCollection = (dbId: string) => {
+    const newExpanded = new Set(expandedCollections);
+    if (newExpanded.has(dbId)) {
+      newExpanded.delete(dbId);
+    } else {
+      newExpanded.add(dbId);
+    }
+    setExpandedCollections(newExpanded);
   };
 
   const toggleSidebar = () => setIsOpen(!isOpen);
@@ -111,30 +124,62 @@ export default function Sidebar({ treeData }: SidebarProps) {
 
                     {expandedDbs.has(db.id) && (
                       <div className="ml-4 pl-3 border-l border-neutral-800 mt-1 space-y-1">
-                        <Link
-                          href={`/dashboard/database/${db.id}`}
-                          className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                            pathname === `/dashboard/database/${db.id}`
-                              ? "text-purple-400 bg-purple-500/10"
-                              : "text-neutral-500 hover:text-white hover:bg-neutral-900"
-                          }`}
-                        >
-                          <span className="truncate">All Tables</span>
-                        </Link>
-                        {db.tables.map((table) => (
-                          <Link
-                            key={table.id}
-                            href={`/dashboard/table/${table.id}`}
-                            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
-                              pathname === `/dashboard/table/${table.id}`
+                        <div>
+                          <div
+                            className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors group ${
+                              pathname === `/dashboard/database/${db.id}`
                                 ? "text-purple-400 bg-purple-500/10"
                                 : "text-neutral-500 hover:text-white hover:bg-neutral-900"
                             }`}
                           >
-                            <Table className="w-3 h-3" />
-                            <span className="truncate">{table.name}</span>
-                          </Link>
-                        ))}
+                            <Link
+                              href={`/dashboard/database/${db.id}`}
+                              className="flex items-center gap-3 flex-1 min-w-0"
+                            >
+                              <span className="truncate font-medium">
+                                Collections
+                              </span>
+                            </Link>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                toggleCollection(db.id);
+                              }}
+                              className="p-1 hover:bg-neutral-800 rounded"
+                            >
+                              {expandedCollections.has(db.id) ? (
+                                <ChevronDown className="w-3 h-3" />
+                              ) : (
+                                <ChevronRight className="w-3 h-3" />
+                              )}
+                            </button>
+                          </div>
+
+                          {/* Nested Tables */}
+                          {expandedCollections.has(db.id) && (
+                            <div className="ml-4 pl-3 border-l border-neutral-800 mt-1 space-y-1">
+                              {db.tables.map((table) => (
+                                <Link
+                                  key={table.id}
+                                  href={`/dashboard/table/${table.id}`}
+                                  className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                                    pathname === `/dashboard/table/${table.id}`
+                                      ? "text-purple-400 bg-purple-500/10"
+                                      : "text-neutral-500 hover:text-white hover:bg-neutral-900"
+                                  }`}
+                                >
+                                  <Table className="w-3 h-3" />
+                                  <span className="truncate">{table.name}</span>
+                                </Link>
+                              ))}
+                              {db.tables.length === 0 && (
+                                <div className="px-3 py-2 text-xs text-neutral-600 italic">
+                                  No tables
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
