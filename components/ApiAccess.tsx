@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { generateApiKey } from "../app/actions";
-import { toast } from "sonner";
 
 export default function ApiAccess({
   databaseId,
@@ -11,7 +9,6 @@ export default function ApiAccess({
   databaseId?: string;
   tableId?: string;
 }) {
-  const [apiKey, setApiKey] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [origin, setOrigin] = useState("");
 
@@ -19,16 +16,6 @@ export default function ApiAccess({
     console.log("Its Calling: " + window.location.origin);
     setOrigin(window.location.origin);
   }, []);
-
-  const handleGenerate = async () => {
-    try {
-      const key = await generateApiKey();
-      setApiKey(key);
-      toast.success("API Key generated successfully");
-    } catch (error) {
-      toast.error("Failed to generate API Key");
-    }
-  };
 
   if (!isOpen) {
     return (

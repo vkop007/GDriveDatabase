@@ -80,8 +80,8 @@ export async function createTable(formData: FormData) {
       await moveFile(result.data.id, parentId);
       console.log("Move successful");
     } else {
-      console.error("Failed to create file:", result.error);
-      throw new Error(`Failed to create file: ${result.error}`);
+      console.error("Failed to create file:", (result as any).error);
+      throw new Error(`Failed to create file: ${(result as any).error}`);
     }
   } catch (error) {
     console.error("Error creating table:", error);
