@@ -291,15 +291,35 @@ export async function deleteDatabase(formData: FormData) {
 export async function listCollections(databaseId: string) {
   try {
     await getAuth();
-    console.log(`Listing collections in ${databaseId}...`);
+    // console.log(`Listing collections in ${databaseId}...`);
     const response = await operations.listFilesInFolder(databaseId);
-    console.log("List response count:", response.data?.files?.length);
+    // console.log("List response count:", response.data?.files?.length);
     // Filter for JSON files just in case, though listFilesInFolder might return all types
     return (response.data?.files || []).filter(
       (f: any) => f.mimeType === "application/json"
     );
   } catch (error) {
     console.error("Error listing collections:", error);
+    return [];
+  }
+}
+
+export async function getDatabaseTree() {
+  try {
+    const databases = await listDatabases();
+    const tree = await Promise.all(
+      databases.map(async (db: any) => {
+        const tables = await listCollections(db.id);
+        return {
+          id: db.id,
+          name: db.name,
+          tables: tables.map((t: any) => ({ id: t.id, name: t.name })),
+        };
+      })
+    );
+    return tree;
+  } catch (error) {
+    console.error("Error fetching database tree:", error);
     return [];
   }
 }
