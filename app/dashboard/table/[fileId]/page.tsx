@@ -1,8 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getTableData } from "../../../actions";
+import { getTableData, getParentId } from "../../../actions";
 import ColumnsView from "././columns";
 import DataView from "././data";
+import ApiAccess from "../../../../components/ApiAccess";
 
 export default async function TablePage({
   params,
@@ -22,6 +23,7 @@ export default async function TablePage({
   }
 
   const table = await getTableData(fileId);
+  const parentId = await getParentId(fileId);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-8">
@@ -41,6 +43,9 @@ export default async function TablePage({
             <h1 className="text-3xl font-bold bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               {table.name}
             </h1>
+            <div className="mt-2">
+              <ApiAccess databaseId={parentId} tableId={fileId} />
+            </div>
           </div>
         </header>
 
