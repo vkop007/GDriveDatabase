@@ -496,6 +496,40 @@ export async function deleteCollection(formData: FormData) {
   redirect(`/dashboard/database/${parentId}`);
 }
 
+export async function createDocument(formData: FormData) {
+  const filename = formData.get("filename") as string;
+  const content = formData.get("content") as string;
+
+  if (!filename || !content) {
+    throw new Error("Missing parameters");
+  }
+
+  let jsonContent;
+  try {
+    jsonContent = JSON.parse(content);
+  } catch (e) {
+    throw new Error("Invalid JSON content");
+  }
+
+  await getAuth();
+
+  try {
+    const rootId = await getOrCreateRootFolder();
+    const result = await operations.createJsonFile(jsonContent, filename);
+
+    if (result.success && result.data.id) {
+      await moveFile(result.data.id, rootId);
+    } else {
+      throw new Error((result as any).error || "Failed to create file");
+    }
+  } catch (error) {
+    console.error("Error creating document:", error);
+    throw error;
+  }
+
+  redirect("/dashboard");
+}
+
 // Keeping saveDocument for generic JSON editing if needed, but might not be used for Tables
 export async function saveDocument(formData: FormData) {
   // ... existing implementation or deprecated
