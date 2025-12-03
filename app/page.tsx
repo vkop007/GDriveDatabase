@@ -9,7 +9,7 @@ export default function Home() {
 
       <div className="z-10 w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tighter bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold tracking-tighter bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
             NoSQL Drive DB
           </h1>
           <p className="text-neutral-400">
