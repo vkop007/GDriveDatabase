@@ -6,6 +6,7 @@ import CopyButton from "./CopyButton";
 import CreateTableModal from "./CreateTableModal";
 import SearchInput from "./SearchInput";
 import { deleteCollection } from "../app/actions";
+import Link from "next/link";
 
 interface DatabaseViewProps {
   initialTables: any[];
@@ -30,12 +31,12 @@ export default function DatabaseView({
         <header className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <a
+              <Link
                 href="/dashboard"
                 className="text-neutral-400 hover:text-white transition-colors"
               >
                 Databases
-              </a>
+              </Link>
               <span className="text-neutral-600">/</span>
               <span className="text-purple-400">Collections</span>
             </div>
@@ -97,12 +98,12 @@ export default function DatabaseView({
                   <CopyButton text={file.id} label="Collection ID" />
                 </div>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-neutral-800">
-                  <a
+                  <Link
                     href={`/dashboard/table/${file.id}`}
                     className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors"
                   >
                     Open Table
-                  </a>
+                  </Link>
                   <form action={deleteCollection}>
                     <input type="hidden" name="fileId" value={file.id} />
                     <input type="hidden" name="parentId" value={databaseId} />

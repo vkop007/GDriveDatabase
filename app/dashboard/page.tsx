@@ -14,6 +14,7 @@ export default async function Dashboard() {
     redirect("/");
   }
 
+  // ✅ Now returns cached data (after first call)
   const files = await listDatabases();
 
   return <DashboardView initialDatabases={files} />;

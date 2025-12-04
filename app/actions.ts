@@ -3,6 +3,7 @@
 import { operations, initDriveService } from "gdrivekit";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { unstable_cache, revalidateTag, revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 
@@ -150,21 +151,7 @@ async function getOrCreateRootFolder() {
   await getAuth();
 
   try {
-    // List all folders in the root directory
-    // This is often more reliable than search queries for immediate consistency
     const response = await operations.listFoldersInFolder("root");
-
-    // console.log(
-    //   "Root folders list:",
-    //   JSON.stringify(
-    //     response.data?.files?.map((f: any) => ({
-    //       name: f.name,
-    //       id: f.id,
-    //       mimeType: f.mimeType,
-    //       trashed: f.trashed,
-    // }))
-    // )
-    // );
 
     const folder = response.data?.files?.find(
       (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
@@ -176,8 +163,6 @@ async function getOrCreateRootFolder() {
     }
   } catch (error) {
     console.error("Error listing root folders:", error);
-    // Fallback to search if list fails? Or just proceed to create?
-    // Let's try search as a backup if list fails, but list should work for 'root'
   }
 
   console.log("Creating new root folder");
@@ -240,9 +225,41 @@ export async function authenticateWithGoogle(formData: FormData) {
   }
 }
 
-export async function listDatabases() {
+// Helper to get root folder ID using driveService instance
+async function _getOrCreateRootFolder() {
   try {
-    const rootId = await getOrCreateRootFolder();
+    const response = await operations.listFoldersInFolder("root");
+    const folder = response.data?.files?.find(
+      (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
+    );
+
+    if (folder) {
+      return folder.id;
+    }
+  } catch (error) {
+    console.error("Error listing root folders:", error);
+  }
+
+  console.log("Creating new root folder");
+  const createResponse = await operations.createFolder(ROOT_FOLDER_NAME);
+  return createResponse.data.id;
+}
+
+// Internal fetch function for databases
+async function _listDatabases(auth: any) {
+  initDriveService(
+    {
+      client_id: auth.clientId,
+      client_secret: auth.clientSecret,
+      project_id: auth.projectId,
+      redirect_uris: ["http://localhost:3000/oauth2callback"],
+    },
+    auth.tokens
+  );
+
+  try {
+    console.log("Fetching databases from Drive...");
+    const rootId = await _getOrCreateRootFolder();
     const response = await operations.listFoldersInFolder(rootId);
     return response.data?.files || [];
   } catch (error) {
@@ -250,6 +267,15 @@ export async function listDatabases() {
     return [];
   }
 }
+
+export const listDatabases = async () => {
+  const auth = await getAuth();
+  return unstable_cache(
+    async () => _listDatabases(auth),
+    ["databases", auth.tokens.refresh_token], // Use refresh token as stable user ID
+    { revalidate: 3600, tags: ["databases"] }
+  )();
+};
 
 export async function createDatabase(formData: FormData) {
   const name = formData.get("name") as string;
@@ -266,35 +292,37 @@ export async function createDatabase(formData: FormData) {
     throw error;
   }
 
+  revalidateTag("databases", { expire: 0 });
+  revalidateTag("database-tree", { expire: 0 });
   redirect("/dashboard");
 }
 
 export async function deleteDatabase(formData: FormData) {
   const fileId = formData.get("fileId") as string;
-
-  if (!fileId) {
-    throw new Error("Missing fileId");
-  }
+  if (!fileId) throw new Error("Missing fileId");
 
   await getAuth();
-
-  try {
-    await operations.deleteFile(fileId);
-  } catch (error) {
-    console.error("Error deleting database:", error);
-    throw error;
-  }
-
+  await operations.deleteFile(fileId);
+  revalidateTag("databases", { expire: 0 });
+  revalidateTag("database-tree", { expire: 0 });
   redirect("/dashboard");
 }
 
-export async function listCollections(databaseId: string) {
+// Internal fetch for collections
+async function _listCollections(databaseId: string, auth: any) {
+  initDriveService(
+    {
+      client_id: auth.clientId,
+      client_secret: auth.clientSecret,
+      project_id: auth.projectId,
+      redirect_uris: ["http://localhost:3000/oauth2callback"],
+    },
+    auth.tokens
+  );
+
   try {
-    await getAuth();
-    // console.log(`Listing collections in ${databaseId}...`);
+    console.log(`Fetching collections for ${databaseId}...`);
     const response = await operations.listFilesInFolder(databaseId);
-    // console.log("List response count:", response.data?.files?.length);
-    // Filter for JSON files just in case, though listFilesInFolder might return all types
     return (response.data?.files || []).filter(
       (f: any) => f.mimeType === "application/json"
     );
@@ -304,29 +332,46 @@ export async function listCollections(databaseId: string) {
   }
 }
 
-export async function getDatabaseTree() {
-  try {
-    const databases = await listDatabases();
-    const tree = await Promise.all(
-      databases.map(async (db: any) => {
-        const tables = await listCollections(db.id);
-        return {
-          id: db.id,
-          name: db.name,
-          tables: tables.map((t: any) => ({ id: t.id, name: t.name })),
-        };
-      })
-    );
-    return tree;
-  } catch (error) {
-    console.error("Error fetching database tree:", error);
-    return [];
-  }
-}
+export const listCollections = async (databaseId: string) => {
+  const auth = await getAuth();
+  return unstable_cache(
+    async () => _listCollections(databaseId, auth),
+    [`collections-${databaseId}`, auth.tokens.refresh_token],
+    { revalidate: 3600, tags: [`collections-${databaseId}`] }
+  )();
+};
+
+export const getDatabaseTree = async () => {
+  const auth = await getAuth();
+  return unstable_cache(
+    async () => {
+      try {
+        console.log("Fetching database tree...");
+        // Use internal functions to avoid calling getAuth() again
+        const databases = await _listDatabases(auth);
+        const tree = await Promise.all(
+          databases.map(async (db: any) => {
+            const tables = await _listCollections(db.id, auth);
+            return {
+              id: db.id,
+              name: db.name,
+              tables: tables.map((t: any) => ({ id: t.id, name: t.name })),
+            };
+          })
+        );
+        return tree;
+      } catch (error) {
+        console.error("Error fetching database tree:", error);
+        return [];
+      }
+    },
+    ["database-tree", auth.tokens.refresh_token],
+    { revalidate: 3600, tags: ["database-tree"] }
+  )();
+};
 
 import { ColumnDefinition, RowData, TableFile } from "../types";
-
-import { revalidatePath } from "next/cache";
+import { cache } from "react";
 
 export async function createTable(formData: FormData) {
   const name = formData.get("name") as string;
@@ -371,26 +416,39 @@ export async function createTable(formData: FormData) {
     throw error;
   }
 
+  revalidateTag(`collections-${parentId}`, { expire: 0 });
+  revalidateTag("database-tree", { expire: 0 });
   revalidatePath(`/dashboard/database/${parentId}`);
   redirect(`/dashboard/database/${parentId}`);
 }
 
-export async function getTableData(fileId: string) {
-  const { tokens, clientId, clientSecret, projectId } = await getAuth();
-
+// Internal fetch for table data
+async function _getTableData(fileId: string, auth: any) {
   const driveService = initDriveService(
     {
-      client_id: clientId,
-      client_secret: clientSecret,
-      project_id: projectId,
+      client_id: auth.clientId,
+      client_secret: auth.clientSecret,
+      project_id: auth.projectId,
       redirect_uris: ["http://localhost:3000/oauth2callback"],
     },
-    tokens
+    auth.tokens
   );
 
   const response = await driveService.selectJsonContent(fileId);
   return response as TableFile;
 }
+
+export const getTableData = async (fileId: string) => {
+  const auth = await getAuth();
+  return unstable_cache(
+    async () => {
+      console.log(`Fetching table data for ${fileId}...`);
+      return _getTableData(fileId, auth);
+    },
+    [`table-data-${fileId}`, auth.tokens.refresh_token],
+    { revalidate: 3600, tags: [`table-data-${fileId}`] }
+  )();
+};
 
 export async function getParentId(fileId: string) {
   const { tokens, clientId, clientSecret, projectId } = await getAuth();
@@ -449,7 +507,7 @@ export async function updateTableSchema(formData: FormData) {
 
   await saveTableContent(fileId, table);
 
-  // Revalidate path? For now just redirect back
+  revalidateTag(`table-data-${fileId}`, { expire: 0 });
   redirect(`/dashboard/table/${fileId}?tab=columns`);
 }
 
@@ -486,6 +544,7 @@ export async function addDocument(formData: FormData) {
   table.documents.push(newDoc);
   await saveTableContent(fileId, table);
 
+  revalidateTag(`table-data-${fileId}`, { expire: 0 });
   redirect(`/dashboard/table/${fileId}?tab=data`);
 }
 
@@ -501,6 +560,7 @@ export async function deleteDocument(formData: FormData) {
   table.documents = table.documents.filter((d) => d.$id !== docId);
 
   await saveTableContent(fileId, table);
+  revalidateTag(`table-data-${fileId}`, { expire: 0 });
   redirect(`/dashboard/table/${fileId}?tab=data`);
 }
 
@@ -644,6 +704,8 @@ export async function deleteCollection(formData: FormData) {
     throw error;
   }
 
+  revalidateTag(`collections-${parentId}`, { expire: 0 });
+  revalidateTag("database-tree", { expire: 0 });
   redirect(`/dashboard/database/${parentId}`);
 }
 
@@ -693,5 +755,6 @@ export async function saveDocument(formData: FormData) {
   }
 
   await saveTableContent(fileId, JSON.parse(content));
+  revalidateTag(`table-data-${fileId}`, { expire: 0 });
   return { success: true };
 }

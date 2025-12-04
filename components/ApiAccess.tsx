@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect } from "react";
 
 export default function ApiAccess({
@@ -83,12 +84,12 @@ export default function ApiAccess({
               <p className="text-sm text-neutral-400 mb-3">
                 Manage your API Key in Settings
               </p>
-              <a
+              <Link
                 href="/dashboard/settings"
                 className="inline-block bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
               >
                 Go to Settings
-              </a>
+              </Link>
             </div>
           </div>
         </div>

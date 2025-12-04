@@ -4,6 +4,7 @@ import { getTableData, getParentId } from "../../../actions";
 import ColumnsView from "././columns";
 import DataView from "././data";
 import ApiAccess from "../../../../components/ApiAccess";
+import Link from "next/link";
 
 export default async function TablePage({
   params,
@@ -31,12 +32,12 @@ export default async function TablePage({
         <header className="flex items-center justify-between">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <a
+              <Link
                 href="/dashboard"
                 className="text-neutral-400 hover:text-white transition-colors"
               >
                 Databases
-              </a>
+              </Link>
               <span className="text-neutral-600">/</span>
               <span className="text-purple-400">Table</span>
             </div>
@@ -52,7 +53,7 @@ export default async function TablePage({
         {/* Tabs */}
         <div className="border-b border-neutral-800">
           <div className="flex gap-8">
-            <a
+            <Link
               href={`/dashboard/table/${fileId}?tab=data`}
               className={`pb-4 text-sm font-medium transition-colors relative ${
                 tab === "data"
@@ -64,8 +65,8 @@ export default async function TablePage({
               {tab === "data" && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500" />
               )}
-            </a>
-            <a
+            </Link>
+            <Link
               href={`/dashboard/table/${fileId}?tab=columns`}
               className={`pb-4 text-sm font-medium transition-colors relative ${
                 tab === "columns"
@@ -77,8 +78,8 @@ export default async function TablePage({
               {tab === "columns" && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500" />
               )}
-            </a>
-            <a
+            </Link>
+            <Link
               href={`/dashboard/table/${fileId}?tab=settings`}
               className={`pb-4 text-sm font-medium transition-colors relative ${
                 tab === "settings"
@@ -90,7 +91,7 @@ export default async function TablePage({
               {tab === "settings" && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-500" />
               )}
-            </a>
+            </Link>
           </div>
         </div>
 

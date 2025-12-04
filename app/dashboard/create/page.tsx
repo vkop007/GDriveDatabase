@@ -1,10 +1,11 @@
+import Link from "next/link";
 import { createDocument } from "../../actions";
 
 export default function CreateDocument() {
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-8 flex items-center justify-center">
       <div className="w-full max-w-2xl bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
-        <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold mb-6 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
           Create New Document
         </h1>
 
@@ -47,16 +48,16 @@ export default function CreateDocument() {
           <div className="flex gap-4">
             <button
               type="submit"
-              className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium py-3 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/25"
+              className="flex-1 bg-linear-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium py-3 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/25"
             >
               Create Document
             </button>
-            <a
+            <Link
               href="/dashboard"
               className="px-6 py-3 rounded-lg border border-neutral-800 hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-white"
             >
               Cancel
-            </a>
+            </Link>
           </div>
         </form>
       </div>
