@@ -24,14 +24,14 @@ export default function DashboardView({
     : initialDatabases;
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white p-8">
+    <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        <header className="flex items-center justify-between">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
               Databases
             </h1>
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-4 mt-2">
               <p className="text-neutral-400">Manage your NoSQL Databases</p>
               <ApiAccess />
               <Link
@@ -42,7 +42,7 @@ export default function DashboardView({
               </Link>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             <SearchInput
               placeholder="Search databases..."
               value={searchQuery}

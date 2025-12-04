@@ -27,9 +27,9 @@ export default async function TablePage({
   const parentId = await getParentId(fileId);
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white p-8">
+    <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        <header className="flex items-center justify-between">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Link
@@ -51,7 +51,7 @@ export default async function TablePage({
         </header>
 
         {/* Tabs */}
-        <div className="border-b border-neutral-800">
+        <div className="border-b border-neutral-800 overflow-x-auto">
           <div className="flex gap-8">
             <Link
               href={`/dashboard/table/${fileId}?tab=data`}
