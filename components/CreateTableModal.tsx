@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Modal from "./Modal";
-import { createTable } from "../app/actions";
+import { createTable } from "../app/actions/table";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface CreateTableModalProps {
   parentId: string;
@@ -13,13 +15,25 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const router = useRouter();
+
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
     try {
-      await createTable(formData);
-      setIsOpen(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = (await createTable(formData)) as any;
+      if (result?.success) {
+        toast.success("Table created successfully");
+        setIsOpen(false);
+        router.refresh();
+      } else {
+        throw new Error(result?.error || "Failed to create table");
+      }
     } catch (error) {
       console.error("Failed to create table", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create table"
+      );
     } finally {
       setIsLoading(false);
     }

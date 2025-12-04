@@ -7,6 +7,9 @@ import { unstable_cache, revalidateTag, revalidatePath } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 
+import { createTable } from "./actions/table";
+import { moveFile } from "../lib/gdrive/operations";
+
 const ROOT_FOLDER_NAME = "GDriveDatabase";
 const SECRETS_FILE = path.join(process.cwd(), "api-secrets.json");
 
@@ -279,6 +282,11 @@ export const listDatabases = async () => {
 
 export async function createDatabase(formData: FormData) {
   const name = formData.get("name") as string;
+  const checkExists = await operations.listFoldersByName(name);
+
+  if (checkExists.data?.files?.length > 0) {
+    throw new Error("Database with this name already exists");
+  }
 
   if (!name) {
     throw new Error("Missing database name");
@@ -289,12 +297,12 @@ export async function createDatabase(formData: FormData) {
     await operations.createFolder(name, rootId);
   } catch (error) {
     console.error("Error creating database:", error);
-    throw error;
+    return { success: false, error: "Failed to create database" };
   }
 
   revalidateTag("databases", { expire: 0 });
   revalidateTag("database-tree", { expire: 0 });
-  redirect("/dashboard");
+  return { success: true };
 }
 
 export async function deleteDatabase(formData: FormData) {
@@ -369,314 +377,6 @@ export const getDatabaseTree = async () => {
     { revalidate: 3600, tags: ["database-tree"] }
   )();
 };
-
-import { ColumnDefinition, RowData, TableFile } from "../types";
-import { cache } from "react";
-
-export async function createTable(formData: FormData) {
-  const name = formData.get("name") as string;
-  const parentId = formData.get("parentId") as string;
-
-  if (!name || !parentId) {
-    throw new Error("Missing name or parentId");
-  }
-
-  await getAuth();
-
-  try {
-    const defaultSchema: ColumnDefinition[] = [
-      { key: "$id", type: "string", required: true },
-      { key: "$createdAt", type: "datetime", required: true },
-      { key: "$updatedAt", type: "datetime", required: true },
-    ];
-
-    const initialContent: TableFile = {
-      name,
-      schema: defaultSchema,
-      documents: [],
-    };
-
-    console.log(`Creating table '${name}' in parent '${parentId}'...`);
-    const result = await operations.createJsonFile(initialContent, name);
-    console.log("Create result:", JSON.stringify(result));
-
-    if (result.success && result.data.id) {
-      console.log(`Moving file ${result.data.id} to ${parentId}...`);
-      // Use custom moveFile instead of operations.moveFile
-      await moveFile(result.data.id, parentId);
-      console.log("Move successful");
-    } else {
-      console.error("Failed to create file:", result);
-      throw new Error(
-        `Failed to create file: ${(result as any).error || "Unknown error"}`
-      );
-    }
-  } catch (error) {
-    console.error("Error creating table:", error);
-    throw error;
-  }
-
-  revalidateTag(`collections-${parentId}`, { expire: 0 });
-  revalidateTag("database-tree", { expire: 0 });
-  revalidatePath(`/dashboard/database/${parentId}`);
-  redirect(`/dashboard/database/${parentId}`);
-}
-
-// Internal fetch for table data
-async function _getTableData(fileId: string, auth: any) {
-  const driveService = initDriveService(
-    {
-      client_id: auth.clientId,
-      client_secret: auth.clientSecret,
-      project_id: auth.projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
-    },
-    auth.tokens
-  );
-
-  const response = await driveService.selectJsonContent(fileId);
-  return response as TableFile;
-}
-
-export const getTableData = async (fileId: string) => {
-  const auth = await getAuth();
-  return unstable_cache(
-    async () => {
-      console.log(`Fetching table data for ${fileId}...`);
-      return _getTableData(fileId, auth);
-    },
-    [`table-data-${fileId}`, auth.tokens.refresh_token],
-    { revalidate: 3600, tags: [`table-data-${fileId}`] }
-  )();
-};
-
-export async function getParentId(fileId: string) {
-  const { tokens, clientId, clientSecret, projectId } = await getAuth();
-
-  const driveService = initDriveService(
-    {
-      client_id: clientId,
-      client_secret: clientSecret,
-      project_id: projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
-    },
-    tokens
-  );
-
-  const response = await driveService.getFile(fileId);
-  return response.data?.parents?.[0];
-}
-
-export async function updateTableSchema(formData: FormData) {
-  const fileId = formData.get("fileId") as string;
-  const key = formData.get("key") as string;
-  const type = formData.get("type") as any;
-  const required = formData.get("required") === "on";
-  const isArray = formData.get("array") === "on";
-  const defaultValue = formData.get("default") as string;
-
-  if (!fileId || !key || !type) {
-    throw new Error("Missing parameters");
-  }
-
-  const table = await getTableData(fileId);
-
-  // Check if column already exists
-  if (table.schema.some((c) => c.key === key)) {
-    throw new Error("Column already exists");
-  }
-
-  const newColumn: ColumnDefinition = {
-    key,
-    type,
-    required,
-    array: isArray,
-    default: defaultValue || undefined,
-  };
-
-  table.schema.push(newColumn);
-
-  // Update all existing documents with default value if provided
-  if (defaultValue !== undefined) {
-    table.documents.forEach((doc) => {
-      if (doc[key] === undefined) {
-        doc[key] = defaultValue;
-      }
-    });
-  }
-
-  await saveTableContent(fileId, table);
-
-  revalidateTag(`table-data-${fileId}`, { expire: 0 });
-  redirect(`/dashboard/table/${fileId}?tab=columns`);
-}
-
-export async function addDocument(formData: FormData) {
-  const fileId = formData.get("fileId") as string;
-  const dataStr = formData.get("data") as string;
-
-  if (!fileId || !dataStr) {
-    throw new Error("Missing parameters");
-  }
-
-  const data = JSON.parse(dataStr);
-  const table = await getTableData(fileId);
-
-  const newDoc: RowData = {
-    $id: crypto.randomUUID(),
-    $createdAt: new Date().toISOString(),
-    $updatedAt: new Date().toISOString(),
-    ...data,
-  };
-
-  // Validate against schema (basic validation)
-  for (const col of table.schema) {
-    if (
-      col.required &&
-      newDoc[col.key] === undefined &&
-      !col.key.startsWith("$")
-    ) {
-      // Allow missing if it has a default? Logic handled in UI mostly, but good to check
-      // For now, we trust the UI/Input
-    }
-  }
-
-  table.documents.push(newDoc);
-  await saveTableContent(fileId, table);
-
-  revalidateTag(`table-data-${fileId}`, { expire: 0 });
-  redirect(`/dashboard/table/${fileId}?tab=data`);
-}
-
-export async function deleteDocument(formData: FormData) {
-  const fileId = formData.get("fileId") as string;
-  const docId = formData.get("docId") as string;
-
-  if (!fileId || !docId) {
-    throw new Error("Missing parameters");
-  }
-
-  const table = await getTableData(fileId);
-  table.documents = table.documents.filter((d) => d.$id !== docId);
-
-  await saveTableContent(fileId, table);
-  revalidateTag(`table-data-${fileId}`, { expire: 0 });
-  redirect(`/dashboard/table/${fileId}?tab=data`);
-}
-
-// Helper to save the entire table content
-async function saveTableContent(fileId: string, content: TableFile) {
-  const { tokens, clientId, clientSecret, projectId } = await getAuth();
-
-  const driveService = initDriveService(
-    {
-      client_id: clientId,
-      client_secret: clientSecret,
-      project_id: projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
-    },
-    tokens
-  );
-
-  await driveService.updateJsonContent(fileId, content);
-}
-
-// Custom move file implementation to bypass gdrivekit issue
-async function moveFile(fileId: string, folderId: string) {
-  let { tokens, clientId, clientSecret } = await getAuth();
-
-  const makeRequest = async (accessToken: string) => {
-    // First we need to get the current parents to remove them
-    const getResponse = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-
-    if (getResponse.status === 401) {
-      return { status: 401 };
-    }
-
-    if (!getResponse.ok) {
-      throw new Error(`Failed to get file parents: ${getResponse.statusText}`);
-    }
-
-    const fileData = await getResponse.json();
-    const previousParents = fileData.parents?.join(",") || "";
-
-    // Now move the file
-    const moveResponse = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}?addParents=${folderId}&removeParents=${previousParents}`,
-      {
-        method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
-
-    if (moveResponse.status === 401) {
-      return { status: 401 };
-    }
-
-    if (!moveResponse.ok) {
-      const errorText = await moveResponse.text();
-      throw new Error(`Failed to move file: ${errorText}`);
-    }
-
-    return { status: 200, success: true };
-  };
-
-  let result = await makeRequest(tokens.access_token);
-
-  if (result.status === 401) {
-    console.log("Access token expired, refreshing...");
-    if (!tokens.refresh_token) {
-      throw new Error("Access token expired and no refresh token available");
-    }
-
-    const refreshResponse = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
-        refresh_token: tokens.refresh_token,
-        grant_type: "refresh_token",
-      }),
-    });
-
-    if (!refreshResponse.ok) {
-      const errorText = await refreshResponse.text();
-      throw new Error(`Failed to refresh token: ${errorText}`);
-    }
-
-    const newTokens = await refreshResponse.json();
-
-    // Merge new tokens with old ones (to keep refresh_token if not returned)
-    const updatedTokens = { ...tokens, ...newTokens };
-
-    // Update cookie
-    const cookieStore = await cookies();
-    cookieStore.set("gdrive_tokens", JSON.stringify(updatedTokens), {
-      secure: process.env.NODE_ENV === "production",
-      httpOnly: true,
-    });
-
-    // Retry with new token
-    console.log("Retrying move with new token...");
-    result = await makeRequest(updatedTokens.access_token);
-
-    if (result.status === 401) {
-      throw new Error("Still unauthorized after token refresh");
-    }
-  }
-
-  return { success: true };
-}
 
 // Re-export listCollections as listTables for clarity (optional, or just alias)
 export { listCollections as listTables };
@@ -754,7 +454,18 @@ export async function saveDocument(formData: FormData) {
     throw new Error("Missing parameters");
   }
 
-  await saveTableContent(fileId, JSON.parse(content));
+  const { tokens, clientId, clientSecret, projectId } = await getAuth();
+  const driveService = initDriveService(
+    {
+      client_id: clientId,
+      client_secret: clientSecret,
+      project_id: projectId,
+      redirect_uris: ["http://localhost:3000/oauth2callback"],
+    },
+    tokens
+  );
+
+  await driveService.updateJsonContent(fileId, JSON.parse(content));
   revalidateTag(`table-data-${fileId}`, { expire: 0 });
   return { success: true };
 }

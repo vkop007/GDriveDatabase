@@ -1,21 +1,35 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Modal from "./Modal";
 import { createDatabase } from "../app/actions";
 import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function CreateDatabaseModal() {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const router = useRouter();
+
   const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
     try {
-      await createDatabase(formData);
-      setIsOpen(false);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = (await createDatabase(formData)) as any;
+      if (result?.success) {
+        toast.success("Database created successfully");
+        setIsOpen(false);
+        router.refresh();
+      } else {
+        throw new Error(result?.error || "Failed to create database");
+      }
     } catch (error) {
       console.error("Failed to create database", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create database"
+      );
     } finally {
       setIsLoading(false);
     }
