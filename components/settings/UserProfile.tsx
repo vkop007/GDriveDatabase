@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { UserProfile as UserProfileType } from "../../actions/user";
+import { UserProfile as UserProfileType } from "../../app/actions/user";
 
 interface UserProfileProps {
   user: UserProfileType | null;
@@ -15,12 +15,11 @@ export default function UserProfile({ user }: UserProfileProps) {
       <div className="flex items-center gap-6">
         {/* Profile Picture */}
         <div className="relative group w-20 h-20">
-          <div className="absolute -inset-0.5 bg-linear-to-r from-purple-500 to-blue-500 rounded-full opacity-75 group-hover:opacity-100 transition duration-200 blur-sm"></div>
           <Image
             src={user.picture}
             alt={user.name}
             fill
-            className="rounded-full object-cover border-2 border-neutral-900"
+            className="rounded-full object-cover border border-gray-400"
           />
         </div>
 

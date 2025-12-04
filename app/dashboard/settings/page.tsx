@@ -1,7 +1,7 @@
 import { getApiKey } from "../../actions";
 import { getUserProfile } from "../../actions/user";
-import ApiSettings from "./ApiSettings";
-import UserProfile from "./UserProfile";
+import ApiSettings from "../../../components/settings/ApiSettings";
+import UserProfile from "../../../components/settings/UserProfile";
 
 export default async function SettingsPage() {
   const apiKey = await getApiKey();

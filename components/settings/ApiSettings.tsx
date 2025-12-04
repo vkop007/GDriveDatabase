@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { generateApiKey, deleteApiKey } from "../../actions";
+import { generateApiKey, deleteApiKey } from "../../app/actions";
 import { toast } from "sonner";
-import CopyButton from "../../../components/CopyButton";
+import CopyButton from "../CopyButton";
 
 interface ApiSettingsProps {
   initialApiKey: string | null;

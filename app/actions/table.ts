@@ -4,7 +4,7 @@ import { operations, initDriveService } from "gdrivekit";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getAuth } from "../../lib/gdrive/auth";
-import { moveFile } from "../../lib/gdrive/operations";
+import { moveFile, createFileInFolder } from "../../lib/gdrive/operations";
 
 // Types for Table Structure
 export interface ColumnDefinition {
@@ -71,25 +71,24 @@ export async function createTable(formData: FormData) {
     };
 
     console.log(`Creating table '${name}' in parent '${parentId}'...`);
-    const result = await operations.createJsonFile(initialContent, name);
+    // Use optimized single-call creation
+    const result = await createFileInFolder(parentId, name, initialContent);
     console.log("Create result:", JSON.stringify(result));
 
-    if (result.success && result.data.id) {
-      console.log(`Moving file ${result.data.id} to ${parentId}...`);
-      // Use custom moveFile instead of operations.moveFile
-      await moveFile(result.data.id, parentId);
-      console.log("Move successful");
-    } else {
+    if (!result.success || !result.data?.id) {
       console.error("Failed to create file:", (result as any).error);
       throw new Error(`Failed to create file: ${(result as any).error}`);
     }
   } catch (error) {
     console.error("Error creating table:", error);
-    throw error;
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 
   revalidatePath(`/dashboard/database/${parentId}`);
-  redirect(`/dashboard/database/${parentId}`);
+  return { success: true };
 }
 
 export async function getTableData(fileId: string) {
@@ -150,7 +149,7 @@ export async function updateTableSchema(formData: FormData) {
   await saveTableContent(fileId, table);
 
   // Revalidate path? For now just redirect back
-  redirect(`/dashboard/table/${fileId}?tab=columns`);
+  return { success: true };
 }
 
 export async function addDocument(formData: FormData) {
@@ -183,10 +182,14 @@ export async function addDocument(formData: FormData) {
     }
   }
 
-  table.documents.push(newDoc);
-  await saveTableContent(fileId, table);
-
-  redirect(`/dashboard/table/${fileId}?tab=data`);
+  try {
+    table.documents.push(newDoc);
+    await saveTableContent(fileId, table);
+    return { success: true };
+  } catch (error) {
+    console.error("Error adding document:", error);
+    return { success: false, error: "Failed to add document" };
+  }
 }
 
 export async function deleteDocument(formData: FormData) {
@@ -201,7 +204,8 @@ export async function deleteDocument(formData: FormData) {
   table.documents = table.documents.filter((d) => d.$id !== docId);
 
   await saveTableContent(fileId, table);
-  redirect(`/dashboard/table/${fileId}?tab=data`);
+  await saveTableContent(fileId, table);
+  return { success: true };
 }
 
 // Helper to save the entire table content

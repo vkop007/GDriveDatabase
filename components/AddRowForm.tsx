@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { addDocument } from "../app/actions";
+import { useRouter } from "next/navigation";
+import { addDocument } from "../app/actions/table";
 import { ColumnDefinition } from "../types";
+import { toast } from "sonner";
 
 export default function AddRowForm({
   fileId,
@@ -12,6 +14,7 @@ export default function AddRowForm({
   schema: ColumnDefinition[];
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
   const inputColumns = schema.filter((col) => !col.key.startsWith("$"));
 
   if (!isOpen) {
@@ -67,7 +70,7 @@ export default function AddRowForm({
           action={async () => {
             // Action logic handled in onSubmit
           }}
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
             const form = e.currentTarget;
             const formData = new FormData(form);
@@ -92,10 +95,23 @@ export default function AddRowForm({
             submissionData.append("fileId", fileId);
             submissionData.append("data", JSON.stringify(data));
 
-            addDocument(submissionData).then(() => {
-              setIsOpen(false);
-              form.reset();
-            });
+            try {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const result = (await addDocument(submissionData)) as any;
+              if (result?.success) {
+                toast.success("Row added successfully");
+                setIsOpen(false);
+                form.reset();
+                router.refresh();
+              } else {
+                throw new Error(result?.error || "Failed to add row");
+              }
+            } catch (error) {
+              console.error("Failed to add row", error);
+              toast.error(
+                error instanceof Error ? error.message : "Failed to add row"
+              );
+            }
           }}
           className="p-6 space-y-6"
         >
