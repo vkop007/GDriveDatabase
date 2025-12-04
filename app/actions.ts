@@ -10,7 +10,7 @@ import path from "path";
 const ROOT_FOLDER_NAME = "GDriveDatabase";
 const SECRETS_FILE = path.join(process.cwd(), "api-secrets.json");
 
-async function getAuth() {
+export async function getAuth() {
   const cookieStore = await cookies();
   const tokensStr = cookieStore.get("gdrive_tokens")?.value;
   const clientId = cookieStore.get("gdrive_client_id")?.value;
@@ -183,7 +183,7 @@ export async function authenticateWithGoogle(formData: FormData) {
   let authUrl;
   try {
     // Construct Auth URL manually to avoid gdrivekit's CLI-centric behavior
-    const scope = "https://www.googleapis.com/auth/drive";
+    const scope = "https://www.googleapis.com/auth/drive email profile";
     const redirectUri = "http://localhost:3000/oauth2callback";
 
     const params = new URLSearchParams({

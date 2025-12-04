@@ -11,7 +11,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-neutral-950">
       <Sidebar treeData={treeData} />
-      <main className="flex-1 md:ml-64 transition-all duration-200">
+      <main className="flex-1 md:ml-(--sidebar-width) transition-all duration-200">
         {children}
       </main>
     </div>

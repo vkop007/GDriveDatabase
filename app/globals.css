@@ -3,6 +3,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --sidebar-width: 16rem;
+  --sidebar-bg: #ffffff;
+  --sidebar-border: #e5e5e5;
+  --sidebar-foreground: #171717;
+  --sidebar-accent: #f5f5f5;
+  --sidebar-accent-foreground: #171717;
 }
 
 @theme inline {
@@ -16,6 +22,11 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --sidebar-bg: #0a0a0a;
+    --sidebar-border: #262626;
+    --sidebar-foreground: #a3a3a3;
+    --sidebar-accent: #262626;
+    --sidebar-accent-foreground: #ffffff;
   }
 }
 
