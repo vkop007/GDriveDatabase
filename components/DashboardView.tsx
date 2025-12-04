@@ -6,6 +6,7 @@ import CopyButton from "./CopyButton";
 import CreateDatabaseModal from "./CreateDatabaseModal";
 import SearchInput from "./SearchInput";
 import { deleteDatabase } from "../app/actions";
+import Link from "next/link";
 
 interface DashboardViewProps {
   initialDatabases: any[];
@@ -33,12 +34,12 @@ export default function DashboardView({
             <div className="flex items-center gap-4">
               <p className="text-neutral-400">Manage your NoSQL Databases</p>
               <ApiAccess />
-              <a
+              <Link
                 href="/dashboard/settings"
                 className="text-sm text-neutral-400 hover:text-white transition-colors"
               >
                 Settings
-              </a>
+              </Link>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -91,12 +92,12 @@ export default function DashboardView({
                   <CopyButton text={file.id} label="Database ID" />
                 </div>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-neutral-800">
-                  <a
+                  <Link
                     href={`/dashboard/database/${file.id}`}
                     className="text-xs font-medium text-purple-400 hover:text-purple-300 transition-colors"
                   >
                     Open
-                  </a>
+                  </Link>
                   <form action={deleteDatabase}>
                     <input type="hidden" name="fileId" value={file.id} />
                     <button

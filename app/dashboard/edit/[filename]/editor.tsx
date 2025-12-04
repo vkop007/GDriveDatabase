@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
 import { JsonTableEditorProps, JsonType } from "../../../../types";
+import Link from "next/link";
 
 export default function JsonTableEditor({
   initialContent,
@@ -392,7 +393,7 @@ export default function JsonTableEditor({
         </div>
       ) : (
         <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000 group-hover:duration-200"></div>
+          <div className="absolute -inset-0.5 bg-linear-to-r from-purple-600 to-blue-600 rounded-lg blur opacity-20 group-hover:opacity-30 transition duration-1000 group-hover:duration-200"></div>
           <textarea
             value={rawContent}
             onChange={(e) => handleRawChange(e.target.value)}
@@ -449,12 +450,12 @@ export default function JsonTableEditor({
         <input type="hidden" name="filename" value={filename} />
         <input type="hidden" name="content" value={rawContent} />
 
-        <a
+        <Link
           href="/dashboard"
           className="px-6 py-2.5 rounded-lg text-sm font-medium text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
         >
           Cancel
-        </a>
+        </Link>
         <button
           type="submit"
           disabled={!!error}
