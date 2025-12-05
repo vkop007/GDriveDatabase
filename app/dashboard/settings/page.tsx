@@ -18,6 +18,23 @@ export default async function SettingsPage() {
         </header>
 
         <UserProfile user={user} />
+
+        <div className="flex justify-end">
+          <form
+            action={async () => {
+              "use server";
+              await import("../../actions/user").then((m) => m.logout());
+            }}
+          >
+            <button
+              type="submit"
+              className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm font-medium transition-colors border border-red-500/20"
+            >
+              Sign Out
+            </button>
+          </form>
+        </div>
+
         <ApiSettings initialApiKey={apiKey} />
       </div>
     </div>

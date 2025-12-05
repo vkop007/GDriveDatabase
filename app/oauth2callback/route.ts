@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { saveUserProfile } from "../actions/user";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -51,11 +52,22 @@ export async function GET(request: NextRequest) {
     }
 
     // Set cookies
+    console.log("Setting gdrive_tokens cookie...");
+    console.log("Tokens received:", Object.keys(tokens));
+
     cookieStore.set("gdrive_tokens", JSON.stringify(tokens), {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
+      path: "/",
+      sameSite: "lax",
     });
 
+    console.log("Cookie set. Saving user profile...");
+
+    // Save user profile to Drive
+    await saveUserProfile(tokens);
+
+    console.log("Redirecting to /dashboard");
     return NextResponse.redirect(new URL("/dashboard", request.url));
   } catch (error: any) {
     console.error("OAuth error:", error);
