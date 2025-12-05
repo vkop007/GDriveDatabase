@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getTableData, getParentId } from "../../../actions";
+import { getTableData, getParentId } from "../../../actions/table";
 import ColumnsView from "././columns";
 import DataView from "././data";
 import ApiAccess from "../../../../components/ApiAccess";
@@ -23,8 +23,10 @@ export default async function TablePage({
     redirect("/");
   }
 
-  const table = await getTableData(fileId);
-  const parentId = await getParentId(fileId);
+  const [table, parentId] = await Promise.all([
+    getTableData(fileId),
+    getParentId(fileId),
+  ]);
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8">

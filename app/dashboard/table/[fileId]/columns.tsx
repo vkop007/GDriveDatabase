@@ -1,4 +1,4 @@
-import { updateTableSchema } from "../../../actions";
+import { updateTableSchema } from "../../../actions/table";
 import { TableFile } from "../../../../types";
 
 export default function ColumnsView({

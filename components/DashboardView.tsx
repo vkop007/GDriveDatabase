@@ -34,12 +34,6 @@ export default function DashboardView({
             <div className="flex flex-wrap items-center gap-4 mt-2">
               <p className="text-neutral-400">Manage your NoSQL Databases</p>
               <ApiAccess />
-              <Link
-                href="/dashboard/settings"
-                className="text-sm text-neutral-400 hover:text-white transition-colors"
-              >
-                Settings
-              </Link>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">

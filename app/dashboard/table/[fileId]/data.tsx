@@ -1,4 +1,4 @@
-import { deleteDocument } from "../../../actions";
+import { deleteDocument } from "../../../actions/table";
 import { TableFile } from "../../../../types";
 import AddRowForm from "../../../../components/AddRowForm";
 

@@ -3,7 +3,7 @@
 import { operations, initDriveService } from "gdrivekit";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getAuth } from "../../lib/gdrive/auth";
+import { getAuth, fetchWithAuth } from "../../lib/gdrive/auth";
 import { moveFile, createFileInFolder } from "../../lib/gdrive/operations";
 
 // Types for Table Structure
@@ -148,8 +148,7 @@ export async function updateTableSchema(formData: FormData) {
 
   await saveTableContent(fileId, table);
 
-  // Revalidate path? For now just redirect back
-  return { success: true };
+  revalidatePath(`/dashboard/table/${fileId}`);
 }
 
 export async function addDocument(formData: FormData) {
@@ -204,8 +203,7 @@ export async function deleteDocument(formData: FormData) {
   table.documents = table.documents.filter((d) => d.$id !== docId);
 
   await saveTableContent(fileId, table);
-  await saveTableContent(fileId, table);
-  return { success: true };
+  revalidatePath(`/dashboard/table/${fileId}`);
 }
 
 // Helper to save the entire table content
@@ -264,4 +262,23 @@ export async function saveDocument(formData: FormData) {
 
   await saveTableContent(fileId, JSON.parse(content));
   return { success: true };
+}
+
+export async function getParentId(fileId: string) {
+  const response = await fetchWithAuth(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(
+      `Failed to fetch file parents. Status: ${response.status}, Text: ${errorText}`
+    );
+    throw new Error(
+      `Failed to fetch file parents: ${response.status} ${response.statusText}`
+    );
+  }
+
+  const data = await response.json();
+  return data.parents?.[0];
 }
