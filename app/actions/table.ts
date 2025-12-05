@@ -148,8 +148,7 @@ export async function updateTableSchema(formData: FormData) {
 
   await saveTableContent(fileId, table);
 
-  // Revalidate path? For now just redirect back
-  return { success: true };
+  revalidatePath(`/dashboard/table/${fileId}`);
 }
 
 export async function addDocument(formData: FormData) {
@@ -204,8 +203,7 @@ export async function deleteDocument(formData: FormData) {
   table.documents = table.documents.filter((d) => d.$id !== docId);
 
   await saveTableContent(fileId, table);
-  await saveTableContent(fileId, table);
-  return { success: true };
+  revalidatePath(`/dashboard/table/${fileId}`);
 }
 
 // Helper to save the entire table content
@@ -264,4 +262,24 @@ export async function saveDocument(formData: FormData) {
 
   await saveTableContent(fileId, JSON.parse(content));
   return { success: true };
+}
+
+export async function getParentId(fileId: string) {
+  const { tokens } = await getAuth();
+
+  const response = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`,
+    {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch file parents");
+  }
+
+  const data = await response.json();
+  return data.parents?.[0];
 }

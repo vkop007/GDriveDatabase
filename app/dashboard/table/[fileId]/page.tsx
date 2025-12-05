@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getTableData, getParentId } from "../../../actions";
+import { getTableData, getParentId } from "../../../actions/table";
 import ColumnsView from "././columns";
 import DataView from "././data";
 import ApiAccess from "../../../../components/ApiAccess";
