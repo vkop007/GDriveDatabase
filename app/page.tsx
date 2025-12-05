@@ -1,6 +1,14 @@
 import { authenticateWithGoogle } from "./actions";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("gdrive_tokens")?.value;
+
+  if (token) {
+    redirect("/dashboard");
+  }
   return (
     <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
       {/* Background Gradients */}
