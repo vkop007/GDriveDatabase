@@ -81,3 +81,73 @@ export async function authenticateWithGoogle(formData: FormData) {
     redirect(authUrl);
   }
 }
+
+export async function fetchWithAuth(url: string, options: RequestInit = {}) {
+  let { tokens, clientId, clientSecret } = await getAuth();
+
+  const makeRequest = async (accessToken: string) => {
+    const headers = {
+      ...options.headers,
+      Authorization: `Bearer ${accessToken}`,
+    } as HeadersInit;
+
+    const response = await fetch(url, { ...options, headers });
+
+    // If 401, return a special marker or the response itself to be checked
+    if (response.status === 401) {
+      return null;
+    }
+
+    return response;
+  };
+
+  let response = await makeRequest(tokens.access_token);
+
+  if (!response) {
+    console.log("Access token expired in fetchWithAuth, refreshing...");
+    if (!tokens.refresh_token) {
+      throw new Error("Access token expired and no refresh token available");
+    }
+
+    const refreshResponse = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: tokens.refresh_token,
+        grant_type: "refresh_token",
+      }),
+    });
+
+    if (!refreshResponse.ok) {
+      const errorText = await refreshResponse.text();
+      throw new Error(`Failed to refresh token: ${errorText}`);
+    }
+
+    const newTokens = await refreshResponse.json();
+    const updatedTokens = { ...tokens, ...newTokens };
+
+    try {
+      const cookieStore = await cookies();
+      cookieStore.set("gdrive_tokens", JSON.stringify(updatedTokens), {
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+      });
+    } catch (error) {
+      console.warn(
+        "Failed to update cookies (likely in Server Component):",
+        error
+      );
+    }
+
+    console.log("Retrying request with new token...");
+    response = await makeRequest(updatedTokens.access_token);
+
+    if (!response) {
+      throw new Error("Still unauthorized after token refresh");
+    }
+  }
+
+  return response;
+}

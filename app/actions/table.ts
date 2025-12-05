@@ -3,7 +3,7 @@
 import { operations, initDriveService } from "gdrivekit";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getAuth } from "../../lib/gdrive/auth";
+import { getAuth, fetchWithAuth } from "../../lib/gdrive/auth";
 import { moveFile, createFileInFolder } from "../../lib/gdrive/operations";
 
 // Types for Table Structure
@@ -265,19 +265,18 @@ export async function saveDocument(formData: FormData) {
 }
 
 export async function getParentId(fileId: string) {
-  const { tokens } = await getAuth();
-
-  const response = await fetch(
-    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`,
-    {
-      headers: {
-        Authorization: `Bearer ${tokens.access_token}`,
-      },
-    }
+  const response = await fetchWithAuth(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`
   );
 
   if (!response.ok) {
-    throw new Error("Failed to fetch file parents");
+    const errorText = await response.text();
+    console.error(
+      `Failed to fetch file parents. Status: ${response.status}, Text: ${errorText}`
+    );
+    throw new Error(
+      `Failed to fetch file parents: ${response.status} ${response.statusText}`
+    );
   }
 
   const data = await response.json();
