@@ -207,6 +207,18 @@ export default function Sidebar({ treeData }: SidebarProps) {
             <Settings className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
             Settings
           </Link>
+
+          <Link
+            href="/dashboard/apidocs"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+              pathname === "/dashboard/apidocs"
+                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
+                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+            }`}
+          >
+            <FileJson className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
+            API Docs
+          </Link>
         </nav>
 
         <div className="p-4 border-t border-(--sidebar-border)">
