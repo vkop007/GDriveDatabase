@@ -151,6 +151,34 @@ export async function updateTableSchema(formData: FormData) {
   revalidatePath(`/dashboard/table/${fileId}`);
 }
 
+export async function deleteColumn(formData: FormData) {
+  const fileId = formData.get("fileId") as string;
+  const columnKey = formData.get("columnKey") as string;
+
+  if (!fileId || !columnKey) {
+    throw new Error("Missing parameters");
+  }
+
+  // Prevent deletion of system columns
+  if (columnKey.startsWith("$")) {
+    throw new Error("Cannot delete system columns");
+  }
+
+  const table = await getTableData(fileId);
+
+  // Remove column from schema
+  table.schema = table.schema.filter((c) => c.key !== columnKey);
+
+  // Remove the key from all existing documents
+  table.documents.forEach((doc) => {
+    delete doc[columnKey];
+  });
+
+  await saveTableContent(fileId, table);
+
+  revalidatePath(`/dashboard/table/${fileId}`);
+}
+
 export async function addDocument(formData: FormData) {
   const fileId = formData.get("fileId") as string;
   const dataStr = formData.get("data") as string;
