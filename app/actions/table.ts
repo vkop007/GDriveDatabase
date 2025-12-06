@@ -3,7 +3,7 @@
 import { operations, initDriveService } from "gdrivekit";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getAuth, fetchWithAuth } from "../../lib/gdrive/auth";
+import { getAuth, fetchWithAuthAndUpdate } from "../../lib/gdrive/auth";
 import { moveFile, createFileInFolder } from "../../lib/gdrive/operations";
 
 // Types for Table Structure
@@ -265,7 +265,7 @@ export async function saveDocument(formData: FormData) {
 }
 
 export async function getParentId(fileId: string) {
-  const response = await fetchWithAuth(
+  const response = await fetchWithAuthAndUpdate(
     `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`
   );
 

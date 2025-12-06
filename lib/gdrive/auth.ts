@@ -2,6 +2,19 @@ import { initDriveService } from "gdrivekit";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+interface StoredTokens {
+  access_token: string;
+  refresh_token: string;
+  expiry_date?: number;
+}
+
+interface TokenResponse {
+  access_token: string;
+  refresh_token?: string;
+  expires_in: number;
+  token_type: string;
+}
+
 export async function getAuth() {
   const cookieStore = await cookies();
   const tokensStr = cookieStore.get("gdrive_tokens")?.value;
@@ -29,6 +42,8 @@ export async function getAuth() {
 }
 
 export async function authenticateWithGoogle(formData: FormData) {
+  "use server";
+
   const clientId = formData.get("clientId") as string;
   const clientSecret = formData.get("clientSecret") as string;
   const projectId = formData.get("projectId") as string;
@@ -61,14 +76,20 @@ export async function authenticateWithGoogle(formData: FormData) {
     cookieStore.set("gdrive_client_id", clientId, {
       secure: isProduction,
       httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
     });
     cookieStore.set("gdrive_client_secret", clientSecret, {
       secure: isProduction,
       httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
     });
     cookieStore.set("gdrive_project_id", projectId, {
       secure: isProduction,
       httpOnly: true,
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
     });
 
     console.log("Auth URL generated:", authUrl);
@@ -82,6 +103,37 @@ export async function authenticateWithGoogle(formData: FormData) {
   }
 }
 
+async function refreshAccessToken(
+  refreshToken: string,
+  clientId: string,
+  clientSecret: string
+): Promise<StoredTokens> {
+  const refreshResponse = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: clientId,
+      client_secret: clientSecret,
+      refresh_token: refreshToken,
+      grant_type: "refresh_token",
+    }),
+  });
+
+  if (!refreshResponse.ok) {
+    const errorText = await refreshResponse.text();
+    console.error("Token refresh failed:", errorText);
+    throw new Error(`Failed to refresh token: ${errorText}`);
+  }
+
+  const newTokens: TokenResponse = await refreshResponse.json();
+
+  return {
+    access_token: newTokens.access_token,
+    refresh_token: newTokens.refresh_token || refreshToken,
+    expiry_date: Date.now() + newTokens.expires_in * 1000,
+  };
+}
+
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   let { tokens, clientId, clientSecret } = await getAuth();
 
@@ -93,7 +145,6 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
 
     const response = await fetch(url, { ...options, headers });
 
-    // If 401, return a special marker or the response itself to be checked
     if (response.status === 401) {
       return null;
     }
@@ -105,48 +156,98 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
 
   if (!response) {
     console.log("Access token expired in fetchWithAuth, refreshing...");
+
     if (!tokens.refresh_token) {
       throw new Error("Access token expired and no refresh token available");
     }
 
-    const refreshResponse = await fetch("https://oauth2.googleapis.com/token", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        client_id: clientId,
-        client_secret: clientSecret,
-        refresh_token: tokens.refresh_token,
-        grant_type: "refresh_token",
-      }),
-    });
+    // Refresh the token
+    const updatedTokens = await refreshAccessToken(
+      tokens.refresh_token,
+      clientId,
+      clientSecret
+    );
 
-    if (!refreshResponse.ok) {
-      const errorText = await refreshResponse.text();
-      throw new Error(`Failed to refresh token: ${errorText}`);
-    }
+    // Return the updated tokens in the response metadata
+    // We'll handle cookie update in a separate server action
+    const newResponse = await makeRequest(updatedTokens.access_token);
 
-    const newTokens = await refreshResponse.json();
-    const updatedTokens = { ...tokens, ...newTokens };
-
-    try {
-      const cookieStore = await cookies();
-      cookieStore.set("gdrive_tokens", JSON.stringify(updatedTokens), {
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true,
-      });
-    } catch (error) {
-      console.warn(
-        "Failed to update cookies (likely in Server Component):",
-        error
-      );
-    }
-
-    console.log("Retrying request with new token...");
-    response = await makeRequest(updatedTokens.access_token);
-
-    if (!response) {
+    if (!newResponse) {
       throw new Error("Still unauthorized after token refresh");
     }
+
+    // Attach updated tokens as metadata that can be used by server actions
+    (newResponse as any).__updatedTokens = updatedTokens;
+
+    return newResponse;
+  }
+
+  return response;
+}
+
+// Server action to update stored tokens - MUST be called from server actions only
+export async function updateStoredTokens(updatedTokens: StoredTokens) {
+  "use server";
+
+  const cookieStore = await cookies();
+  cookieStore.set("gdrive_tokens", JSON.stringify(updatedTokens), {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+  });
+}
+
+// Helper function to set tokens (used during OAuth callback)
+export async function setTokens(tokens: StoredTokens) {
+  "use server";
+
+  const cookieStore = await cookies();
+  cookieStore.set("gdrive_tokens", JSON.stringify(tokens), {
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge: 60 * 60 * 24 * 30, // 30 days
+  });
+}
+
+// Helper function to clear tokens (for logout)
+export async function clearTokens() {
+  "use server";
+
+  const cookieStore = await cookies();
+  cookieStore.delete("gdrive_tokens");
+  cookieStore.delete("gdrive_client_id");
+  cookieStore.delete("gdrive_client_secret");
+  cookieStore.delete("gdrive_project_id");
+}
+
+// Check if user is authenticated
+export async function isAuthenticated(): Promise<boolean> {
+  const cookieStore = await cookies();
+  const tokensStr = cookieStore.get("gdrive_tokens")?.value;
+  const clientId = cookieStore.get("gdrive_client_id")?.value;
+  const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
+  const projectId = cookieStore.get("gdrive_project_id")?.value;
+
+  return !!(tokensStr && clientId && clientSecret && projectId);
+}
+
+// Wrapper for fetchWithAuth - handles token refresh gracefully
+// NOTE: Token updates during SSR cannot be persisted to cookies.
+// The token will be refreshed again on subsequent requests if needed.
+export async function fetchWithAuthAndUpdate(
+  url: string,
+  options: RequestInit = {}
+) {
+  const response = await fetchWithAuth(url, options);
+
+  // Log if tokens were refreshed (but we can't persist during SSR)
+  if ((response as any).__updatedTokens) {
+    console.log(
+      "🔄 Token was refreshed for this request (not persisted during SSR)"
+    );
+    delete (response as any).__updatedTokens;
   }
 
   return response;
