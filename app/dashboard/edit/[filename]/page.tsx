@@ -44,7 +44,7 @@ export default async function EditDocument({
 
   let content = "{}";
   try {
-    let response = await operations.readJsonFileData(id);
+    let response = await operations.jsonOperations.readJsonFileData(id);
 
     // Recursively unwrap if response has { success: true, data: ... } structure
     // This handles cases where the API returns a wrapper AND the file content itself is wrapped

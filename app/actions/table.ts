@@ -32,7 +32,9 @@ export async function listCollections(databaseId: string) {
   try {
     await getAuth();
     console.log(`Listing collections in ${databaseId}...`);
-    const response = await operations.listFilesInFolder(databaseId);
+    const response = await operations.listOperations.listFilesInFolder(
+      databaseId
+    );
     console.log("List response count:", response.data?.files?.length);
     // Filter for JSON files just in case, though listFilesInFolder might return all types
     return (response.data?.files || []).filter(
@@ -268,7 +270,7 @@ export async function deleteCollection(formData: FormData) {
   await getAuth();
 
   try {
-    await operations.deleteFile(fileId);
+    await operations.fileOperations.deleteFile(fileId);
   } catch (error) {
     console.error("Error deleting collection:", error);
     throw error;

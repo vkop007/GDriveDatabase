@@ -28,7 +28,9 @@ async function _getOrCreateRootFolder(auth: any) {
   );
 
   try {
-    const response = await operations.listFoldersInFolder("root");
+    const response = await operations.listOperations.listFoldersInFolder(
+      "root"
+    );
     const folder = response.data?.files?.find(
       (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
     );
@@ -41,7 +43,9 @@ async function _getOrCreateRootFolder(auth: any) {
   }
 
   console.log("Creating new root folder");
-  const createResponse = await operations.createFolder(ROOT_FOLDER_NAME);
+  const createResponse = await operations.folderOperations.createFolder(
+    ROOT_FOLDER_NAME
+  );
   return createResponse.data.id;
 }
 
@@ -93,7 +97,7 @@ export async function saveUserProfile(tokens: any) {
     );
 
     const rootId = await _getOrCreateRootFolder(auth);
-    const files = await operations.listFilesInFolder(rootId);
+    const files = await operations.listOperations.listFilesInFolder(rootId);
     const existingFile = files.data?.files?.find(
       (f: any) => f.name === USER_PROFILE_FILE && !f.trashed
     );
@@ -101,7 +105,7 @@ export async function saveUserProfile(tokens: any) {
     if (existingFile) {
       await driveService.updateJsonContent(existingFile.id, userProfile);
     } else {
-      const result = await operations.createJsonFile(
+      const result = await operations.jsonOperations.createJsonFile(
         userProfile,
         USER_PROFILE_FILE
       );
@@ -121,7 +125,7 @@ export async function saveUserProfile(tokens: any) {
 async function _getUserProfile(auth: any) {
   try {
     const rootId = await _getOrCreateRootFolder(auth);
-    const files = await operations.listFilesInFolder(rootId);
+    const files = await operations.listOperations.listFilesInFolder(rootId);
     const file = files.data?.files?.find(
       (f: any) => f.name === USER_PROFILE_FILE && !f.trashed
     );

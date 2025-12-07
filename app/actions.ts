@@ -60,7 +60,7 @@ export async function generateApiKey() {
   // Sync to Drive
   try {
     const rootId = await getOrCreateRootFolder();
-    const files = await operations.listFilesInFolder(rootId);
+    const files = await operations.listOperations.listFilesInFolder(rootId);
     const existingConfig = files.data?.files?.find(
       (f: any) => f.name === API_CONFIG_FILE && !f.trashed
     );
@@ -68,7 +68,7 @@ export async function generateApiKey() {
     if (existingConfig) {
       await driveService.updateJsonContent(existingConfig.id, secretData);
     } else {
-      const result = await operations.createJsonFile(
+      const result = await operations.jsonOperations.createJsonFile(
         secretData,
         API_CONFIG_FILE
       );
@@ -111,7 +111,7 @@ export async function deleteApiKey() {
 
     // Sync to Drive
     const rootId = await getOrCreateRootFolder();
-    const files = await operations.listFilesInFolder(rootId);
+    const files = await operations.listOperations.listFilesInFolder(rootId);
     const existingConfig = files.data?.files?.find(
       (f: any) => f.name === API_CONFIG_FILE && !f.trashed
     );
@@ -154,7 +154,9 @@ async function getOrCreateRootFolder() {
   await getAuth();
 
   try {
-    const response = await operations.listFoldersInFolder("root");
+    const response = await operations.listOperations.listFoldersInFolder(
+      "root"
+    );
 
     const folder = response.data?.files?.find(
       (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
@@ -170,7 +172,9 @@ async function getOrCreateRootFolder() {
 
   console.log("Creating new root folder");
   // Create if not exists
-  const createResponse = await operations.createFolder(ROOT_FOLDER_NAME);
+  const createResponse = await operations.folderOperations.createFolder(
+    ROOT_FOLDER_NAME
+  );
   return createResponse.data.id;
 }
 
@@ -231,7 +235,9 @@ export async function authenticateWithGoogle(formData: FormData) {
 // Helper to get root folder ID using driveService instance
 async function _getOrCreateRootFolder() {
   try {
-    const response = await operations.listFoldersInFolder("root");
+    const response = await operations.listOperations.listFoldersInFolder(
+      "root"
+    );
     const folder = response.data?.files?.find(
       (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
     );
@@ -244,7 +250,9 @@ async function _getOrCreateRootFolder() {
   }
 
   console.log("Creating new root folder");
-  const createResponse = await operations.createFolder(ROOT_FOLDER_NAME);
+  const createResponse = await operations.folderOperations.createFolder(
+    ROOT_FOLDER_NAME
+  );
   return createResponse.data.id;
 }
 
@@ -263,7 +271,9 @@ async function _listDatabases(auth: any) {
   try {
     console.log("Fetching databases from Drive...");
     const rootId = await _getOrCreateRootFolder();
-    const response = await operations.listFoldersInFolder(rootId);
+    const response = await operations.listOperations.listFoldersInFolder(
+      rootId
+    );
     return response.data?.files || [];
   } catch (error) {
     console.error("Error listing databases:", error);
@@ -282,7 +292,7 @@ export const listDatabases = async () => {
 
 export async function createDatabase(formData: FormData) {
   const name = formData.get("name") as string;
-  const checkExists = await operations.listFoldersByName(name);
+  const checkExists = await operations.listOperations.listFoldersByName(name);
 
   if (checkExists.data?.files?.length > 0) {
     throw new Error("Database with this name already exists");
@@ -294,7 +304,7 @@ export async function createDatabase(formData: FormData) {
 
   try {
     const rootId = await getOrCreateRootFolder();
-    await operations.createFolder(name, rootId);
+    await operations.folderOperations.createFolder(name, rootId);
   } catch (error) {
     console.error("Error creating database:", error);
     return { success: false, error: "Failed to create database" };
@@ -310,7 +320,7 @@ export async function deleteDatabase(formData: FormData) {
   if (!fileId) throw new Error("Missing fileId");
 
   await getAuth();
-  await operations.deleteFile(fileId);
+  await operations.fileOperations.deleteFile(fileId);
   revalidateTag("databases", { expire: 0 });
   revalidateTag("database-tree", { expire: 0 });
   redirect("/dashboard");
@@ -330,7 +340,9 @@ async function _listCollections(databaseId: string, auth: any) {
 
   try {
     console.log(`Fetching collections for ${databaseId}...`);
-    const response = await operations.listFilesInFolder(databaseId);
+    const response = await operations.listOperations.listFilesInFolder(
+      databaseId
+    );
     return (response.data?.files || []).filter(
       (f: any) => f.mimeType === "application/json"
     );
@@ -398,7 +410,7 @@ export async function deleteCollection(formData: FormData) {
   await getAuth();
 
   try {
-    await operations.deleteFile(fileId);
+    await operations.fileOperations.deleteFile(fileId);
   } catch (error) {
     console.error("Error deleting collection:", error);
     throw error;
@@ -428,7 +440,10 @@ export async function createDocument(formData: FormData) {
 
   try {
     const rootId = await getOrCreateRootFolder();
-    const result = await operations.createJsonFile(jsonContent, filename);
+    const result = await operations.jsonOperations.createJsonFile(
+      jsonContent,
+      filename
+    );
 
     if (result.success && result.data.id) {
       await moveFile(result.data.id, rootId);

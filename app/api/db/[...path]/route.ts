@@ -65,13 +65,15 @@ export async function GET(
 
     // Check if it's a file ID or name. For now assume name.
     // gdrivekit has getFileIdByName
-    const fileIdRes = await operations.getFileIdByName(filename);
+    const fileIdRes = await operations.fileOperations.getFileIdByName(filename);
 
     if (!fileIdRes.success || !fileIdRes.fileId) {
       return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
-    const data = await operations.readJsonFileData(fileIdRes.fileId);
+    const data = await operations.jsonOperations.readJsonFileData(
+      fileIdRes.fileId
+    );
     return NextResponse.json(data);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -89,7 +91,7 @@ export async function POST(
     const body = await req.json();
 
     // Check if file exists
-    const fileIdRes = await operations.getFileIdByName(filename);
+    const fileIdRes = await operations.fileOperations.getFileIdByName(filename);
 
     if (fileIdRes.success && fileIdRes.fileId) {
       // Update
@@ -111,7 +113,10 @@ export async function POST(
       );
     } else {
       // Create
-      const res = await operations.createJsonFile(filename, body);
+      const res = await operations.jsonOperations.createJsonFile(
+        body,
+        filename
+      );
       return NextResponse.json(res);
     }
   } catch (error: any) {
@@ -129,7 +134,7 @@ export async function PUT(
     const filename = path[path.length - 1];
     const body = await req.json();
 
-    const fileIdRes = await operations.getFileIdByName(filename);
+    const fileIdRes = await operations.fileOperations.getFileIdByName(filename);
 
     if (!fileIdRes.success || !fileIdRes.fileId) {
       return NextResponse.json({ error: "File not found" }, { status: 404 });
@@ -158,8 +163,8 @@ export async function PUT(
     // gdrivekit usually handles this.
 
     // For now, let's just implement DELETE and CREATE (replace) which is inefficient but works.
-    await operations.deleteFile(fileIdRes.fileId);
-    const res = await operations.createJsonFile(filename, body);
+    await operations.fileOperations.deleteFile(fileIdRes.fileId);
+    const res = await operations.jsonOperations.createJsonFile(body, filename);
     return NextResponse.json(res);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -175,13 +180,13 @@ export async function DELETE(
     const { path } = await params;
     const filename = path[path.length - 1];
 
-    const fileIdRes = await operations.getFileIdByName(filename);
+    const fileIdRes = await operations.fileOperations.getFileIdByName(filename);
 
     if (!fileIdRes.success || !fileIdRes.fileId) {
       return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
-    await operations.deleteFile(fileIdRes.fileId);
+    await operations.fileOperations.deleteFile(fileIdRes.fileId);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

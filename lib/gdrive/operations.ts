@@ -8,7 +8,9 @@ export async function getOrCreateRootFolder() {
   await getAuth();
 
   try {
-    const response = await operations.listFoldersInFolder("root");
+    const response = await operations.listOperations.listFoldersInFolder(
+      "root"
+    );
 
     const folder = response.data?.files?.find(
       (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
@@ -24,7 +26,9 @@ export async function getOrCreateRootFolder() {
 
   console.log("Creating new root folder");
   // Create if not exists
-  const createResponse = await operations.createFolder(ROOT_FOLDER_NAME);
+  const createResponse = await operations.folderOperations.createFolder(
+    ROOT_FOLDER_NAME
+  );
   return createResponse.data.id;
 }
 

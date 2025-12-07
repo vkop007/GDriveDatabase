@@ -104,7 +104,8 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   let response = await makeRequest(tokens.access_token);
 
   if (!response) {
-    console.log("Access token expired in fetchWithAuth, refreshing...");
+    // This is a fallback - middleware should normally handle refresh
+    console.log("Access token expired in fetchWithAuth (fallback refresh)...");
     if (!tokens.refresh_token) {
       throw new Error("Access token expired and no refresh token available");
     }
@@ -128,17 +129,16 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
     const newTokens = await refreshResponse.json();
     const updatedTokens = { ...tokens, ...newTokens };
 
+    // Note: Cookie update may fail in Server Components - that's OK
+    // Middleware will handle persistent token updates
     try {
       const cookieStore = await cookies();
       cookieStore.set("gdrive_tokens", JSON.stringify(updatedTokens), {
         secure: process.env.NODE_ENV === "production",
         httpOnly: true,
       });
-    } catch (error) {
-      console.warn(
-        "Failed to update cookies (likely in Server Component):",
-        error
-      );
+    } catch {
+      // Expected in Server Components - middleware handles this
     }
 
     console.log("Retrying request with new token...");
