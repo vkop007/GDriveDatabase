@@ -52,27 +52,13 @@ export async function moveFile(fileId: string, folderId: string) {
   );
 
   try {
-    // 1. Get current parents
-    const getResponse = await fetchWithAuth(
-      `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`
-    );
-
-    if (!getResponse.ok) {
-      throw new Error(`Failed to get file parents: ${getResponse.statusText}`);
-    }
-
-    const fileData = await getResponse.json();
-    const previousParents = fileData.parents?.join(",") || "";
-
     // 2. Move file (add new parent, remove old parents)
-    const moveResponse = await fetchWithAuth(
-      `https://www.googleapis.com/drive/v3/files/${fileId}?addParents=${folderId}&removeParents=${previousParents}`,
-      {
-        method: "PATCH",
-      }
+    const moveResponse = await operations.fileOperations.moveFile(
+      fileId,
+      folderId
     );
 
-    if (!moveResponse.ok) {
+    if (!moveResponse.success) {
       const errorText = await moveResponse.text();
       throw new Error(`Failed to move file: ${errorText}`);
     }
