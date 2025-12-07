@@ -4,32 +4,43 @@ import { cookies } from "next/headers";
 
 export const ROOT_FOLDER_NAME = "GDriveDatabase";
 
-export async function getOrCreateRootFolder() {
-  await getAuth();
+export async function getOrCreateRootFolder(auth?: any) {
+  if (!auth) {
+    await getAuth();
+  }
 
   try {
-    const response = await operations.listOperations.listFoldersInFolder(
-      "root"
+    const response = await operations.folderOperations.getFolderIdByName(
+      ROOT_FOLDER_NAME
     );
-
-    const folder = response.data?.files?.find(
-      (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
-    );
-
-    if (folder) {
-      console.log("Found existing root folder via list:", folder.id);
-      return folder.id;
+    console.log("Response from getFolderIdByName:", response);
+    if (response.folderId) {
+      console.log("Found existing root folder via list:", response.folderId);
+      return response.folderId;
     }
   } catch (error) {
     console.error("Error listing root folders:", error);
   }
 
-  console.log("Creating new root folder");
   // Create if not exists
+  console.log("Creating new root folder (operations.ts)");
   const createResponse = await operations.folderOperations.createFolder(
     ROOT_FOLDER_NAME
   );
-  return createResponse.data.id;
+  console.log(
+    "Create folder response (operations.ts):",
+    JSON.stringify(createResponse)
+  );
+
+  if (createResponse?.data?.id) {
+    return createResponse.data.id;
+  } else if ((createResponse as any)?.id) {
+    return (createResponse as any).id;
+  }
+
+  throw new Error(
+    "Failed to create root folder: Valid ID not found in response"
+  );
 }
 
 // Custom move file implementation to bypass gdrivekit issue

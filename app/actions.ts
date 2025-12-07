@@ -8,7 +8,12 @@ import fs from "fs/promises";
 import path from "path";
 
 import { createTable } from "./actions/table";
-import { moveFile } from "../lib/gdrive/operations";
+import { fetchWithAuth } from "../lib/gdrive/auth";
+import {
+  moveFile,
+  createFileInFolder,
+  getOrCreateRootFolder,
+} from "../lib/gdrive/operations";
 
 const ROOT_FOLDER_NAME = "GDriveDatabase";
 const SECRETS_FILE = path.join(process.cwd(), "api-secrets.json");
@@ -150,34 +155,6 @@ export async function getApiAuth(apiKey: string) {
   }
 }
 
-async function getOrCreateRootFolder() {
-  await getAuth();
-
-  try {
-    const response = await operations.listOperations.listFoldersInFolder(
-      "root"
-    );
-
-    const folder = response.data?.files?.find(
-      (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
-    );
-
-    if (folder) {
-      console.log("Found existing root folder via list:", folder.id);
-      return folder.id;
-    }
-  } catch (error) {
-    console.error("Error listing root folders:", error);
-  }
-
-  console.log("Creating new root folder");
-  // Create if not exists
-  const createResponse = await operations.folderOperations.createFolder(
-    ROOT_FOLDER_NAME
-  );
-  return createResponse.data.id;
-}
-
 export async function authenticateWithGoogle(formData: FormData) {
   const clientId = formData.get("clientId") as string;
   const clientSecret = formData.get("clientSecret") as string;
@@ -232,30 +209,6 @@ export async function authenticateWithGoogle(formData: FormData) {
   }
 }
 
-// Helper to get root folder ID using driveService instance
-async function _getOrCreateRootFolder() {
-  try {
-    const response = await operations.listOperations.listFoldersInFolder(
-      "root"
-    );
-    const folder = response.data?.files?.find(
-      (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
-    );
-
-    if (folder) {
-      return folder.id;
-    }
-  } catch (error) {
-    console.error("Error listing root folders:", error);
-  }
-
-  console.log("Creating new root folder");
-  const createResponse = await operations.folderOperations.createFolder(
-    ROOT_FOLDER_NAME
-  );
-  return createResponse.data.id;
-}
-
 // Internal fetch function for databases
 async function _listDatabases(auth: any) {
   initDriveService(
@@ -270,7 +223,7 @@ async function _listDatabases(auth: any) {
 
   try {
     console.log("Fetching databases from Drive...");
-    const rootId = await _getOrCreateRootFolder();
+    const rootId = await getOrCreateRootFolder(auth);
     const response = await operations.listOperations.listFoldersInFolder(
       rootId
     );
