@@ -4,7 +4,7 @@
     "": {
       "name": "gdrivedatabase",
       "dependencies": {
-        "gdrivekit": "^2.2.0",
+        "gdrivekit": "^2.3.5",
         "lucide-react": "^0.555.0",
         "next": "16.0.6",
         "react": "19.2.0",
@@ -546,7 +546,7 @@
 
     "functions-have-names": ["functions-have-names@1.2.3", "", {}, "sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ=="],
 
-    "gdrivekit": ["gdrivekit@2.2.0", "", { "dependencies": { "archiver": "^7.0.1", "archiver-zip-encrypted": "^2.0.0", "core-util-is": "^1.0.3", "crypto": "^1.0.1", "update-notifier": "^7.3.1" } }, "sha512-tAG/lEzvCJEWdixFHZLxx09x42E9SVA/Ki2ZHiSk8M81cBPTJP9/z7x9GTMIj4LbvuyuPwsmsMV2oiFtYkZTHw=="],
+    "gdrivekit": ["gdrivekit@2.3.5", "", { "dependencies": { "archiver": "^7.0.1", "archiver-zip-encrypted": "^2.0.0", "core-util-is": "^1.0.3", "crypto": "^1.0.1", "update-notifier": "^7.3.1" } }, "sha512-aV/P+Uf+qIwIrQ6xgEBgDRQaXHOG+rP6LaUrZG5h/bDh/gfRmDUIsma/vPSyVtkyalXZmSUDl8VmRc/q6RbTKw=="],
 
     "generator-function": ["generator-function@2.0.1", "", {}, "sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g=="],
 
@@ -702,7 +702,7 @@
 
     "keyv": ["keyv@4.5.4", "", { "dependencies": { "json-buffer": "3.0.1" } }, "sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw=="],
 
-    "ky": ["ky@1.14.0", "", {}, "sha512-Rczb6FMM6JT0lvrOlP5WUOCB7s9XKxzwgErzhKlKde1bEV90FXplV1o87fpt4PU/asJFiqjYJxAJyzJhcrxOsQ=="],
+    "ky": ["ky@1.14.1", "", {}, "sha512-hYje4L9JCmpEQBtudo+v52X5X8tgWXUYyPcxKSuxQNboqufecl9VMWjGiucAFH060AwPXHZuH+WB2rrqfkmafw=="],
 
     "language-subtag-registry": ["language-subtag-registry@0.3.23", "", {}, "sha512-0K65Lea881pHotoGEa5gDlMxt3pctLi2RplBb7Ezh4rRdLEOtgi7n4EwK9lamnUCkKBqaeKRVebTq6BAxSkpXQ=="],
 

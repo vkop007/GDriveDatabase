@@ -105,7 +105,7 @@ export function DocsTabs() {
                   </h3>
                 </div>
                 <CodeBlock
-                  code={`const newUser = await db\n  .database("your-database-id")\n  .table("users")\n  .create({\n    name: "John Doe",\n    email: "john@example.com",\n    role: "user"\n  });`}
+                  code={`const newUser = await db\n  .database("your-database-id")\n  .table("users")\n  .create({\n    name: "John Doe",\n    email: "john@example.com",\n    role: "user",\n    tags: ["new", "verified"]\n  });`}
                   id="create"
                 />
               </div>
@@ -194,7 +194,7 @@ export function DocsTabs() {
                   Body
                 </div>
                 <CodeBlock
-                  code={`{\n  "name": "New Item",\n  "status": "active"\n}`}
+                  code={`{\n  "name": "New Item",\n  "status": "active",\n  "tags": ["urgent", "v2"]\n}`}
                   language="json"
                   id="post-body"
                 />
