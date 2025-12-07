@@ -134,22 +134,19 @@ async function _getUserProfile(auth: any) {
       return null;
     }
 
-    // Fetch file content using access token
-    const response = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`,
+    // Fetch file content using gdrivekit
+    // Need to initialize driveService here since valid auth is passed in
+    const driveService = initDriveService(
       {
-        headers: {
-          Authorization: `Bearer ${auth.tokens.access_token}`,
-        },
-      }
+        client_id: auth.clientId,
+        client_secret: auth.clientSecret,
+        project_id: auth.projectId,
+        redirect_uris: ["http://localhost:3000/oauth2callback"],
+      },
+      auth.tokens
     );
 
-    if (!response.ok) {
-      console.error("Failed to fetch file content:", response.statusText);
-      return null;
-    }
-
-    const content = await response.json();
+    const content = await driveService.selectJsonContent(file.id);
     return content as UserProfile;
   } catch (error) {
     console.error("Error fetching user profile from Drive:", error);

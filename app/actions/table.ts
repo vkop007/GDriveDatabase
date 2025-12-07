@@ -295,6 +295,8 @@ export async function saveDocument(formData: FormData) {
 }
 
 export async function getParentId(fileId: string) {
+  // gdrivekit doesn't seem to expose a direct "getFileAttributes" or "getParents" helper easily accessible here.
+  // Falling back to fetchWithAuth which works reliably.
   const response = await fetchWithAuth(
     `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`
   );
