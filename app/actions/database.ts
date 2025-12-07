@@ -8,7 +8,9 @@ import { getOrCreateRootFolder } from "../../lib/gdrive/operations";
 export async function listDatabases() {
   try {
     const rootId = await getOrCreateRootFolder();
-    const response = await operations.listFoldersInFolder(rootId);
+    const response = await operations.listOperations.listFoldersInFolder(
+      rootId
+    );
     return response.data?.files || [];
   } catch (error) {
     console.error("Error listing databases:", error);
@@ -25,7 +27,7 @@ export async function createDatabase(formData: FormData) {
 
   try {
     const rootId = await getOrCreateRootFolder();
-    await operations.createFolder(name, rootId);
+    await operations.folderOperations.createFolder(name, rootId);
   } catch (error) {
     console.error("Error creating database:", error);
     throw error;
@@ -44,7 +46,7 @@ export async function deleteDatabase(formData: FormData) {
   await getAuth();
 
   try {
-    await operations.deleteFile(fileId);
+    await operations.fileOperations.deleteFile(fileId);
   } catch (error) {
     console.error("Error deleting database:", error);
     throw error;

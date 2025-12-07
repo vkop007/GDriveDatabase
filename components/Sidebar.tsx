@@ -12,10 +12,12 @@ import {
   FileJson,
   Folder,
   FolderOpen,
+  Pencil,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
+import RenameModal from "./RenameModal";
 
 interface SidebarProps {
   treeData: {
@@ -30,6 +32,12 @@ export default function Sidebar({ treeData }: SidebarProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [expandedDbs, setExpandedDbs] = useState<Set<string>>(new Set());
+  const [renamingItem, setRenamingItem] = useState<{
+    id: string;
+    name: string;
+    type: "database" | "collection";
+    parentId?: string;
+  } | null>(null);
 
   const toggleDb = (e: React.MouseEvent, dbId: string) => {
     e.preventDefault();
@@ -52,6 +60,20 @@ export default function Sidebar({ treeData }: SidebarProps) {
     if (!expandedDbs.has(dbId)) {
       setExpandedDbs(new Set(expandedDbs).add(dbId));
     }
+  };
+
+  const handleRename = (
+    e: React.MouseEvent,
+    item: {
+      id: string;
+      name: string;
+      type: "database" | "collection";
+      parentId?: string;
+    }
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setRenamingItem(item);
   };
 
   return (
@@ -153,6 +175,20 @@ export default function Sidebar({ treeData }: SidebarProps) {
                       )}
                       <span className="truncate font-medium">{db.name}</span>
                     </div>
+
+                    <button
+                      onClick={(e) =>
+                        handleRename(e, {
+                          id: db.id,
+                          name: db.name,
+                          type: "database",
+                        })
+                      }
+                      className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-white transition-all"
+                      title="Rename Database"
+                    >
+                      <Pencil className="w-3 h-3" />
+                    </button>
                   </div>
 
                   {isExpanded && (
@@ -169,7 +205,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
                           <Link
                             key={table.id}
                             href={`/dashboard/table/${table.id}`}
-                            className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                            className={`group flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
                               isTableActive
                                 ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
                                 : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
@@ -182,7 +218,23 @@ export default function Sidebar({ treeData }: SidebarProps) {
                                   : "text-(--sidebar-foreground)"
                               }`}
                             />
-                            <span className="truncate">{table.name}</span>
+                            <span className="truncate flex-1">
+                              {table.name}
+                            </span>
+                            <button
+                              onClick={(e) =>
+                                handleRename(e, {
+                                  id: table.id,
+                                  name: table.name,
+                                  type: "collection",
+                                  parentId: db.id,
+                                })
+                              }
+                              className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-white transition-all"
+                              title="Rename Collection"
+                            >
+                              <Pencil className="w-3 h-3" />
+                            </button>
                           </Link>
                         );
                       })}
@@ -230,6 +282,17 @@ export default function Sidebar({ treeData }: SidebarProps) {
           </div>
         </div>
       </aside>
+
+      {renamingItem && (
+        <RenameModal
+          isOpen={!!renamingItem}
+          onClose={() => setRenamingItem(null)}
+          currentName={renamingItem.name}
+          itemId={renamingItem.id}
+          itemType={renamingItem.type as "database" | "collection"}
+          parentId={renamingItem.parentId}
+        />
+      )}
     </>
   );
 }

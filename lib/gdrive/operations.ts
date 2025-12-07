@@ -8,7 +8,9 @@ export async function getOrCreateRootFolder() {
   await getAuth();
 
   try {
-    const response = await operations.listFoldersInFolder("root");
+    const response = await operations.listOperations.listFoldersInFolder(
+      "root"
+    );
 
     const folder = response.data?.files?.find(
       (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
@@ -24,7 +26,9 @@ export async function getOrCreateRootFolder() {
 
   console.log("Creating new root folder");
   // Create if not exists
-  const createResponse = await operations.createFolder(ROOT_FOLDER_NAME);
+  const createResponse = await operations.folderOperations.createFolder(
+    ROOT_FOLDER_NAME
+  );
   return createResponse.data.id;
 }
 
@@ -214,6 +218,81 @@ export async function createFileInFolder(
     });
 
     console.log("Retrying create with new token...");
+    result = await makeRequest(updatedTokens.access_token);
+
+    if (result.status === 401) {
+      throw new Error("Still unauthorized after token refresh");
+    }
+  }
+
+  return result;
+}
+
+export async function renameFile(fileId: string, newName: string) {
+  let { tokens, clientId, clientSecret } = await getAuth();
+
+  const makeRequest = async (accessToken: string) => {
+    const response = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${fileId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: newName,
+        }),
+      }
+    );
+
+    if (response.status === 401) {
+      return { status: 401 };
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to rename file: ${errorText}`);
+    }
+
+    const data = await response.json();
+    return { status: 200, success: true, data };
+  };
+
+  let result = await makeRequest(tokens.access_token);
+
+  if (result.status === 401) {
+    console.log("Access token expired, refreshing...");
+    if (!tokens.refresh_token) {
+      throw new Error("Access token expired and no refresh token available");
+    }
+
+    const refreshResponse = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: tokens.refresh_token,
+        grant_type: "refresh_token",
+      }),
+    });
+
+    if (!refreshResponse.ok) {
+      const errorText = await refreshResponse.text();
+      throw new Error(`Failed to refresh token: ${errorText}`);
+    }
+
+    const newTokens = await refreshResponse.json();
+    const updatedTokens = { ...tokens, ...newTokens };
+
+    const cookieStore = await cookies();
+    cookieStore.set("gdrive_tokens", JSON.stringify(updatedTokens), {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+    });
+
+    console.log("Retrying rename with new token...");
     result = await makeRequest(updatedTokens.access_token);
 
     if (result.status === 401) {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { addDocument } from "../app/actions/table";
 import { ColumnDefinition } from "../types";
 import { toast } from "sonner";
+import ArrayInput from "./ArrayInput";
 
 export default function AddRowForm({
   fileId,
@@ -78,7 +79,20 @@ export default function AddRowForm({
 
             inputColumns.forEach((col) => {
               const val = formData.get(col.key);
-              if (val !== null && val !== "") {
+
+              if (col.array && val !== null && val !== "") {
+                try {
+                  const parsed = JSON.parse(val as string);
+                  if (col.type === "integer") {
+                    data[col.key] = parsed.map((v: string) => parseInt(v, 10));
+                  } else {
+                    data[col.key] = parsed;
+                  }
+                } catch (e) {
+                  console.error("Failed to parse array input", e);
+                  data[col.key] = [];
+                }
+              } else if (val !== null && val !== "") {
                 if (col.type === "boolean") {
                   data[col.key] = (
                     form.elements.namedItem(col.key) as HTMLInputElement
@@ -88,6 +102,10 @@ export default function AddRowForm({
                 } else {
                   data[col.key] = val;
                 }
+              } else if (col.type === "boolean") {
+                data[col.key] = (
+                  form.elements.namedItem(col.key) as HTMLInputElement
+                ).checked;
               }
             });
 
@@ -122,7 +140,14 @@ export default function AddRowForm({
                   {col.key}{" "}
                   {col.required && <span className="text-red-500">*</span>}
                 </label>
-                {col.type === "boolean" ? (
+                {col.array ? (
+                  <ArrayInput
+                    name={col.key}
+                    required={col.required}
+                    type={col.type as "string" | "integer"}
+                    placeholder={`Add ${col.type} value...`}
+                  />
+                ) : col.type === "boolean" ? (
                   <div className="flex items-center h-10">
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input

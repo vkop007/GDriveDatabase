@@ -28,6 +28,29 @@ export default async function TablePage({
     getParentId(fileId),
   ]);
 
+  // Handle case where table data couldn't be loaded
+  if (!table) {
+    return (
+      <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8 flex items-center justify-center">
+        <div className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-8 max-w-md text-center">
+          <h1 className="text-xl font-semibold text-red-400 mb-2">
+            Failed to Load Table
+          </h1>
+          <p className="text-neutral-400 mb-4">
+            Could not load table data. This might be due to an authentication
+            issue.
+          </p>
+          <a
+            href="/dashboard"
+            className="inline-block bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors"
+          >
+            Back to Dashboard
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">

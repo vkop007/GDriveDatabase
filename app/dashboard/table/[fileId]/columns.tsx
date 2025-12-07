@@ -1,4 +1,4 @@
-import { updateTableSchema } from "../../../actions/table";
+import { updateTableSchema, deleteColumn } from "../../../actions/table";
 import { TableFile } from "../../../../types";
 
 export default function ColumnsView({
@@ -93,6 +93,7 @@ export default function ColumnsView({
               <th className="px-6 py-3">Required</th>
               <th className="px-6 py-3">Array</th>
               <th className="px-6 py-3">Default</th>
+              <th className="px-6 py-3">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-800">
@@ -125,6 +126,22 @@ export default function ColumnsView({
                 </td>
                 <td className="px-6 py-4 text-neutral-400">
                   {col.default ?? "-"}
+                </td>
+                <td className="px-6 py-4">
+                  {col.key.startsWith("$") ? (
+                    <span className="text-neutral-600">-</span>
+                  ) : (
+                    <form action={deleteColumn} className="inline-block">
+                      <input type="hidden" name="fileId" value={fileId} />
+                      <input type="hidden" name="columnKey" value={col.key} />
+                      <button
+                        type="submit"
+                        className="text-red-500 hover:text-red-400 transition-colors text-sm"
+                      >
+                        Delete
+                      </button>
+                    </form>
+                  )}
                 </td>
               </tr>
             ))}

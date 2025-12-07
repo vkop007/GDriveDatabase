@@ -32,7 +32,9 @@ export async function listCollections(databaseId: string) {
   try {
     await getAuth();
     console.log(`Listing collections in ${databaseId}...`);
-    const response = await operations.listFilesInFolder(databaseId);
+    const response = await operations.listOperations.listFilesInFolder(
+      databaseId
+    );
     console.log("List response count:", response.data?.files?.length);
     // Filter for JSON files just in case, though listFilesInFolder might return all types
     return (response.data?.files || []).filter(
@@ -151,6 +153,34 @@ export async function updateTableSchema(formData: FormData) {
   revalidatePath(`/dashboard/table/${fileId}`);
 }
 
+export async function deleteColumn(formData: FormData) {
+  const fileId = formData.get("fileId") as string;
+  const columnKey = formData.get("columnKey") as string;
+
+  if (!fileId || !columnKey) {
+    throw new Error("Missing parameters");
+  }
+
+  // Prevent deletion of system columns
+  if (columnKey.startsWith("$")) {
+    throw new Error("Cannot delete system columns");
+  }
+
+  const table = await getTableData(fileId);
+
+  // Remove column from schema
+  table.schema = table.schema.filter((c) => c.key !== columnKey);
+
+  // Remove the key from all existing documents
+  table.documents.forEach((doc) => {
+    delete doc[columnKey];
+  });
+
+  await saveTableContent(fileId, table);
+
+  revalidatePath(`/dashboard/table/${fileId}`);
+}
+
 export async function addDocument(formData: FormData) {
   const fileId = formData.get("fileId") as string;
   const dataStr = formData.get("data") as string;
@@ -240,7 +270,7 @@ export async function deleteCollection(formData: FormData) {
   await getAuth();
 
   try {
-    await operations.deleteFile(fileId);
+    await operations.fileOperations.deleteFile(fileId);
   } catch (error) {
     console.error("Error deleting collection:", error);
     throw error;
