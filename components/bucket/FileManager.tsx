@@ -26,7 +26,10 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
   const [uploadedFiles, setUploadedFiles] = useState<any[] | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [isDragging, setIsDragging] = useState(false);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dragCounter = useRef(0);
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files?.length) return;
@@ -69,21 +72,62 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
     setIsDeleting(null);
   };
 
+  const startRename = (file: any) => {
+    setRenamingId(file.id);
+    setRenameValue(file.name);
+  };
+
+  const submitRename = async () => {
+    if (!renamingId || !renameValue.trim()) return;
+
+    const fileId = renamingId;
+    const newName = renameValue.trim();
+
+    // Optimistic update
+    setFiles(files.map((f) => (f.id === fileId ? { ...f, name: newName } : f)));
+    setRenamingId(null);
+
+    try {
+      // Dynamic import to avoid server action issues if any
+      const { renameBucketFile } = await import("../../app/actions/bucket");
+      const formData = new FormData();
+      formData.append("fileId", fileId);
+      formData.append("newName", newName);
+      await renameBucketFile(formData);
+    } catch (error) {
+      console.error("Rename failed", error);
+      alert("Rename failed");
+      // Revert on failure involves complex state management relying on router refresh usually
+      // For now we assume success or user will refresh
+    }
+  };
+
   const isImage = (mimeType: string) => mimeType.includes("image");
+
+  const onDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    dragCounter.current += 1;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  };
 
   const onDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(true);
   };
 
   const onDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
-    setIsDragging(false);
+    dragCounter.current -= 1;
+    if (dragCounter.current === 0) {
+      setIsDragging(false);
+    }
   };
 
   const onDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
+    dragCounter.current = 0;
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       setIsUploading(true);
@@ -111,6 +155,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
   return (
     <div
       className="space-y-6 relative min-h-[500px]"
+      onDragEnter={onDragEnter}
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
@@ -207,12 +252,25 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
 
               {/* Info */}
               <div className="p-3">
-                <p
-                  className="text-sm font-medium text-neutral-200 truncate mb-2"
-                  title={file.name}
-                >
-                  {file.name}
-                </p>
+                {renamingId === file.id ? (
+                  <input
+                    type="text"
+                    value={renameValue}
+                    onChange={(e) => setRenameValue(e.target.value)}
+                    onBlur={submitRename}
+                    onKeyDown={(e) => e.key === "Enter" && submitRename()}
+                    className="w-full bg-neutral-800 text-white text-sm px-2 py-1 rounded border border-neutral-600 focus:border-blue-500 outline-none mb-2"
+                    autoFocus
+                  />
+                ) : (
+                  <p
+                    className="text-sm font-medium text-neutral-200 truncate mb-2 cursor-pointer hover:text-blue-400"
+                    title={file.name + " (Click to rename)"}
+                    onClick={() => startRename(file)}
+                  >
+                    {file.name}
+                  </p>
+                )}
 
                 <div className="flex items-center gap-2">
                   <button
@@ -284,9 +342,24 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
                           <FileIcon className="w-4 h-4 text-neutral-500" />
                         )}
                       </div>
-                      <span className="font-medium text-white truncate max-w-xs">
-                        {file.name}
-                      </span>
+                      {renamingId === file.id ? (
+                        <input
+                          type="text"
+                          value={renameValue}
+                          onChange={(e) => setRenameValue(e.target.value)}
+                          onBlur={submitRename}
+                          onKeyDown={(e) => e.key === "Enter" && submitRename()}
+                          className="bg-neutral-800 text-white text-sm px-2 py-1 rounded border border-neutral-600 focus:border-blue-500 outline-none w-full max-w-xs"
+                          autoFocus
+                        />
+                      ) : (
+                        <span
+                          className="font-medium text-white truncate max-w-xs cursor-pointer hover:text-blue-400"
+                          onClick={() => startRename(file)}
+                        >
+                          {file.name}
+                        </span>
+                      )}
                     </div>
                   </td>
                   <td className="px-6 py-4">

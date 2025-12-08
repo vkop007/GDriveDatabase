@@ -4,6 +4,7 @@ import { operations } from "gdrivekit";
 import { redirect } from "next/navigation";
 import { getAuth } from "../../lib/gdrive/auth";
 import { getOrCreateRootFolder } from "../../lib/gdrive/operations";
+import { BUCKET_FOLDER_NAME } from "../../lib/gdrive/bucket-service";
 
 export async function listDatabases() {
   try {
@@ -11,7 +12,10 @@ export async function listDatabases() {
     const response = await operations.listOperations.listFoldersInFolder(
       rootId
     );
-    return response.data?.files || [];
+    return (
+      response.data?.files?.filter((f: any) => f.name !== BUCKET_FOLDER_NAME) ||
+      []
+    );
   } catch (error) {
     console.error("Error listing databases:", error);
     return [];

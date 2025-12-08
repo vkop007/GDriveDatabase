@@ -64,3 +64,16 @@ export async function deleteBucketFile(formData: FormData) {
   await operations.fileOperations.deleteFile(fileId);
   revalidateTag("bucket-files", "max");
 }
+
+export async function renameBucketFile(formData: FormData) {
+  const fileId = formData.get("fileId") as string;
+  const newName = formData.get("newName") as string;
+
+  if (!fileId || !newName) {
+    throw new Error("Missing fileId or newName");
+  }
+
+  await getAuth();
+  await operations.fileOperations.renameFile(fileId, newName);
+  revalidateTag("bucket-files", "max");
+}
