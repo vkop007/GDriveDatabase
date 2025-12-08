@@ -8,12 +8,7 @@ import fs from "fs/promises";
 import path from "path";
 
 import { createTable } from "./actions/table";
-import { fetchWithAuth } from "../lib/gdrive/auth";
-import {
-  moveFile,
-  createFileInFolder,
-  getOrCreateRootFolder,
-} from "../lib/gdrive/operations";
+import { moveFile, getOrCreateRootFolder } from "../lib/gdrive/operations";
 
 const ROOT_FOLDER_NAME = "GDriveDatabase";
 const SECRETS_FILE = path.join(process.cwd(), "api-secrets.json");
@@ -320,10 +315,13 @@ export const getDatabaseTree = async () => {
     async () => {
       try {
         console.log("Fetching database tree...");
-        // Use internal functions to avoid calling getAuth() again
+        // 1. Fetch all databases (Parallel Start)
         const databases = await _listDatabases(auth);
-        const tree = await Promise.all(
+
+        // 2. Fetch all collections for all databases in parallel
+        const treeProps = await Promise.all(
           databases.map(async (db: any) => {
+            // This runs in parallel for each database
             const tables = await _listCollections(db.id, auth);
             return {
               id: db.id,
@@ -332,7 +330,7 @@ export const getDatabaseTree = async () => {
             };
           })
         );
-        return tree;
+        return treeProps;
       } catch (error) {
         console.error("Error fetching database tree:", error);
         return [];
