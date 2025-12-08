@@ -51,9 +51,9 @@ export default function UploadSuccessModal({
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {files.map((file) => (
+          {files.map((file, index) => (
             <div
-              key={file.id}
+              key={`${file.id}-${index}`}
               className="flex items-center gap-4 p-4 bg-neutral-950/50 border border-neutral-800 rounded-lg group hover:border-neutral-700 transition-all"
             >
               <div className="flex-1 min-w-0 space-y-1">
