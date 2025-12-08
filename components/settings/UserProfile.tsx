@@ -14,7 +14,7 @@ export default function UserProfile({ user }: UserProfileProps) {
     <div className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-6 backdrop-blur-sm">
       <div className="flex items-center gap-6">
         {/* Profile Picture */}
-        <div className="relative group w-20 h-20">
+        <div className="relative group w-20 h-20 shrink-0">
           <Image
             src={user.picture}
             alt={user.name}
@@ -35,6 +35,21 @@ export default function UserProfile({ user }: UserProfileProps) {
               Active
             </span>
           </div>
+        </div>
+        <div className="ml-auto">
+          <form
+            action={async () => {
+              "use server";
+              await import("../../app/actions/user").then((m) => m.logout());
+            }}
+          >
+            <button
+              type="submit"
+              className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-sm font-medium transition-colors border border-red-500/20"
+            >
+              Sign Out
+            </button>
+          </form>
         </div>
       </div>
     </div>
