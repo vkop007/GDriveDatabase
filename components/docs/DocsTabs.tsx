@@ -200,6 +200,49 @@ export function DocsTabs() {
                 />
               </div>
             </div>
+
+            <div className="space-y-4 pt-8 border-t border-neutral-800">
+              <h3 className="text-lg font-semibold text-white mb-4">
+                Storage Bucket
+              </h3>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-1 rounded text-xs font-bold bg-blue-500 text-white">
+                    GET
+                  </span>
+                  <code className="bg-neutral-950 px-2 py-1 rounded text-sm text-neutral-300 font-mono">
+                    /api/resources?id=:fileId
+                  </code>
+                </div>
+                <p className="text-sm text-neutral-400">
+                  Fetch raw file content from the bucket.
+                </p>
+              </div>
+
+              <div className="space-y-4 pt-4 border-t border-neutral-800">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-1 rounded text-xs font-bold bg-green-500 text-white">
+                    POST
+                  </span>
+                  <code className="bg-neutral-950 px-2 py-1 rounded text-sm text-neutral-300 font-mono">
+                    /api/bucket/upload
+                  </code>
+                </div>
+                <p className="text-sm text-neutral-400">
+                  Upload files to the bucket.
+                </p>
+
+                <div className="grid gap-2">
+                  <div className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
+                    Body (FormData)
+                  </div>
+                  <div className="bg-neutral-950 p-2 rounded text-sm font-mono text-neutral-300 border border-neutral-800">
+                    files: File[]
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

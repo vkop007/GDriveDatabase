@@ -122,6 +122,18 @@ export default function Sidebar({ treeData }: SidebarProps) {
             Home
           </Link>
 
+          <Link
+            href="/dashboard/apidocs"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+              pathname === "/dashboard/apidocs"
+                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
+                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+            }`}
+          >
+            <FileJson className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
+            API Docs
+          </Link>
+
           <div className="pt-6 pb-2 px-3 text-xs font-semibold text-(--sidebar-foreground) uppercase tracking-wider opacity-70">
             Explorer
           </div>
@@ -273,18 +285,6 @@ export default function Sidebar({ treeData }: SidebarProps) {
           >
             <Settings className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
             Settings
-          </Link>
-
-          <Link
-            href="/dashboard/apidocs"
-            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
-              pathname === "/dashboard/apidocs"
-                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
-                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
-            }`}
-          >
-            <FileJson className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
-            API Docs
           </Link>
         </nav>
 
