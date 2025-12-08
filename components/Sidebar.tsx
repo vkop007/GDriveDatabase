@@ -246,6 +246,21 @@ export default function Sidebar({ treeData }: SidebarProps) {
           </div>
 
           <div className="pt-6 pb-2 px-3 text-xs font-semibold text-(--sidebar-foreground) uppercase tracking-wider opacity-70">
+            Storage
+          </div>
+          <Link
+            href="/dashboard/bucket"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+              pathname === "/dashboard/bucket"
+                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
+                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+            }`}
+          >
+            <Database className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
+            Bucket
+          </Link>
+
+          <div className="pt-6 pb-2 px-3 text-xs font-semibold text-(--sidebar-foreground) uppercase tracking-wider opacity-70">
             System
           </div>
           <Link
