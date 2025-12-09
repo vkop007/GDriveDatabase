@@ -122,6 +122,18 @@ export default function Sidebar({ treeData }: SidebarProps) {
             Home
           </Link>
 
+          <Link
+            href="/dashboard/apidocs"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+              pathname === "/dashboard/apidocs"
+                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
+                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+            }`}
+          >
+            <FileJson className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
+            API Docs
+          </Link>
+
           <div className="pt-6 pb-2 px-3 text-xs font-semibold text-(--sidebar-foreground) uppercase tracking-wider opacity-70">
             Explorer
           </div>
@@ -263,6 +275,42 @@ export default function Sidebar({ treeData }: SidebarProps) {
           <div className="pt-6 pb-2 px-3 text-xs font-semibold text-(--sidebar-foreground) uppercase tracking-wider opacity-70">
             System
           </div>
+
+          <Link
+            href="/dashboard/usage"
+            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+              pathname === "/dashboard/usage"
+                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
+                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+            }`}
+          >
+            <div
+              className={`w-4 h-4 flex items-center justify-center ${
+                pathname === "/dashboard/usage"
+                  ? ""
+                  : "group-hover:text-purple-400"
+              } transition-colors`}
+            >
+              {/* Minimal pie chart icon or similar since we don't have PieChart imported */}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="w-4 h-4"
+              >
+                <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
+                <path d="M22 12A10 10 0 0 0 12 2v10z" />
+              </svg>
+            </div>
+            Usage
+          </Link>
+
           <Link
             href="/dashboard/settings"
             className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
@@ -273,18 +321,6 @@ export default function Sidebar({ treeData }: SidebarProps) {
           >
             <Settings className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
             Settings
-          </Link>
-
-          <Link
-            href="/dashboard/apidocs"
-            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
-              pathname === "/dashboard/apidocs"
-                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
-                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
-            }`}
-          >
-            <FileJson className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
-            API Docs
           </Link>
         </nav>
 
