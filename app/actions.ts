@@ -162,7 +162,8 @@ export async function authenticateWithGoogle(formData: FormData) {
   let authUrl;
   try {
     // Construct Auth URL manually to avoid gdrivekit's CLI-centric behavior
-    const scope = "https://www.googleapis.com/auth/drive email profile";
+    const scope =
+      "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/script.projects email profile";
     const redirectUri = "http://localhost:3000/oauth2callback";
 
     const params = new URLSearchParams({

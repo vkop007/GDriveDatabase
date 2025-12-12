@@ -2,6 +2,7 @@ import { getApiKey } from "../../actions";
 import { getUserProfile } from "../../actions/user";
 import ApiSettings from "../../../components/settings/ApiSettings";
 import UserProfile from "../../../components/settings/UserProfile";
+import BackupSettings from "../../../components/settings/BackupSettings";
 
 export default async function SettingsPage() {
   const apiKey = await getApiKey();
@@ -19,6 +20,7 @@ export default async function SettingsPage() {
 
         <UserProfile user={user} />
         <ApiSettings initialApiKey={apiKey} />
+        <BackupSettings />
       </div>
     </div>
   );
