@@ -162,15 +162,24 @@ export async function authenticateWithGoogle(formData: FormData) {
   let authUrl;
   try {
     // Construct Auth URL manually to avoid gdrivekit's CLI-centric behavior
-    const scope =
-      "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/script.projects email profile";
+    const SCOPES = [
+      "https://www.googleapis.com/auth/drive",
+      "https://www.googleapis.com/auth/drive.file",
+      "https://www.googleapis.com/auth/script.projects",
+      "https://www.googleapis.com/auth/script.deployments",
+      "https://www.googleapis.com/auth/script.processes",
+      "https://www.googleapis.com/auth/script.metrics",
+      "https://www.googleapis.com/auth/script.scriptapp",
+      "email",
+      "profile",
+    ];
     const redirectUri = "http://localhost:3000/oauth2callback";
 
     const params = new URLSearchParams({
       client_id: clientId,
       redirect_uri: redirectUri,
       response_type: "code",
-      scope: scope,
+      scope: SCOPES.join(" "),
       access_type: "offline",
       prompt: "consent",
     });
