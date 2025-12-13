@@ -17,7 +17,7 @@ export default async function Home() {
 
       <div className="z-10 w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tighter bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold tracking-tighter text-gradient-primary">
             NoSQL Drive DB
           </h1>
           <p className="text-neutral-400">
@@ -25,7 +25,7 @@ export default async function Home() {
           </p>
         </div>
 
-        <div className="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
+        <div className="card-glow p-8">
           <form action={authenticateWithGoogle} className="space-y-6">
             <div className="space-y-2">
               <label
@@ -40,7 +40,7 @@ export default async function Home() {
                 type="text"
                 required
                 placeholder="Enter your Google Client ID"
-                className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
+                className="input"
               />
             </div>
 
@@ -57,7 +57,7 @@ export default async function Home() {
                 type="password"
                 required
                 placeholder="Enter your Google Client Secret"
-                className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
+                className="input"
               />
             </div>
 
@@ -74,14 +74,11 @@ export default async function Home() {
                 type="text"
                 required
                 placeholder="Enter your Google Project ID"
-                className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
+                className="input"
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium py-3 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg shadow-purple-500/25"
-            >
+            <button type="submit" className="btn btn-primary w-full py-3">
               Connect Google Drive
             </button>
           </form>

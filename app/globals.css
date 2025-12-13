@@ -1,14 +1,40 @@
 @import "tailwindcss";
 
+/* ============================================
+   GDrive Database - Design System
+   ============================================ */
+
+/* ============================================
+   1. CSS Variables / Theme Tokens
+   ============================================ */
 :root {
+  /* Layout */
+  --sidebar-width: 16rem;
+  
+  /* Colors - Light Mode */
   --background: #ffffff;
   --foreground: #171717;
-  --sidebar-width: 16rem;
   --sidebar-bg: #ffffff;
   --sidebar-border: #e5e5e5;
   --sidebar-foreground: #171717;
   --sidebar-accent: #f5f5f5;
   --sidebar-accent-foreground: #171717;
+  
+  /* Brand Colors */
+  --primary: #a855f7;
+  --primary-foreground: #ffffff;
+  --secondary: #ec4899;
+  --accent: #3b82f6;
+  --success: #22c55e;
+  --warning: #eab308;
+  --danger: #ef4444;
+  
+  /* Card Gradients */
+  --card-purple: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(88, 28, 135, 0.3));
+  --card-pink: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(131, 24, 67, 0.3));
+  --card-blue: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(30, 58, 138, 0.3));
+  --card-red: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(127, 29, 29, 0.3));
+  --card-green: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(20, 83, 45, 0.3));
 }
 
 @theme inline {
@@ -18,6 +44,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Dark Mode (Default for this app) */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -34,4 +61,654 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ============================================
+   2. Base Card Styles
+   ============================================ */
+
+/* Base card with glass morphism effect */
+.card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgb(38, 38, 38);
+  background: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(38, 38, 38, 0.5));
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgb(64, 64, 64);
+}
+
+/* Card with glow effect */
+.card-glow {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgb(38, 38, 38);
+  background: var(--card-purple);
+  transition: all 0.5s ease;
+}
+
+.card-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8rem;
+  height: 8rem;
+  background: rgba(168, 85, 247, 0.1);
+  filter: blur(40px);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: background 0.3s ease;
+}
+
+.card-glow:hover::before {
+  background: rgba(168, 85, 247, 0.2);
+}
+
+.card-glow:hover {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+/* Color variants for card-glow */
+.card-glow-pink {
+  background: var(--card-pink);
+}
+.card-glow-pink::before {
+  background: rgba(236, 72, 153, 0.1);
+}
+.card-glow-pink:hover::before {
+  background: rgba(236, 72, 153, 0.2);
+}
+.card-glow-pink:hover {
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.card-glow-blue {
+  background: var(--card-blue);
+}
+.card-glow-blue::before {
+  background: rgba(59, 130, 246, 0.1);
+}
+.card-glow-blue:hover::before {
+  background: rgba(59, 130, 246, 0.2);
+}
+.card-glow-blue:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.card-glow-red {
+  background: var(--card-red);
+}
+.card-glow-red::before {
+  background: rgba(239, 68, 68, 0.1);
+}
+.card-glow-red:hover::before {
+  background: rgba(239, 68, 68, 0.2);
+}
+.card-glow-red:hover {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.card-glow-green {
+  background: var(--card-green);
+}
+.card-glow-green::before {
+  background: rgba(34, 197, 94, 0.1);
+}
+.card-glow-green:hover::before {
+  background: rgba(34, 197, 94, 0.2);
+}
+.card-glow-green:hover {
+  border-color: rgba(34, 197, 94, 0.3);
+}
+
+/* ============================================
+   3. Icon Containers
+   ============================================ */
+.icon-box {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.icon-box-lg {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+}
+
+.icon-box-purple {
+  background: linear-gradient(to bottom right, rgba(168, 85, 247, 0.3), rgba(168, 85, 247, 0.1));
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+.icon-box-purple:hover,
+.group:hover .icon-box-purple {
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+.icon-box-pink {
+  background: linear-gradient(to bottom right, rgba(236, 72, 153, 0.3), rgba(236, 72, 153, 0.1));
+  border: 1px solid rgba(236, 72, 153, 0.2);
+}
+.icon-box-pink:hover,
+.group:hover .icon-box-pink {
+  border-color: rgba(236, 72, 153, 0.4);
+}
+
+.icon-box-blue {
+  background: linear-gradient(to bottom right, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+.icon-box-blue:hover,
+.group:hover .icon-box-blue {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.icon-box-red {
+  background: linear-gradient(to bottom right, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.1));
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+.icon-box-red:hover,
+.group:hover .icon-box-red {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.icon-box-green {
+  background: linear-gradient(to bottom right, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.1));
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+.icon-box-green:hover,
+.group:hover .icon-box-green {
+  border-color: rgba(34, 197, 94, 0.4);
+}
+
+/* Solid gradient icon boxes */
+.icon-box-solid-purple {
+  background: linear-gradient(to bottom right, #a855f7, #ec4899);
+}
+.icon-box-solid-blue {
+  background: linear-gradient(to bottom right, #3b82f6, #06b6d4);
+}
+.icon-box-solid-green {
+  background: linear-gradient(to bottom right, #22c55e, #10b981);
+}
+
+/* ============================================
+   4. Progress Bars
+   ============================================ */
+.progress-bar {
+  height: 0.5rem;
+  background: rgb(38, 38, 38);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-bar-sm {
+  height: 0.25rem;
+}
+
+.progress-bar-lg {
+  height: 1rem;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 1s ease-out;
+}
+
+.progress-fill-purple {
+  background: linear-gradient(to right, #a855f7, #c084fc);
+}
+
+.progress-fill-pink {
+  background: linear-gradient(to right, #ec4899, #f472b6);
+}
+
+.progress-fill-blue {
+  background: linear-gradient(to right, #3b82f6, #60a5fa);
+}
+
+.progress-fill-red {
+  background: linear-gradient(to right, #ef4444, #f87171);
+}
+
+.progress-fill-green {
+  background: linear-gradient(to right, #22c55e, #4ade80);
+}
+
+/* ============================================
+   5. Buttons
+   ============================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(to right, #a855f7, #ec4899);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.btn-secondary {
+  background: rgb(38, 38, 38);
+  color: rgb(212, 212, 212);
+  border: 1px solid rgb(64, 64, 64);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: rgb(64, 64, 64);
+  color: white;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+}
+.btn-danger:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: rgb(163, 163, 163);
+}
+.btn-ghost:hover:not(:disabled) {
+  background: rgb(38, 38, 38);
+  color: white;
+}
+
+/* ============================================
+   6. Badges & Tags
+   ============================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.badge-purple {
+  background: rgba(168, 85, 247, 0.1);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.badge-pink {
+  background: rgba(236, 72, 153, 0.1);
+  color: #f472b6;
+  border: 1px solid rgba(236, 72, 153, 0.2);
+}
+
+.badge-blue {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.badge-green {
+  background: rgba(34, 197, 94, 0.1);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.badge-red {
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.badge-neutral {
+  background: rgb(38, 38, 38);
+  color: rgb(163, 163, 163);
+}
+
+/* ============================================
+   7. Status Indicators
+   ============================================ */
+.status-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-dot-green {
+  background: #22c55e;
+}
+
+.status-dot-yellow {
+  background: #eab308;
+}
+
+.status-dot-red {
+  background: #ef4444;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* ============================================
+   8. Text Styles
+   ============================================ */
+.text-gradient {
+  background: linear-gradient(to right, white, rgb(163, 163, 163));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-purple {
+  background: linear-gradient(to right, white, rgba(192, 132, 252, 0.8), #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-primary {
+  background: linear-gradient(to right, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   9. List Items / Row Styles
+   ============================================ */
+.list-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: rgba(38, 38, 38, 0.3);
+  border: 1px solid rgba(64, 64, 64, 0.3);
+  transition: all 0.3s ease;
+}
+
+.list-item:hover {
+  background: rgba(38, 38, 38, 0.6);
+  border-color: rgba(64, 64, 64, 0.5);
+}
+
+/* Color accent bar for list items */
+.list-item-bar {
+  width: 0.375rem;
+  height: 2rem;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.list-item-bar-purple {
+  background: linear-gradient(to bottom, #a855f7, #c084fc);
+}
+
+.list-item-bar-pink {
+  background: linear-gradient(to bottom, #ec4899, #f472b6);
+}
+
+.list-item-bar-blue {
+  background: linear-gradient(to bottom, #3b82f6, #60a5fa);
+}
+
+.list-item-bar-violet {
+  background: linear-gradient(to bottom, #8b5cf6, #a78bfa);
+}
+
+.list-item-bar-fuchsia {
+  background: linear-gradient(to bottom, #d946ef, #e879f9);
+}
+
+.list-item-bar-indigo {
+  background: linear-gradient(to bottom, #6366f1, #818cf8);
+}
+
+/* ============================================
+   10. Section Headers
+   ============================================ */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-header-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ============================================
+   11. Alerts
+   ============================================ */
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+
+.alert-warning {
+  background: rgba(234, 179, 8, 0.1);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.alert-info {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.alert-success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+/* ============================================
+   12. Inputs
+   ============================================ */
+.input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  background: rgb(38, 38, 38);
+  border: 1px solid rgb(64, 64, 64);
+  border-radius: 0.5rem;
+  color: white;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+}
+
+.input::placeholder {
+  color: rgb(115, 115, 115);
+}
+
+/* Checkbox styling */
+.checkbox {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgb(64, 64, 64);
+  background: rgb(38, 38, 38);
+  cursor: pointer;
+  accent-color: #a855f7;
+}
+
+/* ============================================
+   13. Tables
+   ============================================ */
+.table-container {
+  background: rgba(23, 23, 23, 0.5);
+  border: 1px solid rgb(38, 38, 38);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.table th {
+  padding: 0.75rem 1.5rem;
+  background: rgb(23, 23, 23);
+  color: rgb(163, 163, 163);
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 1rem 1.5rem;
+  color: white;
+}
+
+.table tbody tr {
+  border-top: 1px solid rgb(38, 38, 38);
+  transition: background 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background: rgba(38, 38, 38, 0.5);
+}
+
+/* ============================================
+   14. Empty States
+   ============================================ */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  border-radius: 0.75rem;
+  background: rgba(38, 38, 38, 0.2);
+  border: 2px dashed rgb(64, 64, 64);
+}
+
+.empty-state-icon {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+  color: rgb(64, 64, 64);
+}
+
+/* ============================================
+   15. Floating Action Bar
+   ============================================ */
+.floating-bar {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  background: rgb(23, 23, 23);
+  border: 1px solid rgb(64, 64, 64);
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ============================================
+   16. Animations
+   ============================================ */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease forwards;
+}
+
+/* ============================================
+   17. Utility Classes
+   ============================================ */
+.glow-purple {
+  box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+}
+
+.glow-pink {
+  box-shadow: 0 0 40px rgba(236, 72, 153, 0.15);
+}
+
+.glow-blue {
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
+}
+
+.divider {
+  width: 1px;
+  height: 1.5rem;
+  background: rgb(64, 64, 64);
 }

@@ -73,7 +73,7 @@ export default function RenameModal({
         <div>
           <label
             htmlFor="rename-input"
-            className="block text-sm font-medium text-neutral-400 mb-1"
+            className="block text-sm font-medium text-neutral-400 mb-2"
           >
             Name
           </label>
@@ -83,23 +83,19 @@ export default function RenameModal({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={`Enter new ${itemType} name`}
-            className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 transition-colors"
+            className="input"
             required
             autoFocus
           />
         </div>
-        <div className="flex justify-end gap-2 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors"
-          >
+        <div className="flex justify-end gap-3 pt-2">
+          <button type="button" onClick={onClose} className="btn btn-ghost">
             Cancel
           </button>
           <button
             type="submit"
             disabled={isLoading || !name.trim() || name === currentName}
-            className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="btn btn-primary"
           >
             {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Changes

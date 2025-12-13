@@ -78,11 +78,11 @@ export default function DataTable({ table, fileId }: DataTableProps) {
 
   return (
     <>
-      <div className="bg-neutral-900/50 border border-neutral-800 rounded-xl overflow-x-auto">
-        <table className="w-full text-left text-sm whitespace-nowrap">
-          <thead className="bg-neutral-900 text-neutral-400 font-medium">
+      <div className="table-container overflow-x-auto">
+        <table className="table whitespace-nowrap">
+          <thead>
             <tr>
-              <th className="px-4 py-3 w-10">
+              <th className="w-10">
                 <input
                   type="checkbox"
                   checked={allSelected}
@@ -92,24 +92,22 @@ export default function DataTable({ table, fileId }: DataTableProps) {
                     }
                   }}
                   onChange={toggleAll}
-                  className="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-neutral-900 cursor-pointer"
+                  className="checkbox"
                   disabled={allIds.length === 0}
                 />
               </th>
               {table.schema.map((col) => (
-                <th key={col.key} className="px-6 py-3">
-                  {col.key}
-                </th>
+                <th key={col.key}>{col.key}</th>
               ))}
-              <th className="px-6 py-3 text-right">Actions</th>
+              <th className="text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-800">
+          <tbody>
             {table.documents.length === 0 ? (
               <tr>
                 <td
                   colSpan={table.schema.length + 2}
-                  className="px-6 py-12 text-center text-neutral-500"
+                  className="text-center text-neutral-500 py-12"
                 >
                   No data yet. Add your first row above.
                 </td>
@@ -120,30 +118,28 @@ export default function DataTable({ table, fileId }: DataTableProps) {
                 return (
                   <tr
                     key={doc.$id}
-                    className={`hover:bg-neutral-800/50 transition-colors ${
-                      isSelected ? "bg-purple-500/10" : ""
-                    }`}
+                    className={isSelected ? "bg-purple-500/10!" : ""}
                   >
-                    <td className="px-4 py-4">
+                    <td>
                       <input
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleRow(doc.$id)}
-                        className="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-purple-500 focus:ring-purple-500 focus:ring-offset-neutral-900 cursor-pointer"
+                        className="checkbox"
                       />
                     </td>
                     {table.schema.map((col) => (
-                      <td key={col.key} className="px-6 py-4 text-white">
+                      <td key={col.key}>
                         {typeof doc[col.key] === "object"
                           ? JSON.stringify(doc[col.key])
                           : String(doc[col.key] ?? "")}
                       </td>
                     ))}
-                    <td className="px-6 py-4 text-right">
+                    <td className="text-right">
                       <form action={deleteDocument} className="inline-block">
                         <input type="hidden" name="fileId" value={fileId} />
                         <input type="hidden" name="docId" value={doc.$id} />
-                        <button className="text-red-500 hover:text-red-400 transition-colors">
+                        <button className="text-red-500 hover:text-red-400 transition-colors text-sm font-medium">
                           Delete
                         </button>
                       </form>

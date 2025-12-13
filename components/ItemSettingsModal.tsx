@@ -32,7 +32,7 @@ export default function ItemSettingsModal({
       title={`${type.charAt(0).toUpperCase() + type.slice(1)} Settings`}
     >
       <div className="space-y-4">
-        <div className="p-4 bg-neutral-950/50 rounded-lg border border-neutral-800">
+        <div className="p-4 rounded-xl bg-neutral-800/30 border border-neutral-700/50">
           <h3 className="text-sm font-medium text-neutral-400 mb-1">
             Selected Item
           </h3>
@@ -50,9 +50,9 @@ export default function ItemSettingsModal({
               onRename();
               onClose();
             }}
-            className="w-full flex items-center gap-3 px-4 py-3 bg-neutral-800/50 hover:bg-neutral-800 text-left rounded-lg transition-colors group"
+            className="list-item w-full text-left"
           >
-            <div className="p-2 bg-neutral-800 rounded-md group-hover:bg-neutral-700 transition-colors">
+            <div className="icon-box icon-box-purple">
               <PenLine className="w-4 h-4 text-purple-400" />
             </div>
             <div>

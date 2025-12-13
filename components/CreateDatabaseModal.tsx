@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "./Modal";
 import { createDatabase } from "../app/actions";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 export default function CreateDatabaseModal() {
@@ -37,23 +37,8 @@ export default function CreateDatabaseModal() {
 
   return (
     <>
-      <button
-        onClick={() => setIsOpen(true)}
-        className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium flex items-center gap-2"
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
+      <button onClick={() => setIsOpen(true)} className="btn btn-primary">
+        <Plus className="w-4 h-4" />
         Create Database
       </button>
 
@@ -66,7 +51,7 @@ export default function CreateDatabaseModal() {
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-neutral-400 mb-1"
+              className="block text-sm font-medium text-neutral-400 mb-2"
             >
               Database Name
             </label>
@@ -75,23 +60,23 @@ export default function CreateDatabaseModal() {
               id="name"
               name="name"
               placeholder="e.g. My Database"
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-purple-500 transition-colors"
+              className="input"
               required
               autoFocus
             />
           </div>
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-3 pt-2">
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors"
+              className="btn btn-ghost"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="btn btn-primary"
             >
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               Create Database

@@ -31,40 +31,53 @@ export async function getStorageUsage() {
     ]);
 
     let appUsageBytes = 0;
+    let bucketUsageBytes = 0;
 
     // Bucket size
     if (bucketFiles && Array.isArray(bucketFiles)) {
-      appUsageBytes += bucketFiles.reduce(
+      bucketUsageBytes = bucketFiles.reduce(
         (acc: number, file: any) => acc + parseInt(file.size || "0"),
         0
       );
+      appUsageBytes += bucketUsageBytes;
     }
 
     // Database sizes (iterate each db to get tables)
-    // We need to fetch files for each dict to get true size
-    // Limit concurrency if needed, but for now Promise.all is fine for reasonable counts
+    interface DbUsage {
+      id: string;
+      name: string;
+      size: number;
+      tableCount: number;
+    }
+    const databaseUsage: DbUsage[] = [];
+
     if (dbs && Array.isArray(dbs)) {
-      const dbSizes = await Promise.all(
+      const dbDetails = await Promise.all(
         dbs.map(async (db: any) => {
           try {
             const res = await operations.listOperations.listFilesInFolder(
               db.id
             );
             const files = res.data?.files || [];
-            return files.reduce(
+            const size = files.reduce(
               (acc: number, f: any) => acc + parseInt(f.size || "0"),
               0
             );
+            return {
+              id: db.id,
+              name: db.name,
+              size,
+              tableCount: files.length,
+            };
           } catch (e) {
             console.error(`Failed to size db ${db.name}:`, e);
-            return 0;
+            return { id: db.id, name: db.name, size: 0, tableCount: 0 };
           }
         })
       );
-      appUsageBytes += dbSizes.reduce(
-        (acc: number, size: number) => acc + size,
-        0
-      );
+
+      databaseUsage.push(...dbDetails);
+      appUsageBytes += dbDetails.reduce((acc, db) => acc + db.size, 0);
     }
 
     const quotaData = (quota as any).data || quota;
@@ -73,7 +86,11 @@ export async function getStorageUsage() {
       success: true,
       data: {
         ...quotaData,
-        appUsage: appUsageBytes, // App specific usage in bytes
+        appUsage: appUsageBytes,
+        bucketUsage: bucketUsageBytes,
+        bucketFileCount: bucketFiles?.length || 0,
+        databaseUsage, // Per-database breakdown
+        databaseCount: dbs?.length || 0,
       },
     };
   } catch (error) {
