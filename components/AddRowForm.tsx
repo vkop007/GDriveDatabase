@@ -20,10 +20,7 @@ export default function AddRowForm({
 
   if (!isOpen) {
     return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium flex items-center gap-2"
-      >
+      <button onClick={() => setIsOpen(true)} className="btn btn-primary">
         <svg
           className="w-4 h-4"
           fill="none"
@@ -49,7 +46,7 @@ export default function AddRowForm({
           <h3 className="text-lg font-semibold text-white">Add New Row</h3>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-neutral-500 hover:text-white transition-colors p-1 rounded-md hover:bg-neutral-800"
+            className="btn btn-ghost p-1"
           >
             <svg
               className="w-5 h-5"
@@ -166,7 +163,7 @@ export default function AddRowForm({
                     type={col.type === "integer" ? "number" : "text"}
                     name={col.key}
                     placeholder={`Enter ${col.key}`}
-                    className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                    className="input"
                     required={col.required}
                   />
                 )}
@@ -178,14 +175,11 @@ export default function AddRowForm({
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="px-4 py-2 rounded-lg text-sm font-medium text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+              className="btn btn-ghost"
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              className="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2 rounded-lg transition-colors text-sm font-medium shadow-lg shadow-purple-900/20"
-            >
+            <button type="submit" className="btn btn-primary">
               Save Row
             </button>
           </div>
