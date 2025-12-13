@@ -236,6 +236,30 @@ export async function deleteDocument(formData: FormData) {
   revalidatePath(`/dashboard/table/${fileId}`);
 }
 
+export async function bulkDeleteDocuments(fileId: string, docIds: string[]) {
+  if (!fileId || !docIds || docIds.length === 0) {
+    return { success: false, error: "Missing parameters" };
+  }
+
+  try {
+    const table = await getTableData(fileId);
+    const docIdSet = new Set(docIds);
+    const initialCount = table.documents.length;
+
+    table.documents = table.documents.filter((d) => !docIdSet.has(d.$id));
+
+    const deletedCount = initialCount - table.documents.length;
+
+    await saveTableContent(fileId, table);
+    revalidatePath(`/dashboard/table/${fileId}`);
+
+    return { success: true, deletedCount };
+  } catch (error) {
+    console.error("Error bulk deleting documents:", error);
+    return { success: false, error: "Failed to delete documents" };
+  }
+}
+
 // Helper to save the entire table content
 async function saveTableContent(fileId: string, content: TableFile) {
   const { tokens, clientId, clientSecret, projectId } = await getAuth();
