@@ -8,7 +8,11 @@ import fs from "fs/promises";
 import path from "path";
 
 import { createTable } from "./actions/table";
-import { moveFile, getOrCreateRootFolder } from "../lib/gdrive/operations";
+import {
+  moveFile,
+  getOrCreateRootFolder,
+  getOrCreateSystemFolder,
+} from "../lib/gdrive/operations";
 
 const ROOT_FOLDER_NAME = "GDriveDatabase";
 const SECRETS_FILE = path.join(process.cwd(), "api-secrets.json");
@@ -57,10 +61,12 @@ export async function generateApiKey() {
   // Save locally
   await fs.writeFile(SECRETS_FILE, JSON.stringify(secretData, null, 2));
 
-  // Sync to Drive
+  // Sync to Drive - save in _SystemData folder
   try {
-    const rootId = await getOrCreateRootFolder();
-    const files = await operations.listOperations.listFilesInFolder(rootId);
+    const systemFolderId = await getOrCreateSystemFolder();
+    const files = await operations.listOperations.listFilesInFolder(
+      systemFolderId
+    );
     const existingConfig = files.data?.files?.find(
       (f: any) => f.name === API_CONFIG_FILE && !f.trashed
     );
@@ -73,7 +79,7 @@ export async function generateApiKey() {
         API_CONFIG_FILE
       );
       if (result.success && result.data.id) {
-        await moveFile(result.data.id, rootId);
+        await moveFile(result.data.id, systemFolderId);
       }
     }
   } catch (e) {
@@ -109,9 +115,11 @@ export async function deleteApiKey() {
     // Save locally
     await fs.writeFile(SECRETS_FILE, JSON.stringify(newSecrets, null, 2));
 
-    // Sync to Drive
-    const rootId = await getOrCreateRootFolder();
-    const files = await operations.listOperations.listFilesInFolder(rootId);
+    // Sync to Drive - use _SystemData folder
+    const systemFolderId = await getOrCreateSystemFolder();
+    const files = await operations.listOperations.listFilesInFolder(
+      systemFolderId
+    );
     const existingConfig = files.data?.files?.find(
       (f: any) => f.name === API_CONFIG_FILE && !f.trashed
     );
@@ -214,6 +222,15 @@ export async function authenticateWithGoogle(formData: FormData) {
   }
 }
 
+// System folder/file names to hide from user
+const SYSTEM_NAMES = [
+  "api-config.json",
+  "_system",
+  ".system",
+  "System",
+  "_SystemData",
+];
+
 // Internal fetch function for databases
 async function _listDatabases(auth: any) {
   initDriveService(
@@ -232,7 +249,14 @@ async function _listDatabases(auth: any) {
     const response = await operations.listOperations.listFoldersInFolder(
       rootId
     );
-    return response.data?.files || [];
+    const folders = response.data?.files || [];
+    // Filter out system folders (starting with _ or . or in SYSTEM_NAMES)
+    return folders.filter(
+      (f: any) =>
+        !f.name.startsWith("_") &&
+        !f.name.startsWith(".") &&
+        !SYSTEM_NAMES.includes(f.name)
+    );
   } catch (error) {
     console.error("Error listing databases:", error);
     return [];

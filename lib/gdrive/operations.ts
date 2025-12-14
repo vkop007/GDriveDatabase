@@ -43,6 +43,47 @@ export async function getOrCreateRootFolder(auth?: any) {
   );
 }
 
+const SYSTEM_FOLDER_NAME = "_SystemData";
+
+/**
+ * Get or create the _SystemData folder inside GDriveDatabase root.
+ * This folder stores system files like api-config.json, backups, user-profile.json
+ */
+export async function getOrCreateSystemFolder(auth?: any) {
+  const rootId = await getOrCreateRootFolder(auth);
+
+  try {
+    // Look for existing _SystemData folder
+    const response = await operations.listOperations.listFoldersInFolder(
+      rootId
+    );
+    const systemFolder = response.data?.files?.find(
+      (f: any) => f.name === SYSTEM_FOLDER_NAME && !f.trashed
+    );
+
+    if (systemFolder) {
+      return systemFolder.id;
+    }
+  } catch (error) {
+    console.error("Error listing folders for _SystemData:", error);
+  }
+
+  // Create if not exists
+  console.log("Creating _SystemData folder...");
+  const createResponse = await operations.folderOperations.createFolder(
+    SYSTEM_FOLDER_NAME,
+    rootId
+  );
+
+  if (createResponse?.data?.id) {
+    return createResponse.data.id;
+  } else if ((createResponse as any)?.id) {
+    return (createResponse as any).id;
+  }
+
+  throw new Error("Failed to create _SystemData folder");
+}
+
 import { fetchWithAuth } from "./auth";
 
 // Custom move file implementation to bypass gdrivekit issue or limitations

@@ -96,15 +96,15 @@ export default function Sidebar({ treeData }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-(--sidebar-width) bg-(--sidebar-bg) border-r border-(--sidebar-border) transform transition-transform duration-200 ease-in-out md:translate-x-0 flex flex-col ${
+        className={`fixed inset-y-0 left-0 z-40 w-(--sidebar-width) bg-[rgb(15,15,15)] border-r border-[rgb(38,38,38)] transform transition-transform duration-200 ease-in-out md:translate-x-0 flex flex-col ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-6 border-b border-(--sidebar-border) flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+        <div className="p-6 border-b border-[rgb(38,38,38)] flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
             <Database className="w-4 h-4 text-white" />
           </div>
-          <h1 className="text-lg font-bold text-foreground tracking-tight">
+          <h1 className="text-lg font-bold text-white tracking-tight">
             GDrive DB
           </h1>
         </div>
@@ -112,10 +112,10 @@ export default function Sidebar({ treeData }: SidebarProps) {
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           <Link
             href="/dashboard"
-            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group ${
               pathname === "/dashboard"
-                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
-                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+                ? "bg-[rgba(168,85,247,0.15)] text-purple-400 border border-purple-500/20"
+                : "text-neutral-400 hover:text-white hover:bg-[rgb(38,38,38)]"
             }`}
           >
             <Home className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
@@ -124,17 +124,17 @@ export default function Sidebar({ treeData }: SidebarProps) {
 
           <Link
             href="/dashboard/apidocs"
-            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group ${
               pathname === "/dashboard/apidocs"
-                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
-                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+                ? "bg-[rgba(168,85,247,0.15)] text-purple-400 border border-purple-500/20"
+                : "text-neutral-400 hover:text-white hover:bg-[rgb(38,38,38)]"
             }`}
           >
             <FileJson className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
             API Docs
           </Link>
 
-          <div className="pt-6 pb-2 px-3 text-xs font-semibold text-(--sidebar-foreground) uppercase tracking-wider opacity-70">
+          <div className="pt-6 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
             Explorer
           </div>
 
@@ -149,16 +149,16 @@ export default function Sidebar({ treeData }: SidebarProps) {
               return (
                 <div key={db.id} className="select-none">
                   <div
-                    className={`group flex items-center gap-1 px-2 py-1.5 rounded-md text-sm transition-colors cursor-pointer ${
+                    className={`group flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm transition-colors cursor-pointer ${
                       isExactDb
-                        ? "bg-blue-500/10 text-blue-400"
-                        : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+                        ? "bg-[rgba(59,130,246,0.15)] text-blue-400 border border-blue-500/20"
+                        : "text-neutral-400 hover:text-white hover:bg-[rgb(38,38,38)]"
                     }`}
                     onClick={() => handleDatabaseClick(db.id)}
                   >
                     <button
                       onClick={(e) => toggleDb(e, db.id)}
-                      className="p-1 rounded-sm hover:bg-(--sidebar-accent) text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) transition-colors"
+                      className="p-1 rounded-sm hover:bg-[rgb(38,38,38)] text-neutral-500 hover:text-white transition-colors"
                     >
                       {isExpanded ? (
                         <ChevronDown className="w-3.5 h-3.5" />
@@ -173,7 +173,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
                           className={`w-4 h-4 ${
                             isExactDb
                               ? "text-blue-400"
-                              : "text-(--sidebar-foreground) group-hover:text-(--sidebar-accent-foreground)"
+                              : "text-neutral-500 group-hover:text-white"
                           }`}
                         />
                       ) : (
@@ -204,9 +204,9 @@ export default function Sidebar({ treeData }: SidebarProps) {
                   </div>
 
                   {isExpanded && (
-                    <div className="ml-4 pl-2 border-l border-(--sidebar-border) mt-0.5 space-y-0.5">
+                    <div className="ml-4 pl-2 border-l border-[rgb(38,38,38)] mt-0.5 space-y-0.5">
                       {db.tables.length === 0 && (
-                        <div className="px-3 py-2 text-xs text-(--sidebar-foreground) italic opacity-60">
+                        <div className="px-3 py-2 text-xs text-neutral-500 italic">
                           No tables found
                         </div>
                       )}
@@ -217,17 +217,17 @@ export default function Sidebar({ treeData }: SidebarProps) {
                           <Link
                             key={table.id}
                             href={`/dashboard/table/${table.id}`}
-                            className={`group flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${
+                            className={`group flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                               isTableActive
-                                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
-                                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+                                ? "bg-[rgba(34,197,94,0.15)] text-green-400 border border-green-500/20"
+                                : "text-neutral-400 hover:text-white hover:bg-[rgb(38,38,38)]"
                             }`}
                           >
                             <FileJson
                               className={`w-3.5 h-3.5 ${
                                 isTableActive
                                   ? "text-green-400"
-                                  : "text-(--sidebar-foreground)"
+                                  : "text-neutral-500"
                               }`}
                             />
                             <span className="truncate flex-1">
@@ -257,31 +257,31 @@ export default function Sidebar({ treeData }: SidebarProps) {
             })}
           </div>
 
-          <div className="pt-6 pb-2 px-3 text-xs font-semibold text-(--sidebar-foreground) uppercase tracking-wider opacity-70">
+          <div className="pt-6 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
             Storage
           </div>
           <Link
             href="/dashboard/bucket"
-            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group ${
               pathname === "/dashboard/bucket"
-                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
-                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+                ? "bg-[rgba(168,85,247,0.15)] text-purple-400 border border-purple-500/20"
+                : "text-neutral-400 hover:text-white hover:bg-[rgb(38,38,38)]"
             }`}
           >
             <Database className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
             Bucket
           </Link>
 
-          <div className="pt-6 pb-2 px-3 text-xs font-semibold text-(--sidebar-foreground) uppercase tracking-wider opacity-70">
+          <div className="pt-6 pb-2 px-3 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
             System
           </div>
 
           <Link
             href="/dashboard/usage"
-            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group ${
               pathname === "/dashboard/usage"
-                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
-                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+                ? "bg-[rgba(168,85,247,0.15)] text-purple-400 border border-purple-500/20"
+                : "text-neutral-400 hover:text-white hover:bg-[rgb(38,38,38)]"
             }`}
           >
             <div
@@ -313,10 +313,10 @@ export default function Sidebar({ treeData }: SidebarProps) {
 
           <Link
             href="/dashboard/settings"
-            className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group ${
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group ${
               pathname === "/dashboard/settings"
-                ? "bg-(--sidebar-accent) text-(--sidebar-accent-foreground)"
-                : "text-(--sidebar-foreground) hover:text-(--sidebar-accent-foreground) hover:bg-(--sidebar-accent)"
+                ? "bg-[rgba(168,85,247,0.15)] text-purple-400 border border-purple-500/20"
+                : "text-neutral-400 hover:text-white hover:bg-[rgb(38,38,38)]"
             }`}
           >
             <Settings className="w-4 h-4 group-hover:text-purple-400 transition-colors" />
@@ -324,12 +324,10 @@ export default function Sidebar({ treeData }: SidebarProps) {
           </Link>
         </nav>
 
-        <div className="p-4 border-t border-(--sidebar-border)">
-          <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-(--sidebar-accent) border border-(--sidebar-border)">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs text-(--sidebar-foreground)">
-              System Online
-            </span>
+        <div className="p-4 border-t border-[rgb(38,38,38)]">
+          <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[rgb(23,23,23)] border border-[rgb(38,38,38)]">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-sm shadow-green-500/50" />
+            <span className="text-xs text-neutral-400">System Online</span>
           </div>
         </div>
       </aside>

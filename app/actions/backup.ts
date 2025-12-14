@@ -2,21 +2,28 @@
 
 import { operations, initDriveService } from "gdrivekit";
 import { getAuth } from "../actions";
-import { getOrCreateRootFolder } from "../../lib/gdrive/operations";
+import {
+  getOrCreateRootFolder,
+  getOrCreateSystemFolder,
+} from "../../lib/gdrive/operations";
 import { cookies } from "next/headers";
 
 // Google Apps Script code that runs on Google's servers for fast backup
-// Includes deletion of old backup before creating new one
+// - Backs up sourceFolderId contents (excluding _SystemData folder)
+// - Stores backup in destFolderId
+// - Deletes old backup before creating new one (only keeps 1 backup)
 const BACKUP_SCRIPT_CODE = `
 function createBackup(params) {
   try {
-    var folderId = params.folderId;
-    var folder = DriveApp.getFolderById(folderId);
+    var sourceFolderId = params.sourceFolderId;
+    var destFolderId = params.destFolderId;
+    var sourceFolder = DriveApp.getFolderById(sourceFolderId);
+    var destFolder = DriveApp.getFolderById(destFolderId);
     
-    // First, delete any existing backup files in this folder
-    var files = folder.getFiles();
-    while (files.hasNext()) {
-      var file = files.next();
+    // First, delete any existing backup files in destination folder
+    var destFiles = destFolder.getFiles();
+    while (destFiles.hasNext()) {
+      var file = destFiles.next();
       if (file.getName().indexOf("GDriveDatabase-backup-") === 0 && 
           file.getName().endsWith(".zip")) {
         Logger.log("Deleting old backup: " + file.getName());
@@ -24,14 +31,14 @@ function createBackup(params) {
       }
     }
     
-    // Now create the new backup
-    var blobs = collectBlobs(folder, "");
+    // Now create the new backup from source folder (excluding _SystemData)
+    var blobs = collectBlobs(sourceFolder, "");
     
     var timestamp = Utilities.formatDate(new Date(), "Asia/Kolkata", "yyyy-MM-dd_HH-mm");
     var zipName = "GDriveDatabase-backup-" + timestamp + ".zip";
     
     var zip = Utilities.zip(blobs, zipName);
-    var file = folder.createFile(zip);
+    var file = destFolder.createFile(zip);
     
     return {
       success: true,
@@ -68,6 +75,9 @@ function collectBlobs(folder, prefix) {
   var folders = folder.getFolders();
   while (folders.hasNext()) {
     var sub = folders.next();
+    // Skip _SystemData folder - it contains system files, not user data
+    if (sub.getName() === "_SystemData") continue;
+    
     var subBlobs = collectBlobs(sub, prefix + sub.getName() + "/");
     for (var i = 0; i < subBlobs.length; i++) {
       blobs.push(subBlobs[i]);
@@ -180,7 +190,9 @@ export async function setupAutoBackup(): Promise<{
       tokens
     );
 
+    // Get folders for backup: source = root folder, dest = _SystemData
     const rootFolderId = await getOrCreateRootFolder();
+    const systemFolderId = await getOrCreateSystemFolder();
 
     // Check if we have a previously deployed script
     let scriptInfo = await getBackupScriptInfo();
@@ -253,7 +265,7 @@ export async function setupAutoBackup(): Promise<{
       await saveBackupScriptInfo(scriptInfo);
 
       // Return authorization URL
-      const authUrl = `${webAppUrl}?func=createBackup&folderId=${rootFolderId}`;
+      const authUrl = `${webAppUrl}?func=createBackup&sourceFolderId=${rootFolderId}&destFolderId=${systemFolderId}`;
 
       return {
         success: false,
@@ -268,7 +280,8 @@ export async function setupAutoBackup(): Promise<{
     console.log("Running initial backup...");
     const url = new URL(scriptInfo.webAppUrl);
     url.searchParams.append("func", "createBackup");
-    url.searchParams.append("folderId", rootFolderId);
+    url.searchParams.append("sourceFolderId", rootFolderId);
+    url.searchParams.append("destFolderId", systemFolderId);
 
     const response = await fetch(url.toString(), {
       method: "GET",
@@ -369,11 +382,13 @@ export async function runDailyBackup(): Promise<{
     );
 
     const rootFolderId = await getOrCreateRootFolder();
+    const systemFolderId = await getOrCreateSystemFolder();
 
     console.log("Running daily backup...");
     const url = new URL(scriptInfo.webAppUrl);
     url.searchParams.append("func", "createBackup");
-    url.searchParams.append("folderId", rootFolderId);
+    url.searchParams.append("sourceFolderId", rootFolderId);
+    url.searchParams.append("destFolderId", systemFolderId);
 
     const response = await fetch(url.toString(), {
       method: "GET",
