@@ -60,7 +60,7 @@ export default async function UsagePage() {
   };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto py-8 px-4">
+    <div className="p-4 md:p-8 max-w-7xl mx-auto min-h-screen text-white space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

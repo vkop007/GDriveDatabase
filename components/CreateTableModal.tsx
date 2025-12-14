@@ -17,8 +17,12 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
 
   const router = useRouter();
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (await createTable(formData)) as any;
@@ -51,7 +55,7 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
         onClose={() => setIsOpen(false)}
         title="Create New Table"
       >
-        <form action={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input type="hidden" name="parentId" value={parentId} />
           <div>
             <label
@@ -68,6 +72,7 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
               className="input"
               required
               autoFocus
+              disabled={isLoading}
             />
           </div>
           <div className="flex justify-end gap-3 pt-2">
@@ -75,6 +80,7 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
               type="button"
               onClick={() => setIsOpen(false)}
               className="btn btn-ghost"
+              disabled={isLoading}
             >
               Cancel
             </button>
@@ -83,8 +89,14 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
               disabled={isLoading}
               className="btn btn-primary"
             >
-              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-              Create Table
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Table"
+              )}
             </button>
           </div>
         </form>

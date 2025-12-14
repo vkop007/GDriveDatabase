@@ -97,8 +97,14 @@ export default function RenameModal({
             disabled={isLoading || !name.trim() || name === currentName}
             className="btn btn-primary"
           >
-            {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-            Save Changes
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              "Save Changes"
+            )}
           </button>
         </div>
       </form>

@@ -223,13 +223,7 @@ export async function authenticateWithGoogle(formData: FormData) {
 }
 
 // System folder/file names to hide from user
-const SYSTEM_NAMES = [
-  "api-config.json",
-  "_system",
-  ".system",
-  "System",
-  "_SystemData",
-];
+const SYSTEM_NAMES = ["_SystemData", "Buckets"];
 
 // Internal fetch function for databases
 async function _listDatabases(auth: any) {

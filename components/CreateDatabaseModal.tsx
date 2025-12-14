@@ -13,8 +13,12 @@ export default function CreateDatabaseModal() {
 
   const router = useRouter();
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading(true);
+
+    const formData = new FormData(e.currentTarget);
+
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (await createDatabase(formData)) as any;
@@ -47,7 +51,7 @@ export default function CreateDatabaseModal() {
         onClose={() => setIsOpen(false)}
         title="Create New Database"
       >
-        <form action={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="name"
@@ -63,6 +67,7 @@ export default function CreateDatabaseModal() {
               className="input"
               required
               autoFocus
+              disabled={isLoading}
             />
           </div>
           <div className="flex justify-end gap-3 pt-2">
@@ -70,6 +75,7 @@ export default function CreateDatabaseModal() {
               type="button"
               onClick={() => setIsOpen(false)}
               className="btn btn-ghost"
+              disabled={isLoading}
             >
               Cancel
             </button>
@@ -78,8 +84,14 @@ export default function CreateDatabaseModal() {
               disabled={isLoading}
               className="btn btn-primary"
             >
-              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-              Create Database
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                "Create Database"
+              )}
             </button>
           </div>
         </form>

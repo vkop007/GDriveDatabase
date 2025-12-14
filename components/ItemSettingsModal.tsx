@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Modal from "./Modal";
-import { PenLine, Trash2 } from "lucide-react";
+import { Loader2, PenLine, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { deleteDatabase, deleteCollection } from "../app/actions";
 
@@ -77,12 +77,20 @@ export default function ItemSettingsModal({
               className="w-full flex items-center gap-3 px-4 py-3 bg-red-500/5 hover:bg-red-500/10 text-left rounded-lg transition-colors group border border-red-500/10 hover:border-red-500/20"
             >
               <div className="p-2 bg-red-500/10 rounded-md group-hover:bg-red-500/20 transition-colors">
-                <Trash2 className="w-4 h-4 text-red-500" />
+                {isDeleting ? (
+                  <Loader2 className="w-4 h-4 text-red-500 animate-spin" />
+                ) : (
+                  <Trash2 className="w-4 h-4 text-red-500" />
+                )}
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-red-500">Delete</p>
+                <p className="text-sm font-medium text-red-500">
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </p>
                 <p className="text-xs text-red-500/60">
-                  Permanently remove this {type}
+                  {isDeleting
+                    ? "Please wait..."
+                    : `Permanently remove this ${type}`}
                 </p>
               </div>
             </button>
