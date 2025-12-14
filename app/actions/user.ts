@@ -5,48 +5,14 @@ import { operations, initDriveService } from "gdrivekit";
 import { unstable_cache, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { moveFile } from "../../lib/gdrive/operations";
+import { moveFile, getOrCreateSystemFolder } from "../../lib/gdrive/operations";
 
 const USER_PROFILE_FILE = "user-profile.json";
-const ROOT_FOLDER_NAME = "GDriveDatabase";
 
 export interface UserProfile {
   name: string;
   email: string;
   picture: string;
-}
-
-async function _getOrCreateRootFolder(auth: any) {
-  initDriveService(
-    {
-      client_id: auth.clientId,
-      client_secret: auth.clientSecret,
-      project_id: auth.projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
-    },
-    auth.tokens
-  );
-
-  try {
-    const response = await operations.listOperations.listFoldersInFolder(
-      "root"
-    );
-    const folder = response.data?.files?.find(
-      (f: any) => f.name === ROOT_FOLDER_NAME && !f.trashed
-    );
-
-    if (folder) {
-      return folder.id;
-    }
-  } catch (error) {
-    console.error("Error listing root folders:", error);
-  }
-
-  console.log("Creating new root folder");
-  const createResponse = await operations.folderOperations.createFolder(
-    ROOT_FOLDER_NAME
-  );
-  return createResponse.data.id;
 }
 
 export async function saveUserProfile(tokens: any) {
@@ -85,7 +51,7 @@ export async function saveUserProfile(tokens: any) {
       picture: userData.picture,
     };
 
-    // 2. Save to Drive
+    // 2. Save to Drive in _SystemData folder
     const driveService = initDriveService(
       {
         client_id: clientId,
@@ -96,8 +62,10 @@ export async function saveUserProfile(tokens: any) {
       tokens
     );
 
-    const rootId = await _getOrCreateRootFolder(auth);
-    const files = await operations.listOperations.listFilesInFolder(rootId);
+    const systemFolderId = await getOrCreateSystemFolder(auth);
+    const files = await operations.listOperations.listFilesInFolder(
+      systemFolderId
+    );
     const existingFile = files.data?.files?.find(
       (f: any) => f.name === USER_PROFILE_FILE && !f.trashed
     );
@@ -110,7 +78,7 @@ export async function saveUserProfile(tokens: any) {
         USER_PROFILE_FILE
       );
       if (result.success && result.data.id) {
-        await moveFile(result.data.id, rootId);
+        await moveFile(result.data.id, systemFolderId);
       }
     }
 
@@ -124,8 +92,10 @@ export async function saveUserProfile(tokens: any) {
 
 async function _getUserProfile(auth: any) {
   try {
-    const rootId = await _getOrCreateRootFolder(auth);
-    const files = await operations.listOperations.listFilesInFolder(rootId);
+    const systemFolderId = await getOrCreateSystemFolder(auth);
+    const files = await operations.listOperations.listFilesInFolder(
+      systemFolderId
+    );
     const file = files.data?.files?.find(
       (f: any) => f.name === USER_PROFILE_FILE && !f.trashed
     );
