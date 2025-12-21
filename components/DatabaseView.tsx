@@ -61,7 +61,7 @@ export default function DatabaseView({
           {/* Title Section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold bg-linear-to-r from-white via-pink-200 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-linear-to-r from-white via-white to-white bg-clip-text text-transparent">
                 Collections
               </h1>
               <p className="text-neutral-400 mt-2">

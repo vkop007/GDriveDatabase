@@ -34,7 +34,7 @@ export default function DashboardView({
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold bg-linear-to-r from-pink-400 to-rose-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-linear-to-r from-white via-white to-white bg-clip-text text-transparent">
               Databases
             </h1>
             <div className="flex flex-wrap items-center gap-4 mt-2">
