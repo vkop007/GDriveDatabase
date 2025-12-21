@@ -11,7 +11,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-full mx-auto space-y-8">
         {/* Header Section */}
         <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
           {/* Glow effect */}

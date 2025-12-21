@@ -57,7 +57,7 @@ export default async function TablePage({
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white pt-20 px-4 pb-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-full mx-auto space-y-8">
         <header className="space-y-4">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 flex-wrap">

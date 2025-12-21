@@ -60,7 +60,7 @@ export default async function UsagePage() {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto py-8 px-4">
+    <div className="space-y-8 max-w-full mx-auto py-8 px-4">
       {/* Header Section */}
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
         {/* Glow effect */}
