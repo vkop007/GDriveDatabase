@@ -7,7 +7,7 @@ import BulkActionBar from "./BulkActionBar";
 import EditRowModal from "./EditRowModal";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2, Database } from "lucide-react";
 
 interface DataTableProps {
   table: TableFile;
@@ -79,89 +79,201 @@ export default function DataTable({ table, fileId }: DataTableProps) {
     }
   };
 
+  // Get visible columns (non-system for better display)
+  const visibleColumns = table.schema;
+
   return (
     <>
-      <div className="table-container overflow-x-auto">
-        <table className="table whitespace-nowrap">
-          <thead>
-            <tr>
-              <th className="w-10">
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  ref={(input) => {
-                    if (input) {
-                      input.indeterminate = someSelected && !allSelected;
-                    }
-                  }}
-                  onChange={toggleAll}
-                  className="checkbox"
-                  disabled={allIds.length === 0}
-                />
-              </th>
-              {table.schema.map((col) => (
-                <th key={col.key}>{col.key}</th>
-              ))}
-              <th className="text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {table.documents.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={table.schema.length + 2}
-                  className="text-center text-neutral-500 py-12"
-                >
-                  No data yet. Add your first row above.
-                </td>
-              </tr>
-            ) : (
-              table.documents.map((doc) => {
-                const isSelected = selectedIds.has(doc.$id);
-                return (
-                  <tr
-                    key={doc.$id}
-                    className={isSelected ? "bg-purple-500/10!" : ""}
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900/80 via-neutral-900 to-neutral-800/50">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-neutral-800">
+                <th className="w-12 px-4 py-4">
+                  <div className="flex items-center justify-center">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      ref={(input) => {
+                        if (input) {
+                          input.indeterminate = someSelected && !allSelected;
+                        }
+                      }}
+                      onChange={toggleAll}
+                      className="w-4 h-4 rounded bg-neutral-950 border-neutral-700 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 cursor-pointer"
+                      disabled={allIds.length === 0}
+                    />
+                  </div>
+                </th>
+                {visibleColumns.map((col) => (
+                  <th
+                    key={col.key}
+                    className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider"
                   >
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleRow(doc.$id)}
-                        className="checkbox"
-                      />
-                    </td>
-                    {table.schema.map((col) => (
-                      <td key={col.key}>
-                        {typeof doc[col.key] === "object"
-                          ? JSON.stringify(doc[col.key])
-                          : String(doc[col.key] ?? "")}
-                      </td>
-                    ))}
-                    <td className="text-right">
-                      <div className="flex items-center justify-end gap-3">
-                        <button
-                          onClick={() => setEditingDocument(doc)}
-                          className="text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium flex items-center gap-1"
-                        >
-                          <Pencil className="w-3 h-3" />
-                          Edit
-                        </button>
-                        <form action={deleteDocument} className="inline-block">
-                          <input type="hidden" name="fileId" value={fileId} />
-                          <input type="hidden" name="docId" value={doc.$id} />
-                          <button className="text-red-500 hover:text-red-400 transition-colors text-sm font-medium">
-                            Delete
-                          </button>
-                        </form>
+                    <span
+                      className={
+                        col.key.startsWith("$") ? "text-neutral-600" : ""
+                      }
+                    >
+                      {col.key}
+                    </span>
+                  </th>
+                ))}
+                <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-800/50">
+              {table.documents.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={visibleColumns.length + 2}
+                    className="text-center py-16"
+                  >
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="w-16 h-16 rounded-2xl bg-neutral-800/50 flex items-center justify-center">
+                        <Database className="w-8 h-8 text-neutral-600" />
                       </div>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                      <div>
+                        <p className="text-neutral-400 font-medium">
+                          No data yet
+                        </p>
+                        <p className="text-sm text-neutral-600 mt-1">
+                          Add your first row using the button above
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                table.documents.map((doc, rowIndex) => {
+                  const isSelected = selectedIds.has(doc.$id);
+                  return (
+                    <tr
+                      key={doc.$id}
+                      className={`group transition-colors ${
+                        isSelected
+                          ? "bg-purple-500/10 hover:bg-purple-500/15"
+                          : "hover:bg-neutral-800/30"
+                      }`}
+                    >
+                      <td className="px-4 py-4">
+                        <div className="flex items-center justify-center">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleRow(doc.$id)}
+                            className="w-4 h-4 rounded bg-neutral-950 border-neutral-700 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 cursor-pointer"
+                          />
+                        </div>
+                      </td>
+                      {visibleColumns.map((col) => {
+                        const value = doc[col.key];
+                        const displayValue =
+                          typeof value === "object"
+                            ? JSON.stringify(value)
+                            : String(value ?? "");
+
+                        // Style system fields differently
+                        const isSystemField = col.key.startsWith("$");
+                        const isId = col.key === "$id";
+                        const isDate = col.type === "datetime";
+
+                        return (
+                          <td key={col.key} className="px-6 py-4">
+                            {isId ? (
+                              <code className="text-xs font-mono px-2 py-1 rounded bg-neutral-800/50 text-neutral-400 border border-neutral-700/50">
+                                {displayValue.slice(0, 8)}...
+                              </code>
+                            ) : isDate ? (
+                              <span className="text-neutral-400 text-sm">
+                                {new Date(displayValue).toLocaleString()}
+                              </span>
+                            ) : col.array ? (
+                              <div className="flex flex-wrap gap-1.5">
+                                {Array.isArray(value) ? (
+                                  value.slice(0, 3).map((item, i) => (
+                                    <span
+                                      key={i}
+                                      className="inline-flex px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 text-xs border border-blue-500/20"
+                                    >
+                                      {String(item)}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="text-neutral-500">—</span>
+                                )}
+                                {Array.isArray(value) && value.length > 3 && (
+                                  <span className="text-xs text-neutral-500">
+                                    +{value.length - 3} more
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span
+                                className={`${
+                                  isSystemField
+                                    ? "text-neutral-500"
+                                    : "text-white"
+                                } truncate block max-w-[200px]`}
+                                title={displayValue}
+                              >
+                                {displayValue || (
+                                  <span className="text-neutral-600">—</span>
+                                )}
+                              </span>
+                            )}
+                          </td>
+                        );
+                      })}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => setEditingDocument(doc)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-purple-400 hover:text-white hover:bg-purple-500/20 transition-all text-xs font-medium"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                            Edit
+                          </button>
+                          <form
+                            action={deleteDocument}
+                            className="inline-block"
+                          >
+                            <input type="hidden" name="fileId" value={fileId} />
+                            <input type="hidden" name="docId" value={doc.$id} />
+                            <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 transition-all text-xs font-medium">
+                              <Trash2 className="w-3.5 h-3.5" />
+                              Delete
+                            </button>
+                          </form>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Table footer with row count */}
+        {table.documents.length > 0 && (
+          <div className="px-6 py-3 border-t border-neutral-800/50 bg-neutral-900/50">
+            <p className="text-xs text-neutral-500">
+              Showing{" "}
+              <span className="text-neutral-400 font-medium">
+                {table.documents.length}
+              </span>{" "}
+              row{table.documents.length !== 1 ? "s" : ""}
+              {selectedIds.size > 0 && (
+                <span className="ml-2 text-purple-400">
+                  • {selectedIds.size} selected
+                </span>
+              )}
+            </p>
+          </div>
+        )}
       </div>
 
       <BulkActionBar

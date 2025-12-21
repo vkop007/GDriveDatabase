@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "./Modal";
 import { createTable } from "../app/actions/table";
-import { Loader2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import GradientButton from "./GradientButton";
 
 interface CreateTableModalProps {
   parentId: string;
@@ -47,10 +48,12 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} className="btn btn-primary">
-        <Plus className="w-4 h-4" />
+      <GradientButton
+        onClick={() => setIsOpen(true)}
+        icon={<Plus className="w-4 h-4" />}
+      >
         Create Table
-      </button>
+      </GradientButton>
 
       <Modal
         isOpen={isOpen}
@@ -83,14 +86,13 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
             >
               Cancel
             </button>
-            <button
+            <GradientButton
               type="submit"
+              isLoading={isLoading}
               disabled={isLoading}
-              className="btn btn-primary"
             >
-              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {isLoading ? "Creating..." : "Create Table"}
-            </button>
+            </GradientButton>
           </div>
         </form>
       </Modal>

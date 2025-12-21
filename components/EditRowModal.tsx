@@ -6,7 +6,8 @@ import { updateDocument } from "../app/actions/table";
 import { ColumnDefinition, RowData } from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
-import { Loader2, X } from "lucide-react";
+import { X } from "lucide-react";
+import GradientButton from "./GradientButton";
 
 interface EditRowModalProps {
   isOpen: boolean;
@@ -186,14 +187,13 @@ export default function EditRowModal({
             <button type="button" onClick={onClose} className="btn btn-ghost">
               Cancel
             </button>
-            <button
+            <GradientButton
               type="submit"
-              className="btn btn-primary"
+              isLoading={isLoading}
               disabled={isLoading}
             >
-              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {isLoading ? "Saving..." : "Save Changes"}
-            </button>
+            </GradientButton>
           </div>
         </form>
       </div>

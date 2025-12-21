@@ -4,7 +4,7 @@ import { operations, initDriveService } from "gdrivekit";
 import { redirect } from "next/navigation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getAuth, fetchWithAuth } from "../../lib/gdrive/auth";
-import { moveFile, createFileInFolder } from "../../lib/gdrive/operations";
+import { createFileInFolder } from "../../lib/gdrive/operations";
 
 // Types for Table Structure
 export interface ColumnDefinition {
@@ -397,4 +397,30 @@ export async function getParentId(fileId: string) {
 
   const data = await response.json();
   return data.parents?.[0];
+}
+
+export async function getParentInfo(
+  fileId: string
+): Promise<{ id: string; name: string } | null> {
+  try {
+    // First get the parent ID
+    const parentId = await getParentId(fileId);
+    if (!parentId) return null;
+
+    // Then get the parent folder's name
+    const response = await fetchWithAuth(
+      `https://www.googleapis.com/drive/v3/files/${parentId}?fields=id,name`
+    );
+
+    if (!response.ok) {
+      console.error(`Failed to fetch parent info: ${response.status}`);
+      return { id: parentId, name: "Collection" };
+    }
+
+    const data = await response.json();
+    return { id: data.id, name: data.name };
+  } catch (error) {
+    console.error("Error getting parent info:", error);
+    return null;
+  }
 }

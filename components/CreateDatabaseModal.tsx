@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "./Modal";
 import { createDatabase } from "../app/actions";
-import { Loader2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import GradientButton from "./GradientButton";
 
 export default function CreateDatabaseModal() {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,10 +43,12 @@ export default function CreateDatabaseModal() {
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} className="btn btn-primary">
-        <Plus className="w-4 h-4" />
+      <GradientButton
+        onClick={() => setIsOpen(true)}
+        icon={<Plus className="w-4 h-4" />}
+      >
         Create Database
-      </button>
+      </GradientButton>
 
       <Modal
         isOpen={isOpen}
@@ -78,14 +81,13 @@ export default function CreateDatabaseModal() {
             >
               Cancel
             </button>
-            <button
+            <GradientButton
               type="submit"
+              isLoading={isLoading}
               disabled={isLoading}
-              className="btn btn-primary"
             >
-              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {isLoading ? "Creating..." : "Create Database"}
-            </button>
+            </GradientButton>
           </div>
         </form>
       </Modal>

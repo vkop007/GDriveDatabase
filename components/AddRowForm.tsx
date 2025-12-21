@@ -6,7 +6,8 @@ import { addDocument } from "../app/actions/table";
 import { ColumnDefinition } from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
-import { Loader2 } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
+import GradientButton from "./GradientButton";
 
 export default function AddRowForm({
   fileId,
@@ -22,22 +23,12 @@ export default function AddRowForm({
 
   if (!isOpen) {
     return (
-      <button onClick={() => setIsOpen(true)} className="btn btn-primary">
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 4v16m8-8H4"
-          />
-        </svg>
+      <GradientButton
+        onClick={() => setIsOpen(true)}
+        icon={<Plus className="w-4 h-4" />}
+      >
         Add Row
-      </button>
+      </GradientButton>
     );
   }
 
@@ -137,44 +128,53 @@ export default function AddRowForm({
           className="p-6 space-y-6"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {inputColumns.map((col) => (
-              <div key={col.key} className="space-y-2">
-                <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                  {col.key}{" "}
-                  {col.required && <span className="text-red-500">*</span>}
-                </label>
-                {col.array ? (
-                  <ArrayInput
-                    name={col.key}
-                    required={col.required}
-                    type={col.type as "string" | "integer"}
-                    placeholder={`Add ${col.type} value...`}
-                  />
-                ) : col.type === "boolean" ? (
-                  <div className="flex items-center h-10">
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name={col.key}
-                        className="sr-only peer"
-                      />
-                      <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                      <span className="ml-3 text-sm font-medium text-neutral-300">
-                        {col.key}
-                      </span>
-                    </label>
-                  </div>
-                ) : (
-                  <input
-                    type={col.type === "integer" ? "number" : "text"}
-                    name={col.key}
-                    placeholder={`Enter ${col.key}`}
-                    className="input"
-                    required={col.required}
-                  />
-                )}
+            {inputColumns.length === 0 ? (
+              <div className="col-span-2 text-center py-8 text-neutral-500">
+                <p className="text-sm">No columns defined yet.</p>
+                <p className="text-xs mt-1">
+                  Add columns first before adding rows.
+                </p>
               </div>
-            ))}
+            ) : (
+              inputColumns.map((col) => (
+                <div key={col.key} className="space-y-2">
+                  <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
+                    {col.key}{" "}
+                    {col.required && <span className="text-red-500">*</span>}
+                  </label>
+                  {col.array ? (
+                    <ArrayInput
+                      name={col.key}
+                      required={col.required}
+                      type={col.type as "string" | "integer"}
+                      placeholder={`Add ${col.type} value...`}
+                    />
+                  ) : col.type === "boolean" ? (
+                    <div className="flex items-center h-10">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name={col.key}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        <span className="ml-3 text-sm font-medium text-neutral-300">
+                          {col.key}
+                        </span>
+                      </label>
+                    </div>
+                  ) : (
+                    <input
+                      type={col.type === "integer" ? "number" : "text"}
+                      name={col.key}
+                      placeholder={`Enter ${col.key}`}
+                      className="input"
+                      required={col.required}
+                    />
+                  )}
+                </div>
+              ))
+            )}
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t border-neutral-800">
@@ -185,14 +185,13 @@ export default function AddRowForm({
             >
               Cancel
             </button>
-            <button
+            <GradientButton
               type="submit"
-              className="btn btn-primary"
-              disabled={isLoading}
+              isLoading={isLoading}
+              disabled={isLoading || inputColumns.length === 0}
             >
-              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {isLoading ? "Adding..." : "Save Row"}
-            </button>
+            </GradientButton>
           </div>
         </form>
       </div>
