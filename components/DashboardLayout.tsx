@@ -39,10 +39,9 @@ export default function DashboardLayoutWrapper({
 
   return (
     <main
-      className="flex-1 transition-all duration-300 ease-out"
-      style={{
-        marginLeft: isCollapsed ? "5rem" : "17rem",
-      }}
+      className={`flex-1 transition-all duration-300 ease-out ${
+        isCollapsed ? "md:ml-20" : "md:ml-68"
+      }`}
     >
       {children}
     </main>

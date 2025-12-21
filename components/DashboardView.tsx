@@ -30,7 +30,7 @@ export default function DashboardView({
     : initialDatabases;
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8">
+    <div className="min-h-screen bg-neutral-950 text-white pt-20 px-4 pb-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
@@ -42,7 +42,7 @@ export default function DashboardView({
               <ApiAccess />
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
             <SearchInput
               placeholder="Search databases..."
               value={searchQuery}

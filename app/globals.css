@@ -564,8 +564,8 @@ body {
 }
 
 .input:focus {
-  border-color: #a855f7;
-  box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(235, 0, 129, 0.2); /* Approximation of --primary with opacity */
 }
 
 .input::placeholder {
@@ -580,7 +580,7 @@ body {
   border: 1px solid rgb(64, 64, 64);
   background: rgb(38, 38, 38);
   cursor: pointer;
-  accent-color: #a855f7;
+  accent-color: var(--primary);
 }
 
 /* ============================================
