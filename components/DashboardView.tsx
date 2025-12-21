@@ -9,7 +9,8 @@ import ItemSettingsModal from "./ItemSettingsModal";
 import SearchInput from "./SearchInput";
 import { deleteDatabase } from "../app/actions";
 import Link from "next/link";
-import { Settings, Database } from "lucide-react";
+import { Database } from "lucide-react";
+import ResourceCard from "./ResourceCard";
 
 interface DashboardViewProps {
   initialDatabases: any[];
@@ -33,7 +34,7 @@ export default function DashboardView({
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gradient-purple">
+            <h1 className="text-3xl font-bold bg-linear-to-r from-pink-400 to-rose-600 bg-clip-text text-transparent">
               Databases
             </h1>
             <div className="flex flex-wrap items-center gap-4 mt-2">
@@ -63,44 +64,15 @@ export default function DashboardView({
             </div>
           ) : (
             files.map((file: any) => (
-              <div key={file.id} className="group card-glow p-0 flex flex-col">
-                <Link
-                  href={`/dashboard/database/${file.id}`}
-                  className="flex-1 p-6 relative z-10"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="icon-box icon-box-lg icon-box-purple">
-                      <Database className="w-5 h-5 text-purple-400" />
-                    </div>
-                    <span className="badge badge-neutral">
-                      {new Date(file.createdTime).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <h3
-                    className="font-medium text-white truncate mb-2 group-hover:text-purple-200 transition-colors"
-                    title={file.name}
-                  >
-                    {file.name}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <CopyButton text={file.id} label="Database ID" />
-                  </div>
-                </Link>
-
-                <div className="px-6 pb-6 pt-2 relative z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      setSettingsDatabase(file);
-                    }}
-                    className="btn btn-primary w-full"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Settings
-                  </button>
-                </div>
-              </div>
+              <ResourceCard
+                key={file.id}
+                name={file.name}
+                id={file.id}
+                createdTime={file.createdTime}
+                type="database"
+                href={`/dashboard/database/${file.id}`}
+                onSettingsClick={() => setSettingsDatabase(file)}
+              />
             ))
           )}
         </div>

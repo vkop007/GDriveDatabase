@@ -134,8 +134,8 @@ export default function Sidebar({ treeData }: SidebarProps) {
           }`}
         >
           <div className="relative group">
-            <div className="absolute inset-0 bg-linear-to-br from-purple-500 to-pink-500 rounded-xl blur-md opacity-50 group-hover:opacity-70 transition-opacity" />
-            <div className="relative w-9 h-9 rounded-xl bg-linear-to-br from-purple-500 via-fuchsia-500 to-pink-500 flex items-center justify-center shadow-lg">
+            <div className="absolute inset-0 bg-linear-to-br from-primary-from to-primary-to rounded-xl blur-md opacity-50 group-hover:opacity-70 transition-opacity" />
+            <div className="relative w-9 h-9 rounded-xl bg-linear-to-br from-primary-from via-primary to-primary-to flex items-center justify-center shadow-lg">
               <Database className="w-4 h-4 text-white" />
             </div>
           </div>
@@ -159,7 +159,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
               pathname === "/dashboard"
-                ? "bg-linear-to-r from-purple-500/20 to-pink-500/10 text-white border border-purple-500/30 shadow-lg shadow-purple-500/10"
+                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
                 : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
             }`}
             title={isCollapsed ? "Home" : undefined}
@@ -167,8 +167,8 @@ export default function Sidebar({ treeData }: SidebarProps) {
             <Home
               className={`w-4 h-4 ${
                 pathname === "/dashboard"
-                  ? "text-purple-400"
-                  : "group-hover:text-purple-400"
+                  ? "text-primary"
+                  : "group-hover:text-primary"
               } transition-colors`}
             />
             {!isCollapsed && "Home"}
@@ -181,7 +181,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
               pathname === "/dashboard/apidocs"
-                ? "bg-linear-to-r from-purple-500/20 to-pink-500/10 text-white border border-purple-500/30 shadow-lg shadow-purple-500/10"
+                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
                 : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
             }`}
             title={isCollapsed ? "API Docs" : undefined}
@@ -189,8 +189,8 @@ export default function Sidebar({ treeData }: SidebarProps) {
             <FileJson
               className={`w-4 h-4 ${
                 pathname === "/dashboard/apidocs"
-                  ? "text-purple-400"
-                  : "group-hover:text-purple-400"
+                  ? "text-primary"
+                  : "group-hover:text-primary"
               } transition-colors`}
             />
             {!isCollapsed && "API Docs"}
@@ -222,7 +222,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
                     onClick={() => handleDatabaseClick(db.id)}
                     className={`w-full flex items-center justify-center p-2.5 rounded-xl text-sm transition-all ${
                       isExactDb
-                        ? "bg-linear-to-r from-blue-500/20 to-cyan-500/10 text-blue-400 border border-blue-500/30"
+                        ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20"
                         : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
                     }`}
                     title={db.name}
@@ -237,7 +237,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
                   <div
                     className={`group flex items-center gap-1 px-2 py-2 rounded-xl text-sm transition-all cursor-pointer ${
                       isExactDb
-                        ? "bg-linear-to-r from-blue-500/20 to-cyan-500/10 text-white border border-blue-500/30 shadow-lg shadow-blue-500/5"
+                        ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-white border border-primary/20 shadow-lg shadow-primary/5"
                         : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
                     }`}
                     onClick={() => handleDatabaseClick(db.id)}
@@ -258,16 +258,16 @@ export default function Sidebar({ treeData }: SidebarProps) {
                         <FolderOpen
                           className={`w-4 h-4 ${
                             isExactDb
-                              ? "text-blue-400"
-                              : "text-neutral-500 group-hover:text-blue-400"
+                              ? "text-primary"
+                              : "text-neutral-500 group-hover:text-primary"
                           } transition-colors`}
                         />
                       ) : (
                         <Folder
                           className={`w-4 h-4 ${
                             isExactDb
-                              ? "text-blue-400"
-                              : "text-neutral-500 group-hover:text-blue-400"
+                              ? "text-primary"
+                              : "text-neutral-500 group-hover:text-primary"
                           } transition-colors`}
                         />
                       )}
@@ -314,15 +314,15 @@ export default function Sidebar({ treeData }: SidebarProps) {
                               href={`/dashboard/database/${db.id}/table/${table.id}`}
                               className={`group flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all ${
                                 isTableActive
-                                  ? "bg-linear-to-r from-emerald-500/20 to-teal-500/10 text-emerald-400 border border-emerald-500/30"
+                                  ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20"
                                   : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
                               }`}
                             >
                               <FileJson
                                 className={`w-3.5 h-3.5 ${
                                   isTableActive
-                                    ? "text-emerald-400"
-                                    : "text-neutral-500 group-hover:text-emerald-400"
+                                    ? "text-primary"
+                                    : "text-neutral-500 group-hover:text-primary"
                                 } transition-colors`}
                               />
                               <span className="truncate flex-1">
@@ -371,7 +371,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
               pathname === "/dashboard/bucket"
-                ? "bg-linear-to-r from-purple-500/20 to-pink-500/10 text-white border border-purple-500/30 shadow-lg shadow-purple-500/10"
+                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
                 : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
             }`}
             title={isCollapsed ? "Bucket" : undefined}
@@ -379,8 +379,8 @@ export default function Sidebar({ treeData }: SidebarProps) {
             <Database
               className={`w-4 h-4 ${
                 pathname === "/dashboard/bucket"
-                  ? "text-purple-400"
-                  : "group-hover:text-purple-400"
+                  ? "text-primary"
+                  : "group-hover:text-primary"
               } transition-colors`}
             />
             {!isCollapsed && "Bucket"}
@@ -405,7 +405,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
               pathname === "/dashboard/usage"
-                ? "bg-linear-to-r from-purple-500/20 to-pink-500/10 text-white border border-purple-500/30 shadow-lg shadow-purple-500/10"
+                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
                 : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
             }`}
             title={isCollapsed ? "Usage" : undefined}
@@ -422,8 +422,8 @@ export default function Sidebar({ treeData }: SidebarProps) {
               strokeLinejoin="round"
               className={`w-4 h-4 ${
                 pathname === "/dashboard/usage"
-                  ? "text-purple-400"
-                  : "group-hover:text-purple-400"
+                  ? "text-primary"
+                  : "group-hover:text-primary"
               } transition-colors`}
             >
               <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
@@ -438,7 +438,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
               pathname === "/dashboard/settings"
-                ? "bg-linear-to-r from-purple-500/20 to-pink-500/10 text-white border border-purple-500/30 shadow-lg shadow-purple-500/10"
+                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
                 : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
             }`}
             title={isCollapsed ? "Settings" : undefined}
@@ -446,8 +446,8 @@ export default function Sidebar({ treeData }: SidebarProps) {
             <Settings
               className={`w-4 h-4 ${
                 pathname === "/dashboard/settings"
-                  ? "text-purple-400"
-                  : "group-hover:text-purple-400"
+                  ? "text-primary"
+                  : "group-hover:text-primary"
               } transition-colors`}
             />
             {!isCollapsed && "Settings"}
@@ -478,13 +478,13 @@ export default function Sidebar({ treeData }: SidebarProps) {
         {/* Collapse Toggle Button - Centered on right edge */}
         <button
           onClick={toggleCollapse}
-          className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 w-7 h-14 items-center justify-center bg-neutral-900/95 backdrop-blur-sm border border-neutral-700/50 rounded-r-xl hover:bg-neutral-800 hover:border-purple-500/50 transition-all group shadow-xl z-50"
+          className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 w-7 h-14 items-center justify-center bg-neutral-900/95 backdrop-blur-sm border border-neutral-700/50 rounded-r-xl hover:bg-neutral-800 hover:border-primary/50 transition-all group shadow-xl z-50"
           title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
-            <PanelLeft className="w-4 h-4 text-neutral-400 group-hover:text-purple-400 transition-colors" />
+            <PanelLeft className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors" />
           ) : (
-            <PanelLeftClose className="w-4 h-4 text-neutral-400 group-hover:text-purple-400 transition-colors" />
+            <PanelLeftClose className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors" />
           )}
         </button>
       </aside>

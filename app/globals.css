@@ -21,25 +21,26 @@
   --sidebar-accent-foreground: #171717;
   
   /* Brand Colors */
-  --primary: #a855f7;
+  --primary: #eb0081; /* Fuchsia-400 (Lighter & More Vibrant) */
+  --text--primary: #ffffff; /* Fuchsia-400 (Lighter & More Vibrant) */
   --primary-foreground: #ffffff;
-  --secondary: #ec4899;
+  --primary-gradient-from: #eb00c0; /* Purple-400 */
+  --primary-gradient-to: #d61545; /* Fuchsia-400 */
+  --secondary: #d61545;
   --accent: #3b82f6;
   --success: #22c55e;
   --warning: #eab308;
   --danger: #ef4444;
-  
-  /* Card Gradients */
-  --card-purple: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(88, 28, 135, 0.3));
-  --card-pink: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(131, 24, 67, 0.3));
-  --card-blue: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(30, 58, 138, 0.3));
-  --card-red: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(127, 29, 29, 0.3));
-  --card-green: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(20, 83, 45, 0.3));
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-from: var(--primary-gradient-from);
+  --color-primary-to: var(--primary-gradient-to);
+  
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

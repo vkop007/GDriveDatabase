@@ -31,7 +31,7 @@ export default function ColumnsView({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary-from to-primary-to flex items-center justify-center">
           <Key className="w-5 h-5 text-white" />
         </div>
         <div>
@@ -43,12 +43,12 @@ export default function ColumnsView({
       </div>
 
       {/* Add Column Form */}
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-purple-950/20">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-[60px] rounded-full pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-primary/20">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px] rounded-full pointer-events-none" />
 
         <div className="relative z-10 p-6">
           <div className="flex items-center gap-2 mb-5">
-            <Plus className="w-4 h-4 text-purple-400" />
+            <Plus className="w-4 h-4 text-primary" />
             <h3 className="text-sm font-semibold text-white">Add New Column</h3>
           </div>
 
@@ -68,7 +68,7 @@ export default function ColumnsView({
                 type="text"
                 name="key"
                 placeholder="e.g. email"
-                className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+                className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 required
               />
             </div>
@@ -80,7 +80,7 @@ export default function ColumnsView({
               </label>
               <select
                 name="type"
-                className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all appearance-none cursor-pointer"
+                className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
               >
                 <option value="string">String</option>
                 <option value="integer">Integer</option>
@@ -101,7 +101,7 @@ export default function ColumnsView({
                       id="required"
                       className="sr-only peer"
                     />
-                    <div className="w-12 h-7 bg-neutral-800 rounded-full peer-checked:bg-linear-to-r peer-checked:from-purple-600 peer-checked:to-pink-600 transition-all border border-neutral-700 peer-checked:border-purple-500/50 shadow-inner" />
+                    <div className="w-12 h-7 bg-neutral-800 rounded-full peer-checked:bg-linear-to-r peer-checked:from-primary-from peer-checked:to-primary-to transition-all border border-neutral-700 peer-checked:border-primary/50 shadow-inner" />
                     <div className="absolute left-1 top-1 w-5 h-5 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-5 peer-checked:bg-white shadow-sm" />
                   </div>
                   <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
@@ -123,7 +123,7 @@ export default function ColumnsView({
                       id="array"
                       className="sr-only peer"
                     />
-                    <div className="w-12 h-7 bg-neutral-800 rounded-full peer-checked:bg-linear-to-r peer-checked:from-blue-600 peer-checked:to-cyan-600 transition-all border border-neutral-700 peer-checked:border-blue-500/50 shadow-inner" />
+                    <div className="w-12 h-7 bg-neutral-800 rounded-full peer-checked:bg-linear-to-r peer-checked:from-primary-from peer-checked:to-primary-to transition-all border border-neutral-700 peer-checked:border-primary/50 shadow-inner" />
                     <div className="absolute left-1 top-1 w-5 h-5 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-5 peer-checked:bg-white shadow-sm" />
                   </div>
                   <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
