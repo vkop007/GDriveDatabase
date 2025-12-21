@@ -43,7 +43,7 @@ export default async function TablePage({
           </p>
           <a
             href="/dashboard"
-            className="inline-block bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg transition-colors"
+            className="inline-block bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg transition-colors"
           >
             Back to Dashboard
           </a>
@@ -56,7 +56,7 @@ export default async function TablePage({
   const tableUrl = `/dashboard/database/${databaseId}/table/${fileId}`;
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8">
+    <div className="min-h-screen bg-neutral-950 text-white pt-20 px-4 pb-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="space-y-4">
           {/* Breadcrumb */}
@@ -77,7 +77,7 @@ export default async function TablePage({
               Collection
             </Link>
             <ChevronRight className="w-4 h-4 text-neutral-600" />
-            <span className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/10 text-purple-400 text-sm font-medium border border-purple-500/20">
+            <span className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-sm font-medium border border-primary/20">
               <Table2 className="w-3.5 h-3.5" />
               Table
             </span>
@@ -102,7 +102,7 @@ export default async function TablePage({
             href={`${tableUrl}?tab=data`}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               tab === "data"
-                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                ? "bg-primary/10 text-primary border border-primary/20"
                 : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
             }`}
           >
@@ -113,7 +113,7 @@ export default async function TablePage({
             href={`${tableUrl}?tab=columns`}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               tab === "columns"
-                ? "bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                ? "bg-primary/10 text-primary border border-primary/20"
                 : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
             }`}
           >
@@ -124,7 +124,7 @@ export default async function TablePage({
             href={`${tableUrl}?tab=settings`}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
               tab === "settings"
-                ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                ? "bg-primary/10 text-primary border border-primary/20"
                 : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
             }`}
           >
