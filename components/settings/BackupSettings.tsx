@@ -15,6 +15,7 @@ import {
   ExternalLink,
   RefreshCw,
   Calendar,
+  Shield,
 } from "lucide-react";
 
 export default function BackupSettings() {
@@ -128,9 +129,9 @@ export default function BackupSettings() {
 
   if (checkingStatus) {
     return (
-      <div className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-6">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
         <div className="flex items-center gap-3">
-          <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+          <Loader2 className="w-5 h-5 text-primary animate-spin" />
           <span className="text-neutral-400">Checking backup status...</span>
         </div>
       </div>
@@ -138,112 +139,126 @@ export default function BackupSettings() {
   }
 
   return (
-    <div className="bg-neutral-900/50 border border-neutral-800 rounded-xl p-6">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-blue-500/10 rounded-lg">
-          <DatabaseBackup className="w-5 h-5 text-blue-400" />
-        </div>
-        <h2 className="text-xl font-semibold">Backup Database</h2>
-      </div>
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
+      {/* Glow effect */}
+      <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      {autoBackupEnabled ? (
-        // Auto-backup is enabled - show status
-        <div className="space-y-4">
-          <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-4">
-            <div className="flex items-center gap-2 text-green-400 mb-2">
-              <CheckCircle className="w-5 h-5" />
-              <span className="font-medium">Auto-backup Enabled</span>
-            </div>
+      <div className="relative">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/30 to-emerald-600/10 flex items-center justify-center border border-emerald-500/20">
+            <DatabaseBackup className="w-5 h-5 text-emerald-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-white">
+              Backup Database
+            </h2>
             <p className="text-neutral-400 text-sm">
-              Your database is automatically backed up once per day when you
-              visit the site. Old backups are deleted before creating new ones.
+              Automatic daily backups to keep your data safe
             </p>
           </div>
-
-          {lastBackup && (
-            <div className="flex items-center gap-2 text-sm text-neutral-300">
-              <Calendar className="w-4 h-4 text-neutral-500" />
-              <span>Last backup: {lastBackup}</span>
-            </div>
-          )}
         </div>
-      ) : (
-        // Auto-backup not enabled - show setup
-        <>
-          <p className="text-neutral-400 text-sm mb-6">
-            Enable automatic daily backups. Your database will be backed up once
-            per day when you visit the site. Old backups are automatically
-            deleted before creating new ones.
-          </p>
 
+        {autoBackupEnabled ? (
+          // Auto-backup is enabled - show status
           <div className="space-y-4">
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
+              <div className="flex items-center gap-2 text-emerald-400 mb-2">
+                <Shield className="w-5 h-5" />
+                <span className="font-medium">Auto-backup Enabled</span>
+              </div>
+              <p className="text-neutral-400 text-sm">
+                Your database is automatically backed up once per day when you
+                visit the site. Old backups are deleted before creating new
+                ones.
+              </p>
+            </div>
+
             {lastBackup && (
-              <div className="flex items-center gap-2 text-sm text-green-400">
-                <CheckCircle className="w-4 h-4" />
+              <div className="flex items-center gap-2 text-sm text-neutral-300 bg-neutral-800/50 rounded-lg p-3 border border-neutral-700/50">
+                <Calendar className="w-4 h-4 text-neutral-500" />
                 <span>Last backup: {lastBackup}</span>
               </div>
             )}
-
-            {/* Authorization required state */}
-            {awaitingAuth && authUrl && (
-              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 space-y-3">
-                <p className="text-yellow-200 text-sm">
-                  <strong>One-time authorization required:</strong> The backup
-                  script needs your permission to access Google Drive.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <a
-                    href={authUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Authorize Script
-                  </a>
-                  <button
-                    onClick={handleAuthComplete}
-                    disabled={loading}
-                    className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white px-4 py-2 rounded-lg transition-colors text-sm font-medium"
-                  >
-                    {loading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <RefreshCw className="w-4 h-4" />
-                    )}
-                    I&apos;ve Authorized
-                  </button>
-                </div>
-                <p className="text-yellow-200/70 text-xs">
-                  Click &quot;Review Permissions&quot; and authorize, then click
-                  the green button.
-                </p>
-              </div>
-            )}
-
-            {/* Setup button */}
-            {!awaitingAuth && (
-              <button
-                onClick={handleSetupAutoBackup}
-                disabled={loading}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-600/50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg transition-colors text-sm font-medium"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Setting up...
-                  </>
-                ) : (
-                  <>
-                    <DatabaseBackup className="w-4 h-4" />
-                    Enable Auto-Backup
-                  </>
-                )}
-              </button>
-            )}
           </div>
-        </>
-      )}
+        ) : (
+          // Auto-backup not enabled - show setup
+          <>
+            <p className="text-neutral-400 text-sm mb-6">
+              Enable automatic daily backups. Your database will be backed up
+              once per day when you visit the site. Old backups are
+              automatically deleted before creating new ones.
+            </p>
+
+            <div className="space-y-4">
+              {lastBackup && (
+                <div className="flex items-center gap-2 text-sm text-green-400 bg-green-500/10 rounded-lg p-3 border border-green-500/20">
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Last backup: {lastBackup}</span>
+                </div>
+              )}
+
+              {/* Authorization required state */}
+              {awaitingAuth && authUrl && (
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 space-y-3">
+                  <p className="text-amber-200 text-sm">
+                    <strong>One-time authorization required:</strong> The backup
+                    script needs your permission to access Google Drive.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <a
+                      href={authUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-500 text-white px-4 py-2.5 rounded-xl transition-all text-sm font-medium"
+                    >
+                      <ExternalLink className="w-4 h-4" />
+                      Authorize Script
+                    </a>
+                    <button
+                      onClick={handleAuthComplete}
+                      disabled={loading}
+                      className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white px-4 py-2.5 rounded-xl transition-all text-sm font-medium"
+                    >
+                      {loading ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <RefreshCw className="w-4 h-4" />
+                      )}
+                      I&apos;ve Authorized
+                    </button>
+                  </div>
+                  <p className="text-amber-200/70 text-xs">
+                    Click &quot;Review Permissions&quot; and authorize, then
+                    click the green button.
+                  </p>
+                </div>
+              )}
+
+              {/* Setup button */}
+              {!awaitingAuth && (
+                <button
+                  onClick={handleSetupAutoBackup}
+                  disabled={loading}
+                  className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-xl transition-all text-sm font-medium shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Setting up...
+                    </>
+                  ) : (
+                    <>
+                      <DatabaseBackup className="w-4 h-4" />
+                      Enable Auto-Backup
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
