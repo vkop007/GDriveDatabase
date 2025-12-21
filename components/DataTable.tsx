@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { bulkDeleteDocuments, deleteDocument } from "../app/actions/table";
-import { TableFile } from "../types";
+import { TableFile, RowData } from "../types";
 import BulkActionBar from "./BulkActionBar";
+import EditRowModal from "./EditRowModal";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Pencil } from "lucide-react";
 
 interface DataTableProps {
   table: TableFile;
@@ -16,6 +18,7 @@ export default function DataTable({ table, fileId }: DataTableProps) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
+  const [editingDocument, setEditingDocument] = useState<RowData | null>(null);
 
   const allIds = table.documents.map((doc) => doc.$id);
   const allSelected =
@@ -136,13 +139,22 @@ export default function DataTable({ table, fileId }: DataTableProps) {
                       </td>
                     ))}
                     <td className="text-right">
-                      <form action={deleteDocument} className="inline-block">
-                        <input type="hidden" name="fileId" value={fileId} />
-                        <input type="hidden" name="docId" value={doc.$id} />
-                        <button className="text-red-500 hover:text-red-400 transition-colors text-sm font-medium">
-                          Delete
+                      <div className="flex items-center justify-end gap-3">
+                        <button
+                          onClick={() => setEditingDocument(doc)}
+                          className="text-purple-400 hover:text-purple-300 transition-colors text-sm font-medium flex items-center gap-1"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          Edit
                         </button>
-                      </form>
+                        <form action={deleteDocument} className="inline-block">
+                          <input type="hidden" name="fileId" value={fileId} />
+                          <input type="hidden" name="docId" value={doc.$id} />
+                          <button className="text-red-500 hover:text-red-400 transition-colors text-sm font-medium">
+                            Delete
+                          </button>
+                        </form>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -158,6 +170,16 @@ export default function DataTable({ table, fileId }: DataTableProps) {
         onClear={clearSelection}
         isDeleting={isDeleting}
       />
+
+      {editingDocument && (
+        <EditRowModal
+          isOpen={!!editingDocument}
+          onClose={() => setEditingDocument(null)}
+          fileId={fileId}
+          schema={table.schema}
+          document={editingDocument}
+        />
+      )}
     </>
   );
 }

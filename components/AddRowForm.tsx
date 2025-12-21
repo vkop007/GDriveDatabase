@@ -6,6 +6,7 @@ import { addDocument } from "../app/actions/table";
 import { ColumnDefinition } from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
+import { Loader2 } from "lucide-react";
 
 export default function AddRowForm({
   fileId,
@@ -15,6 +16,7 @@ export default function AddRowForm({
   schema: ColumnDefinition[];
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const inputColumns = schema.filter((col) => !col.key.startsWith("$"));
 
@@ -70,6 +72,8 @@ export default function AddRowForm({
           }}
           onSubmit={async (e) => {
             e.preventDefault();
+            if (isLoading) return;
+            setIsLoading(true);
             const form = e.currentTarget;
             const formData = new FormData(form);
             const data: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -126,6 +130,8 @@ export default function AddRowForm({
               toast.error(
                 error instanceof Error ? error.message : "Failed to add row"
               );
+            } finally {
+              setIsLoading(false);
             }
           }}
           className="p-6 space-y-6"
@@ -179,8 +185,13 @@ export default function AddRowForm({
             >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary">
-              Save Row
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isLoading}
+            >
+              {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+              {isLoading ? "Adding..." : "Save Row"}
             </button>
           </div>
         </form>

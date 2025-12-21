@@ -2,7 +2,7 @@
 
 import { operations, initDriveService } from "gdrivekit";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { getAuth, fetchWithAuth } from "../../lib/gdrive/auth";
 import { moveFile, createFileInFolder } from "../../lib/gdrive/operations";
 
@@ -221,6 +221,62 @@ export async function addDocument(formData: FormData) {
   }
 }
 
+export async function updateDocument(formData: FormData) {
+  const fileId = formData.get("fileId") as string;
+  const docId = formData.get("docId") as string;
+  const dataStr = formData.get("data") as string;
+
+  console.log("[updateDocument] Called with:", { fileId, docId, dataStr });
+
+  if (!fileId || !docId || !dataStr) {
+    console.log("[updateDocument] Missing parameters");
+    return { success: false, error: "Missing parameters" };
+  }
+
+  try {
+    const data = JSON.parse(dataStr);
+    console.log("[updateDocument] Parsed data:", data);
+
+    const table = await getTableData(fileId);
+    console.log(
+      "[updateDocument] Got table with",
+      table.documents.length,
+      "documents"
+    );
+
+    const docIndex = table.documents.findIndex((d) => d.$id === docId);
+    console.log("[updateDocument] Found document at index:", docIndex);
+
+    if (docIndex === -1) {
+      console.log("[updateDocument] Document not found");
+      return { success: false, error: "Document not found" };
+    }
+
+    // Preserve system fields and update with new data
+    const updatedDoc: RowData = {
+      ...table.documents[docIndex],
+      ...data,
+      $id: docId, // Ensure $id is not changed
+      $createdAt: table.documents[docIndex].$createdAt, // Preserve original
+      $updatedAt: new Date().toISOString(), // Update timestamp
+    };
+
+    console.log("[updateDocument] Updated doc:", updatedDoc);
+
+    table.documents[docIndex] = updatedDoc;
+    console.log("[updateDocument] Saving to Drive...");
+    await saveTableContent(fileId, table);
+    console.log("[updateDocument] Saved successfully!");
+
+    revalidatePath(`/dashboard/table/${fileId}`);
+    revalidateTag(`table-data-${fileId}`, "max");
+    return { success: true };
+  } catch (error) {
+    console.error("[updateDocument] Error:", error);
+    return { success: false, error: "Failed to update document" };
+  }
+}
+
 export async function deleteDocument(formData: FormData) {
   const fileId = formData.get("fileId") as string;
   const docId = formData.get("docId") as string;
@@ -262,6 +318,9 @@ export async function bulkDeleteDocuments(fileId: string, docIds: string[]) {
 
 // Helper to save the entire table content
 async function saveTableContent(fileId: string, content: TableFile) {
+  console.log("[saveTableContent] Saving to fileId:", fileId);
+  console.log("[saveTableContent] Content:", JSON.stringify(content, null, 2));
+
   const { tokens, clientId, clientSecret, projectId } = await getAuth();
 
   const driveService = initDriveService(
@@ -274,7 +333,8 @@ async function saveTableContent(fileId: string, content: TableFile) {
     tokens
   );
 
-  await driveService.updateJsonContent(fileId, content);
+  const result = await driveService.updateJsonContent(fileId, content);
+  console.log("[saveTableContent] Drive API result:", result);
 }
 
 // Deprecated or Modified Actions
