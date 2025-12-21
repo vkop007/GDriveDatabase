@@ -17,8 +17,14 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
 
   const router = useRouter();
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isLoading) return;
+
     setIsLoading(true);
+    const formData = new FormData(e.currentTarget);
+    formData.append("parentId", parentId);
+
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (await createTable(formData)) as any;
@@ -51,8 +57,7 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
         onClose={() => setIsOpen(false)}
         title="Create New Table"
       >
-        <form action={handleSubmit} className="space-y-4">
-          <input type="hidden" name="parentId" value={parentId} />
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label
               htmlFor="name"
@@ -84,7 +89,7 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
               className="btn btn-primary"
             >
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-              Create Table
+              {isLoading ? "Creating..." : "Create Table"}
             </button>
           </div>
         </form>

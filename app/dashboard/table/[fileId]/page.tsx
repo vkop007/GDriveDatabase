@@ -6,6 +6,9 @@ import DataView from "././data";
 import ApiAccess from "../../../../components/ApiAccess";
 import Link from "next/link";
 
+// Force dynamic rendering to ensure fresh data after edits
+export const dynamic = "force-dynamic";
+
 export default async function TablePage({
   params,
   searchParams,
