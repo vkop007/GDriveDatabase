@@ -22,6 +22,7 @@ import {
 import { uploadBucketFiles, deleteBucketFile } from "../../app/actions/bucket";
 import Image from "next/image";
 import UploadSuccessModal from "./UploadSuccessModal";
+import { useConfirm } from "../../contexts/ConfirmContext";
 
 // Helper to get file icon based on MIME type
 const getFileIcon = (mimeType: string) => {
@@ -142,6 +143,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
   const [renameValue, setRenameValue] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounter = useRef(0);
+  const confirm = useConfirm();
 
   const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files?.length) return;
@@ -174,8 +176,17 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
     alert("Resource Link Copied!");
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure?")) return;
+  const handleDelete = async (id: string, fileName?: string) => {
+    const confirmed = await confirm({
+      title: "Delete File",
+      description: `Are you sure you want to delete "${
+        fileName || "this file"
+      }"? This action cannot be undone.`,
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "danger",
+    });
+    if (!confirmed) return;
     setIsDeleting(id);
     const formData = new FormData();
     formData.append("fileId", id);
@@ -412,7 +423,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
                     <span className="text-[11px]">Copy Link</span>
                   </button>
                   <button
-                    onClick={() => handleDelete(file.id)}
+                    onClick={() => handleDelete(file.id, file.name)}
                     disabled={isDeleting === file.id}
                     className="p-2 text-neutral-400 hover:text-white bg-neutral-800/50 hover:bg-red-500 transition-all rounded-lg border border-neutral-700/50 hover:border-red-500"
                   >
@@ -528,7 +539,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
                         Copy Link
                       </button>
                       <button
-                        onClick={() => handleDelete(file.id)}
+                        onClick={() => handleDelete(file.id, file.name)}
                         className="p-2 text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all border border-transparent hover:border-red-500/20"
                         disabled={isDeleting === file.id}
                       >

@@ -7,7 +7,8 @@ import BulkActionBar from "./BulkActionBar";
 import EditRowModal from "./EditRowModal";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2, Database } from "lucide-react";
+import { Pencil, Trash2, Database, Loader2 } from "lucide-react";
+import { useConfirm } from "../contexts/ConfirmContext";
 
 interface DataTableProps {
   table: TableFile;
@@ -18,7 +19,9 @@ export default function DataTable({ table, fileId }: DataTableProps) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deletingRowId, setDeletingRowId] = useState<string | null>(null);
   const [editingDocument, setEditingDocument] = useState<RowData | null>(null);
+  const confirm = useConfirm();
 
   const allIds = table.documents.map((doc) => doc.$id);
   const allSelected =
@@ -50,11 +53,15 @@ export default function DataTable({ table, fileId }: DataTableProps) {
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
 
-    const confirmed = confirm(
-      `Are you sure you want to delete ${selectedIds.size} row${
+    const confirmed = await confirm({
+      title: "Delete Rows",
+      description: `Are you sure you want to delete ${selectedIds.size} row${
         selectedIds.size > 1 ? "s" : ""
-      }? This action cannot be undone.`
-    );
+      }? This action cannot be undone.`,
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "danger",
+    });
 
     if (!confirmed) return;
 
@@ -76,6 +83,33 @@ export default function DataTable({ table, fileId }: DataTableProps) {
       toast.error("An error occurred while deleting");
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleSingleDelete = async (docId: string) => {
+    const confirmed = await confirm({
+      title: "Delete Row",
+      description:
+        "Are you sure you want to delete this row? This action cannot be undone.",
+      confirmText: "Delete",
+      cancelText: "Cancel",
+      variant: "danger",
+    });
+
+    if (!confirmed) return;
+
+    setDeletingRowId(docId);
+    try {
+      const formData = new FormData();
+      formData.append("fileId", fileId);
+      formData.append("docId", docId);
+      await deleteDocument(formData);
+      toast.success("Row deleted successfully");
+      router.refresh();
+    } catch (error) {
+      toast.error("Failed to delete row");
+    } finally {
+      setDeletingRowId(null);
     }
   };
 
@@ -154,7 +188,7 @@ export default function DataTable({ table, fileId }: DataTableProps) {
                       key={doc.$id}
                       className={`group transition-colors ${
                         isSelected
-                          ? "bg-purple-500/10 hover:bg-purple-500/15"
+                          ? "bg-primary/10 hover:bg-primary/15"
                           : "hover:bg-neutral-800/30"
                       }`}
                     >
@@ -164,7 +198,7 @@ export default function DataTable({ table, fileId }: DataTableProps) {
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleRow(doc.$id)}
-                            className="w-4 h-4 rounded bg-neutral-950 border-neutral-700 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 cursor-pointer"
+                            className="w-4 h-4 rounded bg-neutral-950 border-neutral-700 text-primary focus:ring-primary/20 focus:ring-offset-0 cursor-pointer"
                           />
                         </div>
                       </td>
@@ -231,22 +265,23 @@ export default function DataTable({ table, fileId }: DataTableProps) {
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => setEditingDocument(doc)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-purple-400 hover:text-white hover:bg-purple-500/20 transition-all text-xs font-medium"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-primary hover:text-white hover:bg-primary/20 transition-all text-xs font-medium"
                           >
                             <Pencil className="w-3.5 h-3.5" />
                             Edit
                           </button>
-                          <form
-                            action={deleteDocument}
-                            className="inline-block"
+                          <button
+                            onClick={() => handleSingleDelete(doc.$id)}
+                            disabled={deletingRowId === doc.$id}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 transition-all text-xs font-medium disabled:opacity-50"
                           >
-                            <input type="hidden" name="fileId" value={fileId} />
-                            <input type="hidden" name="docId" value={doc.$id} />
-                            <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 transition-all text-xs font-medium">
+                            {deletingRowId === doc.$id ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
                               <Trash2 className="w-3.5 h-3.5" />
-                              Delete
-                            </button>
-                          </form>
+                            )}
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -267,7 +302,7 @@ export default function DataTable({ table, fileId }: DataTableProps) {
               </span>{" "}
               row{table.documents.length !== 1 ? "s" : ""}
               {selectedIds.size > 0 && (
-                <span className="ml-2 text-purple-400">
+                <span className="ml-2 text-primary">
                   • {selectedIds.size} selected
                 </span>
               )}
