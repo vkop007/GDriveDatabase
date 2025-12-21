@@ -84,7 +84,7 @@ export default function DataTable({ table, fileId }: DataTableProps) {
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900/80 via-neutral-900 to-neutral-800/50">
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900/80 via-neutral-900 to-neutral-800/50">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
@@ -100,7 +100,7 @@ export default function DataTable({ table, fileId }: DataTableProps) {
                         }
                       }}
                       onChange={toggleAll}
-                      className="w-4 h-4 rounded bg-neutral-950 border-neutral-700 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 cursor-pointer"
+                      className="w-4 h-4 rounded bg-neutral-950 border-neutral-700 text-primary focus:ring-primary/20 focus:ring-offset-0 cursor-pointer"
                       disabled={allIds.length === 0}
                     />
                   </div>

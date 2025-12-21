@@ -14,7 +14,7 @@ export default function DataView({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary-from to-primary-to border border-white/10 flex items-center justify-center">
             <Table2 className="w-5 h-5 text-white" />
           </div>
           <div>

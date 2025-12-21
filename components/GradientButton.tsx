@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 
 interface GradientButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  variant?: "purple" | "emerald" | "amber" | "blue";
+  variant?: "purple" | "emerald" | "amber" | "blue" | "pink";
   size?: "sm" | "md" | "lg";
   isLoading?: boolean;
   icon?: ReactNode;
@@ -19,6 +19,7 @@ const variantStyles = {
   amber:
     "bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 shadow-amber-500/20 hover:shadow-amber-500/30",
   blue: "bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-blue-500/20 hover:shadow-blue-500/30",
+  pink: "bg-linear-to-r from-primary-from to-primary-to hover:brightness-110 shadow-primary/20 hover:shadow-primary/30",
 };
 
 const sizeStyles = {
@@ -31,7 +32,7 @@ const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>(
   (
     {
       children,
-      variant = "purple",
+      variant = "pink",
       size = "md",
       isLoading = false,
       icon,
@@ -59,7 +60,7 @@ const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>(
         {isLoading ? (
           <Loader2 className="w-4 h-4 animate-spin" />
         ) : icon ? (
-          <span className="flex-shrink-0">{icon}</span>
+          <span className="shrink-0">{icon}</span>
         ) : null}
         {children}
       </button>

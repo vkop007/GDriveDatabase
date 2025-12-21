@@ -86,7 +86,7 @@ export default async function TablePage({
           {/* Title Section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold bg-linear-to-r from-white via-purple-200 to-purple-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-linear-to-r from-white via-white to-white bg-clip-text text-transparent">
                 {table.name}
               </h1>
               <div className="mt-3">

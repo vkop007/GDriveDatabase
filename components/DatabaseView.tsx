@@ -9,7 +9,15 @@ import ItemSettingsModal from "./ItemSettingsModal";
 import SearchInput from "./SearchInput";
 import { deleteCollection } from "../app/actions";
 import Link from "next/link";
-import { Settings, Table, Database, ChevronRight, Layers } from "lucide-react";
+import {
+  Settings,
+  Table,
+  Database,
+  ChevronRight,
+  Layers,
+  CreditCard,
+} from "lucide-react";
+import ResourceCard from "./ResourceCard";
 
 interface DatabaseViewProps {
   initialTables: any[];
@@ -53,7 +61,7 @@ export default function DatabaseView({
           {/* Title Section */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold bg-linear-to-r from-white via-pink-200 to-pink-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-linear-to-r from-white via-white to-white bg-clip-text text-transparent">
                 Collections
               </h1>
               <p className="text-neutral-400 mt-2">
@@ -86,47 +94,15 @@ export default function DatabaseView({
             </div>
           ) : (
             files.map((file: any) => (
-              <div
+              <ResourceCard
                 key={file.id}
-                className="group card-glow-pink p-0 card-glow flex flex-col"
-              >
-                <Link
-                  href={`/dashboard/database/${databaseId}/table/${file.id}`}
-                  className="flex-1 p-6 relative z-10"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="icon-box icon-box-lg icon-box-pink">
-                      <Table className="w-5 h-5 text-pink-400" />
-                    </div>
-                    <span className="badge badge-neutral">
-                      {new Date(file.createdTime).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <h3
-                    className="font-medium text-white truncate mb-2 group-hover:text-pink-200 transition-colors"
-                    title={file.name}
-                  >
-                    {file.name}
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <CopyButton text={file.id} label="Collection ID" />
-                  </div>
-                </Link>
-
-                <div className="px-6 pb-6 pt-2 relative z-10">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      setSettingsCollection(file);
-                    }}
-                    className="btn btn-primary w-full"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Settings
-                  </button>
-                </div>
-              </div>
+                name={file.name}
+                id={file.id}
+                createdTime={file.createdTime}
+                type="collection"
+                href={`/dashboard/database/${databaseId}/table/${file.id}`}
+                onSettingsClick={() => setSettingsCollection(file)}
+              />
             ))
           )}
         </div>

@@ -47,13 +47,13 @@ export default function Modal({
       />
       <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-neutral-800 bg-neutral-900 shadow-2xl animate-slide-up">
         {/* Glow effect */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
 
         {/* Header */}
         <div className="relative flex items-center justify-between p-5 border-b border-neutral-800 bg-linear-to-r from-neutral-900 to-neutral-800/50">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-purple-500/30 to-pink-500/20 flex items-center justify-center border border-purple-500/20">
-              <div className="w-2 h-2 rounded-full bg-purple-400" />
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary/30 to-primary/20 flex items-center justify-center border border-primary/20">
+              <div className="w-2 h-2 rounded-full bg-primary" />
             </div>
             <h2 className="text-lg font-semibold text-white">{title}</h2>
           </div>
