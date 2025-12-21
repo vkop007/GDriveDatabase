@@ -4,7 +4,7 @@
     "": {
       "name": "gdrivedatabase",
       "dependencies": {
-        "gdrivekit": "^2.6.0",
+        "gdrivekit": "^3.0.0",
         "lucide-react": "^0.555.0",
         "next": "16.0.6",
         "react": "19.2.0",
@@ -546,7 +546,7 @@
 
     "functions-have-names": ["functions-have-names@1.2.3", "", {}, "sha512-xckBUXyTIqT97tq2x2AMb+g163b5JFysYk0x4qxNFwbfQkmNZoiRHb6sPzI9/QV33WeuvVYBUIiD4NzNIyqaRQ=="],
 
-    "gdrivekit": ["gdrivekit@2.6.0", "", { "dependencies": { "archiver": "^7.0.1", "archiver-zip-encrypted": "^2.0.0", "core-util-is": "^1.0.3", "crypto": "^1.0.1", "update-notifier": "^7.3.1" } }, "sha512-feb0hUDxvMMbGizDIYig2StqmXf120mpSpvUFbks1dPbpRMGMXgRg9SilM5ip58tF/S3Cpzh64BzvOvNNojBwg=="],
+    "gdrivekit": ["gdrivekit@3.0.0", "", { "dependencies": { "archiver": "^7.0.1", "archiver-zip-encrypted": "^2.0.0", "core-util-is": "^1.0.3", "crypto": "^1.0.1", "update-notifier": "^7.3.1" } }, "sha512-gjA6ZzzTYUuMZoN73aqfH2aiGKjpLk4DR2yB8v9fw2+I1hDicCALYUjmfiNu9cXrbKsIxBu78ETQ10oAYKzaaw=="],
 
     "generator-function": ["generator-function@2.0.1", "", {}, "sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g=="],
 
