@@ -6,7 +6,7 @@ import { addDocument } from "../app/actions/table";
 import { ColumnDefinition } from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, X, Table2 } from "lucide-react";
 import GradientButton from "./GradientButton";
 
 export default function AddRowForm({
@@ -34,26 +34,29 @@ export default function AddRowForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex justify-between items-center p-6 border-b border-neutral-800">
-          <h3 className="text-lg font-semibold text-white">Add New Row</h3>
+      <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 shadow-2xl animate-in fade-in zoom-in duration-200">
+        {/* Glow effect */}
+        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 blur-2xl rounded-full pointer-events-none" />
+
+        {/* Header */}
+        <div className="relative flex justify-between items-center p-6 border-b border-neutral-800 bg-gradient-to-r from-neutral-900 to-neutral-800/50">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-primary/20 flex items-center justify-center border border-primary/20">
+              <Table2 className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">Add New Row</h3>
+              <p className="text-xs text-neutral-400">
+                Fill in the fields below
+              </p>
+            </div>
+          </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="btn btn-ghost p-1"
+            className="p-2 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-lg transition-all"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -125,22 +128,27 @@ export default function AddRowForm({
               setIsLoading(false);
             }
           }}
-          className="p-6 space-y-6"
+          className="relative p-6 space-y-6"
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {inputColumns.length === 0 ? (
-              <div className="col-span-2 text-center py-8 text-neutral-500">
-                <p className="text-sm">No columns defined yet.</p>
-                <p className="text-xs mt-1">
-                  Add columns first before adding rows.
+              <div className="col-span-2 text-center py-12 rounded-xl bg-neutral-800/30 border border-dashed border-neutral-700">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-neutral-800/50 flex items-center justify-center">
+                  <Table2 className="w-6 h-6 text-neutral-500" />
+                </div>
+                <p className="text-sm text-neutral-400">
+                  No columns defined yet
+                </p>
+                <p className="text-xs text-neutral-500 mt-1">
+                  Add columns first before adding rows
                 </p>
               </div>
             ) : (
               inputColumns.map((col) => (
                 <div key={col.key} className="space-y-2">
-                  <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
-                    {col.key}{" "}
-                    {col.required && <span className="text-red-500">*</span>}
+                  <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider flex items-center gap-2">
+                    {col.key}
+                    {col.required && <span className="text-primary">*</span>}
                   </label>
                   {col.array ? (
                     <ArrayInput
@@ -157,7 +165,7 @@ export default function AddRowForm({
                           name={col.key}
                           className="sr-only peer"
                         />
-                        <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                        <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                         <span className="ml-3 text-sm font-medium text-neutral-300">
                           {col.key}
                         </span>
@@ -168,7 +176,7 @@ export default function AddRowForm({
                       type={col.type === "integer" ? "number" : "text"}
                       name={col.key}
                       placeholder={`Enter ${col.key}`}
-                      className="input"
+                      className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                       required={col.required}
                     />
                   )}
@@ -181,7 +189,7 @@ export default function AddRowForm({
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="btn btn-ghost"
+              className="px-5 py-2.5 text-sm font-medium text-neutral-300 hover:text-white hover:bg-neutral-800 rounded-xl transition-all"
             >
               Cancel
             </button>

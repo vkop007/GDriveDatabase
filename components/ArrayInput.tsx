@@ -47,12 +47,12 @@ export default function ArrayInput({
           onChange={(e) => setCurrentValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="flex-1 bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+          className="flex-1 bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
         />
         <button
           type="button"
           onClick={handleAdd}
-          className="bg-neutral-800 hover:bg-neutral-700 text-white p-2.5 rounded-lg transition-colors"
+          className="bg-gradient-to-r from-primary/20 to-primary/10 hover:from-primary hover:to-primary/80 text-primary hover:text-white p-2.5 rounded-xl transition-all border border-primary/20 hover:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={!currentValue.trim()}
         >
           <Plus className="w-5 h-5" />
@@ -64,13 +64,13 @@ export default function ArrayInput({
           {values.map((value, index) => (
             <div
               key={index}
-              className="flex items-center gap-1.5 bg-neutral-800/50 border border-neutral-700 px-3 py-1 rounded-full text-sm text-neutral-200"
+              className="group flex items-center gap-1.5 bg-primary/10 border border-primary/20 px-3 py-1.5 rounded-full text-sm text-primary"
             >
               <span>{value}</span>
               <button
                 type="button"
                 onClick={() => handleRemove(index)}
-                className="text-neutral-500 hover:text-red-400 transition-colors"
+                className="text-primary/60 hover:text-red-400 transition-colors"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
