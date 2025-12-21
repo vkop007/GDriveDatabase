@@ -1,5 +1,6 @@
 import { getDatabaseTree } from "../actions";
 import Sidebar from "../../components/Sidebar";
+import DashboardLayoutWrapper from "../../components/DashboardLayout";
 
 export default async function DashboardLayout({
   children,
@@ -11,9 +12,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-neutral-950">
       <Sidebar treeData={treeData} />
-      <main className="flex-1 md:ml-(--sidebar-width) transition-all duration-200">
-        {children}
-      </main>
+      <DashboardLayoutWrapper>{children}</DashboardLayoutWrapper>
     </div>
   );
 }

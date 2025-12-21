@@ -4,8 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Modal from "./Modal";
 import { renameItem } from "../app/actions/rename";
-import { Loader2, PenLine } from "lucide-react";
+import { PenLine } from "lucide-react";
 import { toast } from "sonner";
+import GradientButton from "./GradientButton";
 
 interface RenameModalProps {
   isOpen: boolean;
@@ -92,14 +93,13 @@ export default function RenameModal({
           <button type="button" onClick={onClose} className="btn btn-ghost">
             Cancel
           </button>
-          <button
+          <GradientButton
             type="submit"
+            isLoading={isLoading}
             disabled={isLoading || !name.trim() || name === currentName}
-            className="btn btn-primary"
           >
-            {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
             Save Changes
-          </button>
+          </GradientButton>
         </div>
       </form>
     </Modal>

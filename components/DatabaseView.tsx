@@ -9,7 +9,7 @@ import ItemSettingsModal from "./ItemSettingsModal";
 import SearchInput from "./SearchInput";
 import { deleteCollection } from "../app/actions";
 import Link from "next/link";
-import { Settings, Table } from "lucide-react";
+import { Settings, Table, Database, ChevronRight, Layers } from "lucide-react";
 
 interface DatabaseViewProps {
   initialTables: any[];
@@ -33,35 +33,44 @@ export default function DatabaseView({
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Link
-                href="/dashboard"
-                className="text-neutral-400 hover:text-white transition-colors"
-              >
-                Databases
-              </Link>
-              <span className="text-neutral-600">/</span>
-              <span className="text-purple-400">Collections</span>
-            </div>
-            <h1 className="text-3xl font-bold text-gradient-purple">
+        <header className="space-y-4">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neutral-800/50 hover:bg-neutral-800 text-neutral-400 hover:text-white transition-all text-sm font-medium"
+            >
+              <Database className="w-3.5 h-3.5" />
+              Databases
+            </Link>
+            <ChevronRight className="w-4 h-4 text-neutral-600" />
+            <span className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-pink-500/10 text-pink-400 text-sm font-medium border border-pink-500/20">
+              <Layers className="w-3.5 h-3.5" />
               Collections
-            </h1>
-            <p className="text-neutral-400 mt-1">
-              Manage Tables in this Database
-            </p>
-            <div className="mt-2">
-              <ApiAccess databaseId={databaseId} />
+            </span>
+          </nav>
+
+          {/* Title Section */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <h1 className="text-4xl font-bold bg-linear-to-r from-white via-pink-200 to-pink-400 bg-clip-text text-transparent">
+                Collections
+              </h1>
+              <p className="text-neutral-400 mt-2">
+                Manage Tables in this Database
+              </p>
+              <div className="mt-3">
+                <ApiAccess databaseId={databaseId} />
+              </div>
             </div>
-          </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            <SearchInput
-              placeholder="Search tables..."
-              value={searchQuery}
-              onChange={setSearchQuery}
-            />
-            <CreateTableModal parentId={databaseId} />
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <SearchInput
+                placeholder="Search tables..."
+                value={searchQuery}
+                onChange={setSearchQuery}
+              />
+              <CreateTableModal parentId={databaseId} />
+            </div>
           </div>
         </header>
 
@@ -82,7 +91,7 @@ export default function DatabaseView({
                 className="group card-glow-pink p-0 card-glow flex flex-col"
               >
                 <Link
-                  href={`/dashboard/table/${file.id}`}
+                  href={`/dashboard/database/${databaseId}/table/${file.id}`}
                   className="flex-1 p-6 relative z-10"
                 >
                   <div className="flex items-start justify-between mb-4">
