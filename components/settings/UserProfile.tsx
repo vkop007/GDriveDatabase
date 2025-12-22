@@ -12,11 +12,8 @@ export default function UserProfile({ user }: UserProfileProps) {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
-      {/* Glow effect */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="relative flex flex-col md:flex-row md:items-center gap-6">
+    <div className="relative">
+      <div className="flex flex-col md:flex-row md:items-center gap-6">
         {/* Profile Picture */}
         <div className="relative group w-20 h-20 shrink-0">
           <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary to-primary/50 blur-sm opacity-50 group-hover:opacity-75 transition-opacity" />

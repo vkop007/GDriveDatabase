@@ -33,9 +33,28 @@ export default async function SettingsPage() {
           </div>
         </div>
 
-        <UserProfile user={user} />
-        <ApiSettings initialApiKey={apiKey} />
-        <BackupSettings />
+        {/* Unified Settings Card */}
+        <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800">
+          {/* Multi-color glow effects */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/2 right-1/4 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+
+          {/* User Profile Section */}
+          <div className="relative p-6 border-b border-neutral-800/50">
+            <UserProfile user={user} />
+          </div>
+
+          {/* API Settings Section */}
+          <div className="relative p-6 border-b border-neutral-800/50">
+            <ApiSettings initialApiKey={apiKey} />
+          </div>
+
+          {/* Backup Settings Section */}
+          <div className="relative p-6">
+            <BackupSettings />
+          </div>
+        </div>
       </div>
     </div>
   );
