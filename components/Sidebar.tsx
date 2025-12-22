@@ -105,7 +105,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
       {/* Mobile Toggle */}
       <button
         onClick={toggleSidebar}
-        className="fixed top-4 left-4 z-50 p-2 bg-neutral-900/80 backdrop-blur-sm border border-neutral-700/50 rounded-xl md:hidden text-white hover:bg-neutral-800 transition-all hover:scale-105 active:scale-95 shadow-lg"
+        className="fixed top-4 left-4 z-50 p-2.5 bg-neutral-900/90 backdrop-blur-md border border-neutral-700/50 rounded-xl md:hidden text-white hover:bg-neutral-800 hover:border-primary/30 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-black/20"
       >
         {isOpen ? <X className="w-5 h-5" /> : <PanelLeft className="w-5 h-5" />}
       </button>
@@ -113,34 +113,41 @@ export default function Sidebar({ treeData }: SidebarProps) {
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-md"
+          className="fixed inset-0 bg-black/70 z-40 md:hidden backdrop-blur-md animate-in fade-in duration-200"
           onClick={() => setIsOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 ${sidebarWidth} bg-linear-to-b from-[rgb(12,12,12)] to-[rgb(8,8,8)] border-r border-neutral-800/50 transform transition-all duration-300 ease-out md:translate-x-0 flex flex-col ${
+        className={`fixed inset-y-0 left-0 z-40 ${sidebarWidth} bg-linear-to-b from-[rgb(14,14,14)] via-[rgb(10,10,10)] to-[rgb(8,8,8)] border-r border-neutral-800/60 transform transition-all duration-300 ease-out md:translate-x-0 flex flex-col ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{
-          boxShadow: "4px 0 24px rgba(0, 0, 0, 0.3)",
+          boxShadow: "4px 0 32px rgba(0, 0, 0, 0.4)",
         }}
       >
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-linear-to-br from-primary/[0.02] via-transparent to-transparent pointer-events-none" />
+
         {/* Header */}
         <div
-          className={`p-4 border-b border-neutral-800/50 flex items-center ${
+          className={`relative p-4 border-b border-neutral-800/50 flex items-center ${
             isCollapsed ? "justify-center" : "gap-3"
           }`}
         >
+          {/* Header glow */}
+          <div className="absolute top-0 left-0 right-0 h-24 bg-linear-to-b from-primary/5 to-transparent pointer-events-none" />
+
           <div className="relative group">
-            <div className="absolute inset-0 bg-linear-to-br from-primary-from to-primary-to rounded-xl blur-md opacity-50 group-hover:opacity-70 transition-opacity" />
-            <div className="relative w-9 h-9 rounded-xl bg-linear-to-br from-primary-from via-primary to-primary-to flex items-center justify-center shadow-lg">
-              <Database className="w-4 h-4 text-white" />
+            <div className="absolute -inset-1 bg-linear-to-br from-primary-from to-primary-to rounded-xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-300" />
+            <div className="relative w-10 h-10 rounded-xl bg-linear-to-br from-primary-from via-primary to-primary-to flex items-center justify-center shadow-lg shadow-primary/20">
+              <div className="absolute inset-0 rounded-xl bg-linear-to-t from-black/20 to-transparent" />
+              <Database className="relative w-4.5 h-4.5 text-white drop-shadow-sm" />
             </div>
           </div>
           {!isCollapsed && (
-            <h1 className="text-lg font-bold text-white tracking-tight">
+            <h1 className="relative text-lg font-bold text-white tracking-tight">
               GDrive DB
             </h1>
           )}
@@ -148,28 +155,28 @@ export default function Sidebar({ treeData }: SidebarProps) {
 
         {/* Navigation */}
         <nav
-          className={`flex-1 overflow-y-auto ${
+          className={`relative flex-1 overflow-y-auto ${
             isCollapsed ? "p-2" : "p-3"
-          } space-y-1 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent`}
+          } space-y-1 scrollbar-thin scrollbar-thumb-neutral-700/50 scrollbar-track-transparent`}
         >
           {/* Home */}
           <Link
             href="/dashboard"
             className={`group flex items-center ${
               isCollapsed ? "justify-center" : "gap-3"
-            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard"
-                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
-                : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
+                ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25 shadow-lg shadow-primary/10"
+                : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
             }`}
             title={isCollapsed ? "Home" : undefined}
           >
             <Home
-              className={`w-4 h-4 ${
+              className={`w-4 h-4 transition-all duration-200 ${
                 pathname === "/dashboard"
-                  ? "text-primary"
-                  : "group-hover:text-primary"
-              } transition-colors`}
+                  ? "text-primary drop-shadow-sm"
+                  : "group-hover:text-primary group-hover:scale-110"
+              }`}
             />
             {!isCollapsed && "Home"}
           </Link>
@@ -179,32 +186,32 @@ export default function Sidebar({ treeData }: SidebarProps) {
             href="/dashboard/apidocs"
             className={`group flex items-center ${
               isCollapsed ? "justify-center" : "gap-3"
-            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/apidocs"
-                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
-                : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
+                ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25 shadow-lg shadow-primary/10"
+                : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
             }`}
             title={isCollapsed ? "API Docs" : undefined}
           >
             <FileJson
-              className={`w-4 h-4 ${
+              className={`w-4 h-4 transition-all duration-200 ${
                 pathname === "/dashboard/apidocs"
-                  ? "text-primary"
-                  : "group-hover:text-primary"
-              } transition-colors`}
+                  ? "text-primary drop-shadow-sm"
+                  : "group-hover:text-primary group-hover:scale-110"
+              }`}
             />
             {!isCollapsed && "API Docs"}
           </Link>
 
           {/* Explorer Section */}
           {!isCollapsed && (
-            <div className="pt-6 pb-2 px-3">
-              <div className="flex items-center gap-2">
-                <div className="h-px flex-1 bg-linear-to-r from-neutral-700/50 to-transparent" />
-                <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-widest">
+            <div className="pt-6 pb-2 px-1">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-linear-to-r from-neutral-700/60 via-neutral-600/30 to-transparent" />
+                <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-[0.15em]">
                   Explorer
                 </span>
-                <div className="h-px flex-1 bg-linear-to-l from-neutral-700/50 to-transparent" />
+                <div className="h-px flex-1 bg-linear-to-l from-neutral-700/60 via-neutral-600/30 to-transparent" />
               </div>
             </div>
           )}
@@ -220,10 +227,10 @@ export default function Sidebar({ treeData }: SidebarProps) {
                   <button
                     key={db.id}
                     onClick={() => handleDatabaseClick(db.id)}
-                    className={`w-full flex items-center justify-center p-2.5 rounded-xl text-sm transition-all ${
+                    className={`w-full flex items-center justify-center p-2.5 rounded-xl text-sm transition-all duration-200 ${
                       isExactDb
-                        ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20"
-                        : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
+                        ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25"
+                        : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
                     }`}
                     title={db.name}
                   >
@@ -235,16 +242,16 @@ export default function Sidebar({ treeData }: SidebarProps) {
               return (
                 <div key={db.id} className="select-none">
                   <div
-                    className={`group flex items-center gap-1 px-2 py-2 rounded-xl text-sm transition-all cursor-pointer ${
+                    className={`group flex items-center gap-1 px-2 py-2 rounded-xl text-sm transition-all duration-200 cursor-pointer ${
                       isExactDb
-                        ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-white border border-primary/20 shadow-lg shadow-primary/5"
-                        : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
+                        ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-white border border-primary/25 shadow-lg shadow-primary/10"
+                        : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
                     }`}
                     onClick={() => handleDatabaseClick(db.id)}
                   >
                     <button
                       onClick={(e) => toggleDb(e, db.id)}
-                      className="p-1 rounded-lg hover:bg-neutral-700/50 text-neutral-500 hover:text-white transition-all"
+                      className="p-1 rounded-lg hover:bg-white/10 text-neutral-500 hover:text-white transition-all duration-150"
                     >
                       {isExpanded ? (
                         <ChevronDown className="w-3.5 h-3.5" />
@@ -256,19 +263,19 @@ export default function Sidebar({ treeData }: SidebarProps) {
                     <div className="flex items-center gap-2 min-w-0 flex-1">
                       {isExpanded ? (
                         <FolderOpen
-                          className={`w-4 h-4 ${
+                          className={`w-4 h-4 transition-all duration-200 ${
                             isExactDb
                               ? "text-primary"
                               : "text-neutral-500 group-hover:text-primary"
-                          } transition-colors`}
+                          }`}
                         />
                       ) : (
                         <Folder
-                          className={`w-4 h-4 ${
+                          className={`w-4 h-4 transition-all duration-200 ${
                             isExactDb
                               ? "text-primary"
                               : "text-neutral-500 group-hover:text-primary"
-                          } transition-colors`}
+                          }`}
                         />
                       )}
                       <span className="truncate font-medium">{db.name}</span>
@@ -282,7 +289,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
                           type: "database",
                         })
                       }
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-neutral-500 hover:text-white hover:bg-neutral-700/50 transition-all"
+                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-neutral-500 hover:text-white hover:bg-white/10 transition-all duration-150"
                       title="Rename Database"
                     >
                       <Pencil className="w-3 h-3" />
@@ -298,54 +305,51 @@ export default function Sidebar({ treeData }: SidebarProps) {
                     }}
                   >
                     <div className="overflow-hidden">
-                      <div className="ml-4 pl-3 border-l border-neutral-700/50 mt-1 space-y-0.5">
-                        {db.tables.length === 0 && (
-                          <div className="px-3 py-2 text-xs text-neutral-600 italic">
-                            No tables found
-                          </div>
-                        )}
-                        {db.tables.map((table) => {
-                          const isTableActive =
-                            pathname ===
-                            `/dashboard/database/${db.id}/table/${table.id}`;
-                          return (
-                            <Link
-                              key={table.id}
-                              href={`/dashboard/database/${db.id}/table/${table.id}`}
-                              className={`group flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all ${
-                                isTableActive
-                                  ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20"
-                                  : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
-                              }`}
-                            >
-                              <FileJson
-                                className={`w-3.5 h-3.5 ${
+                      {db.tables.length > 0 && (
+                        <div className="ml-4 pl-3 border-l border-neutral-700/40 mt-1 space-y-0.5">
+                          {db.tables.map((table) => {
+                            const isTableActive =
+                              pathname ===
+                              `/dashboard/database/${db.id}/table/${table.id}`;
+                            return (
+                              <Link
+                                key={table.id}
+                                href={`/dashboard/database/${db.id}/table/${table.id}`}
+                                className={`group flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all duration-200 ${
                                   isTableActive
-                                    ? "text-primary"
-                                    : "text-neutral-500 group-hover:text-primary"
-                                } transition-colors`}
-                              />
-                              <span className="truncate flex-1">
-                                {table.name}
-                              </span>
-                              <button
-                                onClick={(e) =>
-                                  handleRename(e, {
-                                    id: table.id,
-                                    name: table.name,
-                                    type: "collection",
-                                    parentId: db.id,
-                                  })
-                                }
-                                className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-white transition-all"
-                                title="Rename Collection"
+                                    ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25"
+                                    : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
+                                }`}
                               >
-                                <Pencil className="w-3 h-3" />
-                              </button>
-                            </Link>
-                          );
-                        })}
-                      </div>
+                                <FileJson
+                                  className={`w-3.5 h-3.5 transition-all duration-200 ${
+                                    isTableActive
+                                      ? "text-primary"
+                                      : "text-neutral-500 group-hover:text-primary"
+                                  }`}
+                                />
+                                <span className="truncate flex-1">
+                                  {table.name}
+                                </span>
+                                <button
+                                  onClick={(e) =>
+                                    handleRename(e, {
+                                      id: table.id,
+                                      name: table.name,
+                                      type: "collection",
+                                      parentId: db.id,
+                                    })
+                                  }
+                                  className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-white transition-all duration-150"
+                                  title="Rename Collection"
+                                >
+                                  <Pencil className="w-3 h-3" />
+                                </button>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -355,13 +359,13 @@ export default function Sidebar({ treeData }: SidebarProps) {
 
           {/* Storage Section */}
           {!isCollapsed && (
-            <div className="pt-6 pb-2 px-3">
-              <div className="flex items-center gap-2">
-                <div className="h-px flex-1 bg-linear-to-r from-neutral-700/50 to-transparent" />
-                <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-widest">
+            <div className="pt-6 pb-2 px-1">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-linear-to-r from-neutral-700/60 via-neutral-600/30 to-transparent" />
+                <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-[0.15em]">
                   Storage
                 </span>
-                <div className="h-px flex-1 bg-linear-to-l from-neutral-700/50 to-transparent" />
+                <div className="h-px flex-1 bg-linear-to-l from-neutral-700/60 via-neutral-600/30 to-transparent" />
               </div>
             </div>
           )}
@@ -369,32 +373,32 @@ export default function Sidebar({ treeData }: SidebarProps) {
             href="/dashboard/bucket"
             className={`group flex items-center ${
               isCollapsed ? "justify-center" : "gap-3"
-            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/bucket"
-                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
-                : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
+                ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25 shadow-lg shadow-primary/10"
+                : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
             }`}
             title={isCollapsed ? "Bucket" : undefined}
           >
             <Database
-              className={`w-4 h-4 ${
+              className={`w-4 h-4 transition-all duration-200 ${
                 pathname === "/dashboard/bucket"
-                  ? "text-primary"
-                  : "group-hover:text-primary"
-              } transition-colors`}
+                  ? "text-primary drop-shadow-sm"
+                  : "group-hover:text-primary group-hover:scale-110"
+              }`}
             />
             {!isCollapsed && "Bucket"}
           </Link>
 
           {/* System Section */}
           {!isCollapsed && (
-            <div className="pt-6 pb-2 px-3">
-              <div className="flex items-center gap-2">
-                <div className="h-px flex-1 bg-linear-to-r from-neutral-700/50 to-transparent" />
-                <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-widest">
+            <div className="pt-6 pb-2 px-1">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-linear-to-r from-neutral-700/60 via-neutral-600/30 to-transparent" />
+                <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-[0.15em]">
                   System
                 </span>
-                <div className="h-px flex-1 bg-linear-to-l from-neutral-700/50 to-transparent" />
+                <div className="h-px flex-1 bg-linear-to-l from-neutral-700/60 via-neutral-600/30 to-transparent" />
               </div>
             </div>
           )}
@@ -403,10 +407,10 @@ export default function Sidebar({ treeData }: SidebarProps) {
             href="/dashboard/usage"
             className={`group flex items-center ${
               isCollapsed ? "justify-center" : "gap-3"
-            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/usage"
-                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
-                : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
+                ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25 shadow-lg shadow-primary/10"
+                : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
             }`}
             title={isCollapsed ? "Usage" : undefined}
           >
@@ -420,11 +424,11 @@ export default function Sidebar({ treeData }: SidebarProps) {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className={`w-4 h-4 ${
+              className={`w-4 h-4 transition-all duration-200 ${
                 pathname === "/dashboard/usage"
-                  ? "text-primary"
-                  : "group-hover:text-primary"
-              } transition-colors`}
+                  ? "text-primary drop-shadow-sm"
+                  : "group-hover:text-primary group-hover:scale-110"
+              }`}
             >
               <path d="M21.21 15.89A10 10 0 1 1 8 2.83" />
               <path d="M22 12A10 10 0 0 0 12 2v10z" />
@@ -436,19 +440,19 @@ export default function Sidebar({ treeData }: SidebarProps) {
             href="/dashboard/settings"
             className={`group flex items-center ${
               isCollapsed ? "justify-center" : "gap-3"
-            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/settings"
-                ? "bg-linear-to-r from-primary-from/10 to-primary-to/5 text-primary border border-primary/20 shadow-lg shadow-primary/5"
-                : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
+                ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25 shadow-lg shadow-primary/10"
+                : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
             }`}
             title={isCollapsed ? "Settings" : undefined}
           >
             <Settings
-              className={`w-4 h-4 ${
+              className={`w-4 h-4 transition-all duration-200 ${
                 pathname === "/dashboard/settings"
-                  ? "text-primary"
-                  : "group-hover:text-primary"
-              } transition-colors`}
+                  ? "text-primary drop-shadow-sm"
+                  : "group-hover:text-primary group-hover:scale-110"
+              }`}
             />
             {!isCollapsed && "Settings"}
           </Link>
@@ -456,19 +460,27 @@ export default function Sidebar({ treeData }: SidebarProps) {
 
         {/* Footer Status */}
         <div
-          className={`p-3 border-t border-neutral-800/50 ${
+          className={`relative p-3 border-t border-neutral-800/50 ${
             isCollapsed ? "flex justify-center" : ""
           }`}
         >
           {isCollapsed ? (
-            <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50" />
+            <div className="relative">
+              <div className="absolute inset-0 bg-emerald-500 rounded-full blur-md opacity-50 animate-pulse" />
+              <div className="relative w-3 h-3 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50" />
+            </div>
           ) : (
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-linear-to-r from-neutral-900/80 to-neutral-800/50 border border-neutral-700/30">
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-linear-to-r from-neutral-900/90 to-neutral-800/60 border border-neutral-700/40 backdrop-blur-sm">
               <div className="relative">
-                <div className="absolute inset-0 bg-emerald-500 rounded-full blur-sm animate-pulse" />
-                <div className="relative w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                {/* Animated ring */}
+                <div
+                  className="absolute -inset-1 rounded-full border border-emerald-500/30 animate-ping"
+                  style={{ animationDuration: "2s" }}
+                />
+                <div className="absolute inset-0 bg-emerald-500 rounded-full blur-sm opacity-60 animate-pulse" />
+                <div className="relative w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-lg shadow-emerald-500/50" />
               </div>
-              <span className="text-xs text-neutral-400 font-medium">
+              <span className="text-xs text-neutral-400 font-medium tracking-wide">
                 System Online
               </span>
             </div>
@@ -478,13 +490,13 @@ export default function Sidebar({ treeData }: SidebarProps) {
         {/* Collapse Toggle Button - Centered on right edge */}
         <button
           onClick={toggleCollapse}
-          className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 w-7 h-14 items-center justify-center bg-neutral-900/95 backdrop-blur-sm border border-neutral-700/50 rounded-r-xl hover:bg-neutral-800 hover:border-primary/50 transition-all group shadow-xl z-50"
+          className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 w-7 h-14 items-center justify-center bg-neutral-900/95 backdrop-blur-md border border-neutral-700/50 rounded-r-xl hover:bg-neutral-800 hover:border-primary/40 transition-all duration-200 group shadow-xl shadow-black/30 z-50"
           title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {isCollapsed ? (
-            <PanelLeft className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors" />
+            <PanelLeft className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors duration-200" />
           ) : (
-            <PanelLeftClose className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors" />
+            <PanelLeftClose className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors duration-200" />
           )}
         </button>
       </aside>

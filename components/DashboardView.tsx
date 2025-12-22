@@ -31,7 +31,7 @@ export default function DashboardView({
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white pt-20 px-4 pb-4 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-full mx-auto space-y-8">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold bg-linear-to-r from-white via-white to-white bg-clip-text text-transparent">

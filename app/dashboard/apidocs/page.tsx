@@ -3,7 +3,7 @@ import { DocsTabs } from "../../../components/docs/DocsTabs";
 
 export default function ApiDocsPage() {
   return (
-    <div className="max-w-7xl mx-auto p-8 space-y-8 text-neutral-200">
+    <div className="max-w-full mx-auto p-8 space-y-8 text-neutral-200">
       <div className="space-y-4">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500">

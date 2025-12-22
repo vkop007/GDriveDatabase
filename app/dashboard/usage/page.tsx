@@ -41,7 +41,7 @@ export default async function UsagePage() {
 
   // Chart segments
   const segments = [
-    { label: "GDriveDB App", value: appUsage, color: "#a855f7" },
+    { label: "GDriveDB App", value: appUsage, color: "#eb0081" },
     { label: "Other Drive Files", value: otherUsage, color: "#3b82f6" },
     { label: "Trash", value: usedInTrash, color: "#ef4444" },
   ].filter((s) => s.value > 0);
@@ -60,43 +60,67 @@ export default async function UsagePage() {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto py-8 px-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white via-purple-200 to-purple-400">
-            Storage Usage
-          </h1>
-          <p className="text-neutral-400 mt-2">
-            Google Drive storage breakdown and analysis
-          </p>
-        </div>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-800/50 border border-neutral-700">
+    <div className="space-y-8 max-w-full mx-auto py-8 px-4">
+      {/* Header Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
+        {/* Glow effect */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
+              <HardDrive className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+                Storage Usage
+              </h1>
+              <p className="text-neutral-400 text-sm mt-1">
+                Google Drive storage breakdown and analysis
+              </p>
+            </div>
+          </div>
+
           <div
-            className={`w-2 h-2 rounded-full ${
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl border ${
               percentage >= 90
-                ? "bg-red-400"
+                ? "bg-red-500/10 border-red-500/30"
                 : percentage >= 70
-                ? "bg-yellow-400"
-                : "bg-green-400"
-            } animate-pulse`}
-          />
-          <span className={`text-sm font-medium ${getStatusColor()}`}>
-            {getStatusText()}
-          </span>
+                ? "bg-amber-500/10 border-amber-500/30"
+                : "bg-emerald-500/10 border-emerald-500/30"
+            }`}
+          >
+            <div
+              className={`w-2.5 h-2.5 rounded-full ${
+                percentage >= 90
+                  ? "bg-red-400"
+                  : percentage >= 70
+                  ? "bg-amber-400"
+                  : "bg-emerald-400"
+              } animate-pulse`}
+            />
+            <span className={`text-sm font-medium ${getStatusColor()}`}>
+              {getStatusText()}
+            </span>
+            <span className="text-neutral-500 text-sm">•</span>
+            <span className="text-neutral-400 text-sm font-medium">
+              {percentage.toFixed(1)}% used
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Main Chart Card */}
       <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-neutral-800/50">
         {/* Glow effects */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
 
         <div className="relative z-10">
           <div className="p-6 border-b border-neutral-800">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
                 <Cloud className="w-5 h-5 text-white" />
               </div>
               <div>
@@ -115,12 +139,12 @@ export default async function UsagePage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Storage */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-purple-950/30 hover:border-purple-500/30 transition-all duration-500">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-purple-500/20 transition-colors" />
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-primary/5 hover:border-primary/30 transition-all duration-500">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 blur-2xl rounded-full pointer-events-none group-hover:bg-primary/20 transition-colors" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-purple-500/30 to-purple-600/10 flex items-center justify-center border border-purple-500/20 group-hover:border-purple-500/40 transition-colors">
-                <HardDrive className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary/30 to-primary/10 flex items-center justify-center border border-primary/20 group-hover:border-primary/40 transition-colors">
+                <HardDrive className="w-6 h-6 text-primary" />
               </div>
               <div className="w-10 h-10 relative">
                 <svg className="w-full h-full transform -rotate-90">
@@ -137,14 +161,14 @@ export default async function UsagePage() {
                     cy="20"
                     r="16"
                     fill="none"
-                    stroke="rgb(168,85,247)"
+                    stroke="var(--primary)"
                     strokeWidth="3"
                     strokeLinecap="round"
                     strokeDasharray={`${100.5} 100.5`}
                     className="transition-all duration-1000"
                   />
                 </svg>
-                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-purple-400">
+                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-primary">
                   MAX
                 </span>
               </div>
@@ -155,9 +179,7 @@ export default async function UsagePage() {
             <p className="text-2xl font-bold text-white">
               {formatBytes(total)}
             </p>
-            <p className="text-xs text-purple-400/70 mt-2">
-              Google Drive limit
-            </p>
+            <p className="text-xs text-primary/70 mt-2">Google Drive limit</p>
           </div>
         </div>
 
@@ -300,13 +322,13 @@ export default async function UsagePage() {
       </div>
 
       {/* App Usage Breakdown */}
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-purple-950/20">
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-primary/5">
         {/* Glow effects */}
-        <div className="absolute bottom-0 right-0 w-48 h-48 bg-purple-500/10 blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
 
         <div className="relative z-10 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
               <Database className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -321,15 +343,15 @@ export default async function UsagePage() {
           </div>
 
           <div className="space-y-4">
-            {/* Bucket Section - Purple theme to match */}
-            <div className="group p-4 rounded-xl bg-linear-to-r from-purple-500/10 to-transparent border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300">
+            {/* Bucket Section - Primary theme to match */}
+            <div className="group p-4 rounded-xl bg-linear-to-r from-primary/10 to-transparent border border-primary/20 hover:border-primary/40 transition-all duration-300">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-linear-to-br from-purple-500/30 to-purple-600/20 flex items-center justify-center border border-purple-500/30">
-                    <FolderOpen className="w-5 h-5 text-purple-400" />
+                  <div className="w-10 h-10 rounded-lg bg-linear-to-br from-primary/30 to-primary/20 flex items-center justify-center border border-primary/30">
+                    <FolderOpen className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-white group-hover:text-purple-200 transition-colors">
+                    <h4 className="font-medium text-white group-hover:text-primary transition-colors">
                       Storage Bucket
                     </h4>
                     <p className="text-xs text-neutral-500">
@@ -341,7 +363,7 @@ export default async function UsagePage() {
                   <span className="text-xl font-bold text-white">
                     {formatBytes(Number(data.bucketUsage) || 0)}
                   </span>
-                  <p className="text-xs text-purple-400">
+                  <p className="text-xs text-primary">
                     {appUsage > 0
                       ? (
                           ((Number(data.bucketUsage) || 0) / appUsage) *
@@ -354,7 +376,7 @@ export default async function UsagePage() {
               </div>
               <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-linear-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-1000 ease-out"
+                  className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full transition-all duration-1000 ease-out"
                   style={{
                     width: `${
                       appUsage > 0
@@ -370,7 +392,7 @@ export default async function UsagePage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-purple-500" />
+                  <div className="w-2 h-2 rounded-full bg-primary" />
                   <span className="text-sm font-medium text-neutral-300">
                     Databases
                   </span>
@@ -388,11 +410,11 @@ export default async function UsagePage() {
                       const dbPercentage =
                         appUsage > 0 ? (db.size / appUsage) * 100 : 0;
                       const colors = [
-                        "from-purple-500 to-purple-400",
+                        "from-primary to-primary/70",
                         "from-pink-500 to-pink-400",
-                        "from-violet-500 to-violet-400",
-                        "from-fuchsia-500 to-fuchsia-400",
-                        "from-indigo-500 to-indigo-400",
+                        "from-cyan-500 to-cyan-400",
+                        "from-amber-500 to-amber-400",
+                        "from-emerald-500 to-emerald-400",
                       ];
                       const colorClass = colors[index % colors.length];
 
