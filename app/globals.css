@@ -328,11 +328,15 @@ body {
 }
 
 .btn-danger {
-  background: #ef4444;
+  background: linear-gradient(135deg, #dc2626, #b91c1c, #991b1b);
   color: white;
+  box-shadow: 0 0 20px rgba(185, 28, 28, 0.4);
+  transition: all 0.3s ease;
 }
 .btn-danger:hover:not(:disabled) {
-  background: #dc2626;
+  background: linear-gradient(135deg, #ef4444, #dc2626, #b91c1c);
+  box-shadow: 0 0 30px rgba(185, 28, 28, 0.6);
+  transform: translateY(-1px);
 }
 
 .btn-ghost {
