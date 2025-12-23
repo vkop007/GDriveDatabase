@@ -735,24 +735,30 @@ body {
 }
 
 /* ================================
-   SCROLLBAR (Premium Dark)
+   SCROLLBAR (Thin & Subtle)
 ================================ */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #ff006e, #a855f7);
+  background: rgba(163, 163, 163, 0.2);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #ff3385, #c084fc);
+  background: rgba(163, 163, 163, 0.4);
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(163, 163, 163, 0.2) transparent;
 }
 
 /* ================================
