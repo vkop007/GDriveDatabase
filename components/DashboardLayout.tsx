@@ -39,7 +39,7 @@ export default function DashboardLayoutWrapper({
 
   return (
     <main
-      className={`flex-1 transition-all duration-300 ease-out ${
+      className={`flex-1 h-screen overflow-y-auto transition-all duration-300 ease-out ${
         isCollapsed ? "md:ml-20" : "md:ml-68"
       }`}
     >
