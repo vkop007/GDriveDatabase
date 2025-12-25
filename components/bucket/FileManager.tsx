@@ -18,11 +18,17 @@ import {
   FileSpreadsheet,
   Presentation,
   FileJson,
+  Eye,
+  X,
+  ZoomIn,
+  ZoomOut,
+  Download,
 } from "lucide-react";
 import { uploadBucketFiles, deleteBucketFile } from "../../app/actions/bucket";
 import Image from "next/image";
 import UploadSuccessModal from "./UploadSuccessModal";
 import { useConfirm } from "../../contexts/ConfirmContext";
+import { createPortal } from "react-dom";
 
 // Helper to get file icon based on MIME type
 const getFileIcon = (mimeType: string) => {
@@ -141,6 +147,8 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const [previewFile, setPreviewFile] = useState<any | null>(null);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounter = useRef(0);
   const confirm = useConfirm();
@@ -372,7 +380,12 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
               className="group relative bg-linear-to-br from-neutral-900 to-neutral-900/50 border border-neutral-800 rounded-2xl overflow-hidden hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1"
             >
               {/* Preview */}
-              <div className="aspect-square relative bg-linear-to-br from-neutral-950/80 to-neutral-900/50 flex items-center justify-center p-4 overflow-hidden">
+              <div
+                className={`aspect-square relative bg-linear-to-br from-neutral-950/80 to-neutral-900/50 flex items-center justify-center p-4 overflow-hidden ${
+                  isImage(file.mimeType) ? "cursor-pointer" : ""
+                }`}
+                onClick={() => isImage(file.mimeType) && setPreviewFile(file)}
+              >
                 {isImage(file.mimeType) ? (
                   <>
                     <Image
@@ -382,8 +395,12 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                       unoptimized
                     />
-                    {/* Overlay linear on hover */}
-                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    {/* Overlay with Eye icon on hover */}
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <div className="w-7 h-7 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                        <Eye className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
                   </>
                 ) : (
                   <div className="flex flex-col items-center gap-2">
@@ -420,7 +437,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
                     className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-linear-to-r from-primary/20 to-primary/10 hover:from-primary hover:to-primary/80 text-xs text-primary hover:text-white rounded-lg font-medium transition-all border border-primary/20 hover:border-primary shadow-sm hover:shadow-primary/25"
                   >
                     <Copy className="w-3.5 h-3.5" />
-                    <span className="text-[11px]">Copy Link</span>
+                    <span className="text-[11px]">Copy</span>
                   </button>
                   <button
                     onClick={() => handleDelete(file.id, file.name)}
@@ -575,6 +592,99 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
           </table>
         </div>
       )}
+
+      {/* Image Preview Modal */}
+      {previewFile &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center"
+            onClick={() => {
+              setPreviewFile(null);
+              setZoomLevel(1);
+            }}
+          >
+            {/* Close button */}
+            <button
+              onClick={() => {
+                setPreviewFile(null);
+                setZoomLevel(1);
+              }}
+              className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all border border-white/20 z-10"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Controls */}
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-3 rounded-xl bg-neutral-900/90 backdrop-blur-xl border border-neutral-700/50 z-10">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setZoomLevel(Math.max(0.5, zoomLevel - 0.25));
+                }}
+                className="p-2 rounded-lg hover:bg-neutral-800 text-white transition-colors"
+                title="Zoom Out"
+              >
+                <ZoomOut className="w-5 h-5" />
+              </button>
+              <span className="text-sm text-neutral-400 min-w-[60px] text-center">
+                {Math.round(zoomLevel * 100)}%
+              </span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setZoomLevel(Math.min(3, zoomLevel + 0.25));
+                }}
+                className="p-2 rounded-lg hover:bg-neutral-800 text-white transition-colors"
+                title="Zoom In"
+              >
+                <ZoomIn className="w-5 h-5" />
+              </button>
+              <div className="w-px h-6 bg-neutral-700" />
+              <a
+                href={`/api/resources?id=${previewFile.id}`}
+                download={previewFile.name}
+                onClick={(e) => e.stopPropagation()}
+                className="p-2 rounded-lg hover:bg-neutral-800 text-white transition-colors"
+                title="Download"
+              >
+                <Download className="w-5 h-5" />
+              </a>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  copyLink(previewFile.id);
+                }}
+                className="p-2 rounded-lg hover:bg-neutral-800 text-white transition-colors"
+                title="Copy Link"
+              >
+                <Copy className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Image */}
+            <div
+              className="relative max-w-[90vw] max-h-[85vh] transition-transform duration-200"
+              style={{ transform: `scale(${zoomLevel})` }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={`/api/resources?id=${previewFile.id}`}
+                alt={previewFile.name}
+                width={1200}
+                height={800}
+                className="object-contain max-h-[85vh] rounded-lg shadow-2xl"
+                unoptimized
+              />
+            </div>
+
+            {/* File name */}
+            <div className="absolute top-6 left-6 text-white">
+              <p className="text-lg font-medium">{previewFile.name}</p>
+            </div>
+          </div>,
+          document.body
+        )}
 
       <UploadSuccessModal
         files={uploadedFiles || []}
