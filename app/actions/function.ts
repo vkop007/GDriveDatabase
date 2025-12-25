@@ -7,6 +7,8 @@ import { revalidateTag } from "next/cache";
 
 const FUNCTIONS_REGISTRY_FILE = "functions-registry.json";
 
+export type ScheduleType = "none" | "minutely" | "hourly" | "daily" | "weekly";
+
 export interface FunctionInfo {
   id: string;
   scriptId: string;
@@ -15,6 +17,9 @@ export interface FunctionInfo {
   webAppUrl?: string;
   deploymentId?: string;
   status: "draft" | "deployed" | "error";
+  schedule: ScheduleType;
+  triggerEnabled?: boolean;
+  nextRunAt?: string;
   createdAt: string;
   updatedAt: string;
   lastRunAt?: string;
@@ -114,11 +119,39 @@ export async function listFunctions(): Promise<FunctionInfo[]> {
 }
 
 /**
+ * Calculate the next run time based on schedule
+ */
+function calculateNextRunTime(schedule: ScheduleType): string | undefined {
+  if (schedule === "none") return undefined;
+
+  const now = new Date();
+  switch (schedule) {
+    case "minutely":
+      return new Date(now.getTime() + 60 * 1000).toISOString();
+    case "hourly":
+      return new Date(now.getTime() + 60 * 60 * 1000).toISOString();
+    case "daily":
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(9, 0, 0, 0); // 9 AM next day
+      return tomorrow.toISOString();
+    case "weekly":
+      const nextWeek = new Date(now);
+      nextWeek.setDate(nextWeek.getDate() + ((8 - nextWeek.getDay()) % 7) || 7); // Next Monday
+      nextWeek.setHours(9, 0, 0, 0);
+      return nextWeek.toISOString();
+    default:
+      return undefined;
+  }
+}
+
+/**
  * Create a new function
  */
 export async function createFunction(
   name: string,
-  code: string
+  code: string,
+  schedule: ScheduleType = "none"
 ): Promise<{ success: boolean; function?: FunctionInfo; error?: string }> {
   try {
     const { tokens, clientId, clientSecret, projectId } = await getAuth();
@@ -211,6 +244,8 @@ function run(params) {
       webAppUrl: deployResult?.webAppUrl,
       deploymentId: deployResult?.deploymentId,
       status: deployResult?.webAppUrl ? "deployed" : "draft",
+      schedule,
+      nextRunAt: calculateNextRunTime(schedule),
       createdAt: now,
       updatedAt: now,
     };
@@ -372,6 +407,171 @@ function run(params) {
 }
 
 /**
+ * Update the schedule for a function
+ */
+export async function updateSchedule(
+  id: string,
+  schedule: ScheduleType
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { tokens, clientId, clientSecret, projectId } = await getAuth();
+    initDriveService(
+      {
+        client_id: clientId,
+        client_secret: clientSecret,
+        project_id: projectId,
+        redirect_uris: ["http://localhost:3000/oauth2callback"],
+      },
+      tokens
+    );
+
+    const { registryId, registry } = await getOrCreateRegistry();
+    const funcIndex = registry.functions.findIndex((f) => f.id === id);
+
+    if (funcIndex === -1) {
+      return { success: false, error: "Function not found" };
+    }
+
+    const func = registry.functions[funcIndex];
+
+    // Update schedule in registry
+    func.schedule = schedule;
+    func.nextRunAt = calculateNextRunTime(schedule);
+    func.updatedAt = new Date().toISOString();
+
+    registry.functions[funcIndex] = func;
+    await saveRegistry(registryId, registry);
+    revalidateTag("functions", { expire: 0 });
+
+    console.log(`Schedule updated for ${func.name}: ${schedule}`);
+
+    // Note: The actual trigger is managed within the Apps Script itself
+    // When the user runs the function, it will set up the trigger on Google's side
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating schedule:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to update schedule",
+    };
+  }
+}
+
+/**
+ * Enable auto-run by calling the trigger setup function via the web app
+ */
+export async function enableAutoRun(id: string): Promise<{
+  success: boolean;
+  error?: string;
+  needsAuth?: boolean;
+  authUrl?: string;
+}> {
+  try {
+    const { tokens, clientId, clientSecret, projectId } = await getAuth();
+    initDriveService(
+      {
+        client_id: clientId,
+        client_secret: clientSecret,
+        project_id: projectId,
+        redirect_uris: ["http://localhost:3000/oauth2callback"],
+      },
+      tokens
+    );
+
+    const { registryId, registry } = await getOrCreateRegistry();
+    const funcIndex = registry.functions.findIndex((f) => f.id === id);
+
+    if (funcIndex === -1) {
+      return { success: false, error: "Function not found" };
+    }
+
+    const func = registry.functions[funcIndex];
+
+    if (!func.webAppUrl) {
+      return { success: false, error: "Function is not deployed" };
+    }
+
+    if (!func.schedule || func.schedule === "none") {
+      return {
+        success: false,
+        error: "No schedule set. Please set a schedule first.",
+      };
+    }
+
+    // Call the setupTrigger function via the web app URL
+    const url = new URL(func.webAppUrl);
+    url.searchParams.append("func", "setupTrigger");
+    url.searchParams.append("schedule", func.schedule);
+
+    console.log(
+      `Enabling auto-run for ${func.name} with schedule: ${func.schedule}`
+    );
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      redirect: "follow",
+    });
+
+    const text = await response.text();
+
+    // Check if authorization is needed
+    if (
+      text.includes("Authorization needed") ||
+      text.includes("auth-required") ||
+      text.includes("You need to authorize")
+    ) {
+      return {
+        success: false,
+        needsAuth: true,
+        authUrl: url.toString(),
+        error:
+          "Please authorize the script to set up triggers. Click the link to authorize.",
+      };
+    }
+
+    let result: any;
+    try {
+      result = JSON.parse(text);
+    } catch {
+      // If not JSON, it might be an HTML page (authorization needed)
+      if (text.includes("<!DOCTYPE") || text.includes("<html")) {
+        return {
+          success: false,
+          needsAuth: true,
+          authUrl: url.toString(),
+          error:
+            "Please visit the script URL to authorize trigger permissions.",
+        };
+      }
+      result = { message: text };
+    }
+
+    if (result.error) {
+      throw new Error(result.error);
+    }
+
+    // Update the function to show triggers are active
+    func.triggerEnabled = true;
+    func.updatedAt = new Date().toISOString();
+    registry.functions[funcIndex] = func;
+    await saveRegistry(registryId, registry);
+    revalidateTag("functions", { expire: 0 });
+
+    console.log(`Auto-run enabled for ${func.name}:`, result);
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error enabling auto-run:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to enable auto-run",
+    };
+  }
+}
+
+/**
  * Delete a function
  */
 export async function deleteFunction(
@@ -426,7 +626,13 @@ export async function deleteFunction(
 export async function runFunction(
   id: string,
   params?: Record<string, any>
-): Promise<{ success: boolean; result?: any; error?: string }> {
+): Promise<{
+  success: boolean;
+  result?: any;
+  error?: string;
+  needsAuth?: boolean;
+  authUrl?: string;
+}> {
   try {
     const { tokens, clientId, clientSecret, projectId } = await getAuth();
     initDriveService(
@@ -467,11 +673,20 @@ export async function runFunction(
 
     const text = await response.text();
 
-    if (text.includes("Authorization needed")) {
+    // Check for authorization issues
+    if (
+      text.includes("Authorization needed") ||
+      text.includes("Access denied") ||
+      text.includes("auth-required") ||
+      (text.includes("<!DOCTYPE") &&
+        text.includes("<title>Access denied</title>"))
+    ) {
       return {
         success: false,
+        needsAuth: true,
+        authUrl: func.webAppUrl,
         error:
-          "Function needs authorization. Please open the web app URL to authorize.",
+          "Function needs authorization. Click the button below to authorize.",
       };
     }
 

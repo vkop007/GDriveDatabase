@@ -23,6 +23,8 @@ export default function RunFunctionModal({
     success: boolean;
     data?: any;
     error?: string;
+    needsAuth?: boolean;
+    authUrl?: string;
   } | null>(null);
 
   const handleRun = async () => {
@@ -43,6 +45,13 @@ export default function RunFunctionModal({
       if (response.success) {
         setResult({ success: true, data: response.result });
         onRan(func.id, JSON.stringify(response.result).substring(0, 500));
+      } else if (response.needsAuth && response.authUrl) {
+        setResult({
+          success: false,
+          error: response.error,
+          needsAuth: true,
+          authUrl: response.authUrl,
+        });
       } else {
         setResult({ success: false, error: response.error });
       }
@@ -51,6 +60,26 @@ export default function RunFunctionModal({
     } finally {
       setIsRunning(false);
     }
+  };
+
+  const handleAuthorize = () => {
+    if (!result?.authUrl) return;
+
+    // Open auth popup and monitor when it closes
+    const authPopup = window.open(
+      result.authUrl,
+      "auth_popup",
+      "width=600,height=700,scrollbars=yes"
+    );
+
+    // Poll to check when the popup closes
+    const checkPopup = setInterval(async () => {
+      if (authPopup?.closed) {
+        clearInterval(checkPopup);
+        // Retry running after auth popup closes
+        handleRun();
+      }
+    }, 500);
   };
 
   if (!isOpen) return null;
@@ -110,6 +139,8 @@ export default function RunFunctionModal({
               className={`p-4 rounded-xl border ${
                 result.success
                   ? "bg-emerald-500/10 border-emerald-500/30"
+                  : result.needsAuth
+                  ? "bg-amber-500/10 border-amber-500/30"
                   : "bg-red-500/10 border-red-500/30"
               }`}
             >
@@ -121,6 +152,13 @@ export default function RunFunctionModal({
                       Success
                     </span>
                   </>
+                ) : result.needsAuth ? (
+                  <>
+                    <AlertCircle className="w-4 h-4 text-amber-400" />
+                    <span className="text-sm font-medium text-amber-400">
+                      Authorization Required
+                    </span>
+                  </>
                 ) : (
                   <>
                     <AlertCircle className="w-4 h-4 text-red-400" />
@@ -130,11 +168,23 @@ export default function RunFunctionModal({
                   </>
                 )}
               </div>
-              <pre className="text-sm font-mono text-neutral-300 overflow-auto max-h-48 whitespace-pre-wrap">
-                {result.success
-                  ? JSON.stringify(result.data, null, 2)
-                  : result.error}
-              </pre>
+              <p className="text-sm text-neutral-300 mb-3">
+                {result.success ? null : result.error}
+              </p>
+              {result.success && (
+                <pre className="text-sm font-mono text-neutral-300 overflow-auto max-h-48 whitespace-pre-wrap">
+                  {JSON.stringify(result.data, null, 2)}
+                </pre>
+              )}
+              {result.needsAuth && (
+                <button
+                  onClick={handleAuthorize}
+                  className="flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-500/40 text-amber-400 font-medium rounded-lg hover:bg-amber-500/30 transition-all"
+                >
+                  <Play className="w-4 h-4" />
+                  Authorize & Retry
+                </button>
+              )}
             </div>
           )}
         </div>
