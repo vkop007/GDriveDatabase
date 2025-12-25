@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@xyflow/react": "^12.10.0",
-    "gdrivekit": "^3.0.0",
+    "gdrivekit": "file:../gdrivekit",
     "lucide-react": "^0.555.0",
     "next": "16.0.6",
     "react": "19.2.0",

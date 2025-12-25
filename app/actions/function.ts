@@ -142,29 +142,13 @@ export async function createFunction(
       };
     }
 
-    // Wrap user code in a callable function structure for web app
+    // gdrivekit already provides a doGet dispatcher that calls functions via ?func=functionName
+    // We just need to define the function(s) that can be called
     const wrappedCode = `
-function doGet(e) {
-  try {
-    var funcName = e.parameter.func || "run";
-    var paramsStr = e.parameter.params || "{}";
-    var params = JSON.parse(paramsStr);
-    
-    var result;
-    if (funcName === "run") {
-      result = run(params);
-    } else {
-      result = { error: "Unknown function: " + funcName };
-    }
-    
-    return ContentService.createTextOutput(JSON.stringify(result))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ error: err.toString() }))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
+/**
+ * Main function - called via ?func=run&param1=value1&param2=value2
+ * All URL params are passed to this function
+ */
 function run(params) {
   ${code}
 }
@@ -330,13 +314,13 @@ export async function updateFunction(
     const func = registry.functions[funcIndex];
 
     // Delete old script and create new one (gdrivekit doesn't have updateGoogleScript)
+    // gdrivekit provides the doGet dispatcher, we just define the run function
     const wrappedCode = `
+/**
+ * Main function - called via ?func=run&param1=value1&param2=value2
+ */
 function run(params) {
-  try {
-    ${code}
-  } catch (e) {
-    return { error: e.toString() };
-  }
+  ${code}
 }
 `;
 

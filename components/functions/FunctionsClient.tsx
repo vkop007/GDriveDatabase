@@ -154,23 +154,22 @@ export default function FunctionsClient({
                 </h3>
               </div>
 
-              {/* Code Preview */}
-              <div className="mb-4 p-3 rounded-lg bg-neutral-950/50 border border-neutral-800/50 font-mono text-xs text-neutral-400 overflow-hidden max-h-20">
-                <pre className="whitespace-pre-wrap break-all">
-                  {func.code.substring(0, 150)}
-                  {func.code.length > 150 && "..."}
-                </pre>
+              {/* Function Info */}
+              <div className="mb-4 text-sm text-neutral-500">
+                Created:{" "}
+                {new Date(func.createdAt).toLocaleDateString("en-IN", {
+                  timeZone: "Asia/Kolkata",
+                })}
+                {func.lastRunAt && (
+                  <>
+                    <br />
+                    Last run:{" "}
+                    {new Date(func.lastRunAt).toLocaleString("en-IN", {
+                      timeZone: "Asia/Kolkata",
+                    })}
+                  </>
+                )}
               </div>
-
-              {/* Last Run Info */}
-              {func.lastRunAt && (
-                <div className="mb-4 text-xs text-neutral-500">
-                  Last run:{" "}
-                  {new Date(func.lastRunAt).toLocaleString("en-IN", {
-                    timeZone: "Asia/Kolkata",
-                  })}
-                </div>
-              )}
 
               {/* Actions */}
               <div className="flex items-center gap-2">
