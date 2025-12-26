@@ -56,6 +56,7 @@ export default function AddColumnForm({
           <option value="boolean">Boolean</option>
           <option value="datetime">Datetime</option>
           <option value="relation">Relation</option>
+          <option value="storage">Storage / Media</option>
         </select>
       </div>
 

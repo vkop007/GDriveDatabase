@@ -3,10 +3,11 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { addDocument, getSimpleTableData } from "../app/actions/table";
+import { listBucketFiles } from "../app/actions/bucket";
 import { ColumnDefinition } from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
-import { Loader2, Plus, X, Table2 } from "lucide-react";
+import { Loader2, Plus, X, Table2, Image as ImageIcon } from "lucide-react";
 import GradientButton from "./GradientButton";
 
 export default function AddRowForm({
@@ -21,6 +22,7 @@ export default function AddRowForm({
   const [relationOptions, setRelationOptions] = useState<
     Record<string, { id: string; label: string }[]>
   >({});
+  const [mediaOptions, setMediaOptions] = useState<Record<string, any[]>>({});
 
   const router = useRouter();
   const inputColumns = schema.filter((col) => !col.key.startsWith("$"));
@@ -41,6 +43,30 @@ export default function AddRowForm({
           }));
         }
       });
+
+      // Fetch options for storage columns
+      const storageColumns = inputColumns.filter(
+        (col) => col.type === "storage"
+      );
+      if (storageColumns.length > 0) {
+        // Fetch once for all storage columns since they share the same bucket
+        listBucketFiles().then((files) => {
+          const fileOptions = files.map((f: any) => ({
+            id: f.id,
+            name: f.name,
+            mimeType: f.mimeType,
+            thumbnailLink: f.thumbnailLink,
+            webViewLink: f.webViewLink,
+          }));
+
+          storageColumns.forEach((col) => {
+            setMediaOptions((prev) => ({
+              ...prev,
+              [col.key]: fileOptions,
+            }));
+          });
+        });
+      }
     }
   }, [isOpen]);
 
@@ -193,11 +219,34 @@ export default function AddRowForm({
                         </span>
                       </label>
                     </div>
+                  ) : col.type === "storage" ? (
+                    <div className="relative">
+                      <select
+                        name={col.key}
+                        className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                        required={col.required}
+                        defaultValue=""
+                      >
+                        <option value="" disabled>
+                          Select File
+                        </option>
+                        {mediaOptions[col.key]?.map((opt) => (
+                          <option key={opt.id} value={opt.id}>
+                            {opt.name}
+                          </option>
+                        ))}
+                      </select>
+                      {mediaOptions[col.key] === undefined && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <Loader2 className="w-4 h-4 text-neutral-500 animate-spin" />
+                        </div>
+                      )}
+                    </div>
                   ) : col.type === "relation" ? (
                     <div className="relative">
                       <select
                         name={col.key}
-                        className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all appearance-none cursor-pointer"
+                        className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
                         required={col.required}
                         defaultValue=""
                       >

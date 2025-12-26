@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import { deleteDatabase, deleteCollection } from "../app/actions";
 import { useConfirm } from "../contexts/ConfirmContext";
+import { useRouter } from "next/navigation";
 
 interface ItemSettingsModalProps {
   isOpen: boolean;
@@ -33,6 +34,7 @@ export default function ItemSettingsModal({
 }: ItemSettingsModalProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const confirm = useConfirm();
+  const router = useRouter();
 
   const handleDelete = async () => {
     const confirmed = await confirm({
@@ -65,6 +67,8 @@ export default function ItemSettingsModal({
       toast.success(
         `${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully`
       );
+
+      router.refresh();
     } catch (error) {
       toast.error(`Failed to delete ${type}`);
       setIsDeleting(false);
@@ -79,10 +83,10 @@ export default function ItemSettingsModal({
     >
       <div className="space-y-5">
         {/* Selected Item Card */}
-        <div className="relative overflow-hidden p-5 rounded-xl bg-gradient-to-br from-neutral-800/60 via-neutral-800/40 to-neutral-900/60 border border-neutral-700/50">
+        <div className="relative overflow-hidden p-5 rounded-xl bg-linear-to-br from-neutral-800/60 via-neutral-800/40 to-neutral-900/60 border border-neutral-700/50">
           <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 blur-2xl rounded-full pointer-events-none" />
           <div className="relative flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-purple-500/10 border border-primary/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary/20 to-purple-500/10 border border-primary/20 flex items-center justify-center">
               {type === "database" ? (
                 <Database className="w-5 h-5 text-primary" />
               ) : (
@@ -117,7 +121,7 @@ export default function ItemSettingsModal({
           >
             <div className="relative">
               <div className="absolute inset-0 rounded-xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-primary/25 to-purple-500/15 border border-primary/20 flex items-center justify-center group-hover:border-primary/40 transition-colors duration-300">
+              <div className="relative w-11 h-11 rounded-xl bg-linear-to-br from-primary/25 to-purple-500/15 border border-primary/20 flex items-center justify-center group-hover:border-primary/40 transition-colors duration-300">
                 <PenLine className="w-5 h-5 text-primary group-hover:scale-110 transition-transform duration-300" />
               </div>
             </div>
@@ -140,7 +144,7 @@ export default function ItemSettingsModal({
           >
             <div className="relative">
               <div className="absolute inset-0 rounded-xl bg-red-500/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-red-500/20 to-red-600/10 border border-red-500/20 flex items-center justify-center group-hover:border-red-500/40 transition-colors duration-300">
+              <div className="relative w-11 h-11 rounded-xl bg-linear-to-br from-red-500/20 to-red-600/10 border border-red-500/20 flex items-center justify-center group-hover:border-red-500/40 transition-colors duration-300">
                 <Trash2 className="w-5 h-5 text-red-500 group-hover:scale-110 transition-transform duration-300" />
               </div>
             </div>
