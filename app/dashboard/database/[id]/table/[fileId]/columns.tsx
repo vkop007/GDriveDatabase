@@ -1,9 +1,13 @@
-import { updateTableSchema, deleteColumn } from "../../../../../actions/table";
+import {
+  updateTableSchema,
+  deleteColumn,
+  listTables,
+} from "../../../../../actions/table";
 import { TableFile } from "../../../../../../types";
-import { Plus, Key, Type, ToggleLeft, List, Trash2 } from "lucide-react";
-import GradientButton from "../../../../../../components/GradientButton";
+import { Plus, Key, Type, ToggleLeft, List, Trash2, Link2 } from "lucide-react";
+import AddColumnForm from "../../../../../../components/AddColumnForm";
 
-export default function ColumnsView({
+export default async function ColumnsView({
   table,
   fileId,
   databaseId,
@@ -12,6 +16,12 @@ export default function ColumnsView({
   fileId: string;
   databaseId: string;
 }) {
+  const tables = await listTables(databaseId);
+  const availableTables = tables.map((t: { id: string; name: string }) => ({
+    id: t.id,
+    name: t.name,
+  }));
+
   const getTypeColor = (type: string) => {
     switch (type) {
       case "string":
@@ -22,9 +32,18 @@ export default function ColumnsView({
         return "text-amber-400 bg-amber-500/10 border-amber-500/20";
       case "datetime":
         return "text-purple-400 bg-purple-500/10 border-purple-500/20";
+      case "relation":
+        return "text-pink-400 bg-pink-500/10 border-pink-500/20";
       default:
         return "text-neutral-400 bg-neutral-500/10 border-neutral-500/20";
     }
+  };
+
+  const getTableName = (id: string) => {
+    return (
+      availableTables.find((t: { id: string; name: string }) => t.id === id)
+        ?.name || id
+    );
   };
 
   return (
@@ -52,99 +71,11 @@ export default function ColumnsView({
             <h3 className="text-sm font-semibold text-white">Add New Column</h3>
           </div>
 
-          <form
-            action={updateTableSchema}
-            className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end"
-          >
-            <input type="hidden" name="fileId" value={fileId} />
-            <input type="hidden" name="databaseId" value={databaseId} />
-
-            <div className="md:col-span-2 space-y-2">
-              <label className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
-                <Key className="w-3 h-3" />
-                Key
-              </label>
-              <input
-                type="text"
-                name="key"
-                placeholder="e.g. email"
-                className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
-                <Type className="w-3 h-3" />
-                Type
-              </label>
-              <select
-                name="type"
-                className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
-              >
-                <option value="string">String</option>
-                <option value="integer">Integer</option>
-                <option value="boolean">Boolean</option>
-                <option value="datetime">Datetime</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col justify-end">
-              <div className="h-5 mb-2" />{" "}
-              {/* Spacer for alignment with labels */}
-              <div className="h-[42px] flex items-center">
-                <label className="flex items-center gap-3 cursor-pointer group">
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      name="required"
-                      id="required"
-                      className="sr-only peer"
-                    />
-                    <div className="w-12 h-7 bg-neutral-800 rounded-full peer-checked:bg-linear-to-r peer-checked:from-primary-from peer-checked:to-primary-to transition-all border border-neutral-700 peer-checked:border-primary/50 shadow-inner" />
-                    <div className="absolute left-1 top-1 w-5 h-5 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-5 peer-checked:bg-white shadow-sm" />
-                  </div>
-                  <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
-                    Required
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-end">
-              <div className="h-5 mb-2" />{" "}
-              {/* Spacer for alignment with labels */}
-              <div className="h-[42px] flex items-center">
-                <label className="flex items-center gap-3 cursor-pointer group">
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      name="array"
-                      id="array"
-                      className="sr-only peer"
-                    />
-                    <div className="w-12 h-7 bg-neutral-800 rounded-full peer-checked:bg-linear-to-r peer-checked:from-primary-from peer-checked:to-primary-to transition-all border border-neutral-700 peer-checked:border-primary/50 shadow-inner" />
-                    <div className="absolute left-1 top-1 w-5 h-5 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-5 peer-checked:bg-white shadow-sm" />
-                  </div>
-                  <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
-                    Array
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex flex-col justify-end">
-              <div className="h-5 mb-2" /> {/* Spacer */}
-              <div className="h-[42px] flex items-center">
-                <GradientButton
-                  type="submit"
-                  icon={<Plus className="w-4 h-4" />}
-                >
-                  Add Column
-                </GradientButton>
-              </div>
-            </div>
-          </form>
+          <AddColumnForm
+            fileId={fileId}
+            databaseId={databaseId}
+            availableTables={availableTables}
+          />
         </div>
       </div>
 
@@ -179,7 +110,7 @@ export default function ColumnsView({
                   </div>
                 </th>
                 <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-                  Default
+                  Details
                 </th>
                 <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">
                   Actions
@@ -250,9 +181,16 @@ export default function ColumnsView({
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="text-neutral-400 font-mono text-xs">
-                      {col.default ?? "—"}
-                    </span>
+                    {col.type === "relation" && col.relationTableId ? (
+                      <span className="inline-flex items-center gap-1.5 text-neutral-300 font-mono text-xs">
+                        <Link2 className="w-3 h-3 text-pink-400" />
+                        {getTableName(col.relationTableId)}
+                      </span>
+                    ) : (
+                      <span className="text-neutral-400 font-mono text-xs">
+                        {col.default ?? "—"}
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-right">
                     {col.key.startsWith("$") ? (

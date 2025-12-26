@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { addDocument } from "../app/actions/table";
+import { addDocument, getSimpleTableData } from "../app/actions/table";
 import { ColumnDefinition } from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
@@ -18,8 +18,31 @@ export default function AddRowForm({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [relationOptions, setRelationOptions] = useState<
+    Record<string, { id: string; label: string }[]>
+  >({});
+
   const router = useRouter();
   const inputColumns = schema.filter((col) => !col.key.startsWith("$"));
+
+  useEffect(() => {
+    if (isOpen) {
+      // Fetch options for relation columns
+      const relationColumns = inputColumns.filter(
+        (col) => col.type === "relation" && col.relationTableId
+      );
+
+      relationColumns.forEach(async (col) => {
+        if (col.relationTableId) {
+          const options = await getSimpleTableData(col.relationTableId);
+          setRelationOptions((prev) => ({
+            ...prev,
+            [col.key]: options,
+          }));
+        }
+      });
+    }
+  }, [isOpen]);
 
   if (!isOpen) {
     return (
@@ -70,7 +93,7 @@ export default function AddRowForm({
             setIsLoading(true);
             const form = e.currentTarget;
             const formData = new FormData(form);
-            const data: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
+            const data: Record<string, any> = {};
 
             inputColumns.forEach((col) => {
               const val = formData.get(col.key);
@@ -109,7 +132,6 @@ export default function AddRowForm({
             submissionData.append("data", JSON.stringify(data));
 
             try {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const result = (await addDocument(submissionData)) as any;
               if (result?.success) {
                 toast.success("Row added successfully");
@@ -170,6 +192,29 @@ export default function AddRowForm({
                           {col.key}
                         </span>
                       </label>
+                    </div>
+                  ) : col.type === "relation" ? (
+                    <div className="relative">
+                      <select
+                        name={col.key}
+                        className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all appearance-none cursor-pointer"
+                        required={col.required}
+                        defaultValue=""
+                      >
+                        <option value="" disabled>
+                          Select Item
+                        </option>
+                        {relationOptions[col.key]?.map((opt) => (
+                          <option key={opt.id} value={opt.id}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                      {relationOptions[col.key] === undefined && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <Loader2 className="w-4 h-4 text-neutral-500 animate-spin" />
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <input

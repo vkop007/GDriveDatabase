@@ -13,9 +13,14 @@ import { useConfirm } from "../contexts/ConfirmContext";
 interface DataTableProps {
   table: TableFile;
   fileId: string;
+  relationLookup?: Record<string, Record<string, string>>;
 }
 
-export default function DataTable({ table, fileId }: DataTableProps) {
+export default function DataTable({
+  table,
+  fileId,
+  relationLookup = {},
+}: DataTableProps) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
@@ -213,6 +218,7 @@ export default function DataTable({ table, fileId }: DataTableProps) {
                         const isSystemField = col.key.startsWith("$");
                         const isId = col.key === "$id";
                         const isDate = col.type === "datetime";
+                        const isRelation = col.type === "relation";
 
                         return (
                           <td key={col.key} className="px-6 py-4">
@@ -223,6 +229,11 @@ export default function DataTable({ table, fileId }: DataTableProps) {
                             ) : isDate ? (
                               <span className="text-neutral-400 text-sm">
                                 {new Date(displayValue).toLocaleString()}
+                              </span>
+                            ) : isRelation ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                {relationLookup[col.key]?.[displayValue] ||
+                                  displayValue}
                               </span>
                             ) : col.array ? (
                               <div className="flex flex-wrap gap-1.5">

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { getTableData } from "../../../../../actions/table";
+import { getTableData, getSimpleTableData } from "../../../../../actions/table";
 import ColumnsView from "./columns";
 import DataView from "./data";
 import ApiAccess from "../../../../../../components/ApiAccess";
@@ -28,6 +28,33 @@ export default async function TablePage({
   }
 
   const table = await getTableData(fileId);
+
+  // Helper to fetch relation data for display
+  const relationLookup: Record<string, Record<string, string>> = {};
+
+  if (table) {
+    const relationColumns = table.schema.filter(
+      (col) => col.type === "relation" && col.relationTableId
+    );
+
+    await Promise.all(
+      relationColumns.map(async (col) => {
+        if (col.relationTableId) {
+          const data = await getSimpleTableData(col.relationTableId);
+          relationLookup[col.key] = data.reduce(
+            (
+              acc: Record<string, string>,
+              item: { id: string; label: string }
+            ) => {
+              acc[item.id] = item.label;
+              return acc;
+            },
+            {} as Record<string, string>
+          );
+        }
+      })
+    );
+  }
 
   // Handle case where table data couldn't be loaded
   if (!table) {
@@ -135,7 +162,13 @@ export default async function TablePage({
 
         {/* Content */}
         <div>
-          {tab === "data" && <DataView table={table} fileId={fileId} />}
+          {tab === "data" && (
+            <DataView
+              table={table}
+              fileId={fileId}
+              relationLookup={relationLookup}
+            />
+          )}
           {tab === "columns" && (
             <ColumnsView
               table={table}
