@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { updateDocument, getSimpleTableData } from "../app/actions/table";
+import { listBucketFiles } from "../app/actions/bucket";
 import { ColumnDefinition, RowData } from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
@@ -30,6 +31,7 @@ export default function EditRowModal({
   const [relationOptions, setRelationOptions] = useState<
     Record<string, { id: string; label: string }[]>
   >({});
+  const [mediaOptions, setMediaOptions] = useState<Record<string, any[]>>({});
 
   // Filter out system columns for editing
   const editableColumns = schema.filter((col) => !col.key.startsWith("$"));
@@ -57,6 +59,30 @@ export default function EditRowModal({
           }));
         }
       });
+
+      // Fetch options for storage columns
+      const storageColumns = editableColumns.filter(
+        (col) => col.type === "storage"
+      );
+      if (storageColumns.length > 0) {
+        // Fetch once for all storage columns since they share the same bucket
+        listBucketFiles().then((files) => {
+          const fileOptions = files.map((f: any) => ({
+            id: f.id,
+            name: f.name,
+            mimeType: f.mimeType,
+            thumbnailLink: f.thumbnailLink,
+            webViewLink: f.webViewLink,
+          }));
+
+          storageColumns.forEach((col) => {
+            setMediaOptions((prev) => ({
+              ...prev,
+              [col.key]: fileOptions,
+            }));
+          });
+        });
+      }
     }
   }, [isOpen, document]);
 
@@ -181,11 +207,34 @@ export default function EditRowModal({
                         }
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                      <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                       <span className="ml-3 text-sm font-medium text-neutral-300">
                         {col.key}
                       </span>
                     </label>
+                  </div>
+                ) : col.type === "storage" ? (
+                  <div className="relative">
+                    <select
+                      value={formData[col.key] ?? ""}
+                      onChange={(e) =>
+                        handleInputChange(col.key, e.target.value)
+                      }
+                      className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                      required={col.required}
+                    >
+                      <option value="">Select File</option>
+                      {mediaOptions[col.key]?.map((opt) => (
+                        <option key={opt.id} value={opt.id}>
+                          {opt.name}
+                        </option>
+                      ))}
+                    </select>
+                    {mediaOptions[col.key] === undefined && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="w-4 h-4 text-neutral-500 animate-spin" />
+                      </div>
+                    )}
                   </div>
                 ) : col.type === "relation" ? (
                   <div className="relative">
@@ -194,7 +243,7 @@ export default function EditRowModal({
                       onChange={(e) =>
                         handleInputChange(col.key, e.target.value)
                       }
-                      className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all appearance-none cursor-pointer"
+                      className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
                       required={col.required}
                     >
                       <option value="">Select Item</option>

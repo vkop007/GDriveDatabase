@@ -1,6 +1,6 @@
 export interface ColumnDefinition {
   key: string;
-  type: "string" | "integer" | "boolean" | "datetime" | "relation";
+  type: "string" | "integer" | "boolean" | "datetime" | "relation" | "storage";
   required: boolean;
   default?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   array?: boolean;

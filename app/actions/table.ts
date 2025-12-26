@@ -9,7 +9,7 @@ import { createFileInFolder } from "../../lib/gdrive/operations";
 // Types for Table Structure
 export interface ColumnDefinition {
   key: string;
-  type: "string" | "integer" | "boolean" | "datetime" | "relation";
+  type: "string" | "integer" | "boolean" | "datetime" | "relation" | "storage";
   required: boolean;
   default?: any;
   array?: boolean;

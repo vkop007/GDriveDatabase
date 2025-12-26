@@ -235,6 +235,36 @@ export default function DataTable({
                                 {relationLookup[col.key]?.[displayValue] ||
                                   displayValue}
                               </span>
+                            ) : col.type === "storage" ? (
+                              value ? (
+                                <a
+                                  href={`/api/resources?id=${displayValue}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 text-primary hover:underline"
+                                >
+                                  <div className="w-8 h-8 rounded bg-neutral-800 border border-neutral-700 flex items-center justify-center overflow-hidden">
+                                    {/* Try to show image thumbnail if possible, otherwise generic file icon */}
+                                    {/* Since we only store the link, we can't be sure it's an image without metadata, but we can try */}
+                                    <img
+                                      src={`/api/resources?id=${displayValue}`}
+                                      alt="File"
+                                      className="w-full h-full object-cover"
+                                      onError={(e) => {
+                                        e.currentTarget.style.display = "none";
+                                        e.currentTarget.parentElement?.classList.add(
+                                          "bg-neutral-800"
+                                        );
+                                      }}
+                                    />
+                                  </div>
+                                  <span className="text-xs truncate max-w-[150px]">
+                                    View File
+                                  </span>
+                                </a>
+                              ) : (
+                                <span className="text-neutral-600">—</span>
+                              )
                             ) : col.array ? (
                               <div className="flex flex-wrap gap-1.5">
                                 {Array.isArray(value) ? (
