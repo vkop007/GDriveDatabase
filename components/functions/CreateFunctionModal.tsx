@@ -1,8 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { X, Loader2, FunctionSquare } from "lucide-react";
-import { createFunction, FunctionInfo } from "@/app/actions/function";
+import { X, Loader2, FunctionSquare, Clock } from "lucide-react";
+import {
+  createFunction,
+  FunctionInfo,
+  ScheduleType,
+} from "@/app/actions/function";
 
 interface CreateFunctionModalProps {
   isOpen: boolean;
@@ -23,6 +27,7 @@ export default function CreateFunctionModal({
 }: CreateFunctionModalProps) {
   const [name, setName] = useState("");
   const [code, setCode] = useState(TEMPLATE_CODE);
+  const [schedule, setSchedule] = useState<ScheduleType>("none");
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -41,11 +46,12 @@ export default function CreateFunctionModal({
     setError(null);
 
     try {
-      const result = await createFunction(name.trim(), code);
+      const result = await createFunction(name.trim(), code, schedule);
       if (result.success && result.function) {
         onCreated(result.function);
         setName("");
         setCode(TEMPLATE_CODE);
+        setSchedule("none");
       } else {
         setError(result.error || "Failed to create function");
       }
@@ -119,6 +125,32 @@ export default function CreateFunctionModal({
             <p className="mt-2 text-xs text-neutral-500">
               Your code will be wrapped in a function. Access parameters with
               &apos;params&apos; object.
+            </p>
+          </div>
+
+          {/* Schedule Selector */}
+          <div>
+            <label className="block text-sm font-medium text-neutral-300 mb-2">
+              <span className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Auto-Run Schedule
+              </span>
+            </label>
+            <select
+              value={schedule}
+              onChange={(e) => setSchedule(e.target.value as ScheduleType)}
+              className="w-full px-4 py-3 bg-neutral-950/50 border border-neutral-800/50 rounded-xl text-white focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer"
+            >
+              <option value="none">No auto-run (manual only)</option>
+              <option value="minutely">Every minute</option>
+              <option value="hourly">Every hour</option>
+              <option value="daily">Daily at 9 AM</option>
+              <option value="weekly">Weekly (Monday 9 AM)</option>
+            </select>
+            <p className="mt-2 text-xs text-neutral-500">
+              {schedule === "none"
+                ? "Function will only run when you click Run."
+                : "Function will automatically run on Google's servers at the scheduled time."}
             </p>
           </div>
 

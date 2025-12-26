@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { updateDocument } from "../app/actions/table";
+import { updateDocument, getSimpleTableData } from "../app/actions/table";
 import { ColumnDefinition, RowData } from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 import GradientButton from "./GradientButton";
 
 interface EditRowModalProps {
@@ -27,6 +27,9 @@ export default function EditRowModal({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<Record<string, any>>({});
+  const [relationOptions, setRelationOptions] = useState<
+    Record<string, { id: string; label: string }[]>
+  >({});
 
   // Filter out system columns for editing
   const editableColumns = schema.filter((col) => !col.key.startsWith("$"));
@@ -39,6 +42,21 @@ export default function EditRowModal({
         initialData[col.key] = document[col.key] ?? "";
       });
       setFormData(initialData);
+
+      // Fetch options for relation columns
+      const relationColumns = editableColumns.filter(
+        (col) => col.type === "relation" && col.relationTableId
+      );
+
+      relationColumns.forEach(async (col) => {
+        if (col.relationTableId) {
+          const options = await getSimpleTableData(col.relationTableId);
+          setRelationOptions((prev) => ({
+            ...prev,
+            [col.key]: options,
+          }));
+        }
+      });
     }
   }, [isOpen, document]);
 
@@ -168,6 +186,29 @@ export default function EditRowModal({
                         {col.key}
                       </span>
                     </label>
+                  </div>
+                ) : col.type === "relation" ? (
+                  <div className="relative">
+                    <select
+                      value={formData[col.key] ?? ""}
+                      onChange={(e) =>
+                        handleInputChange(col.key, e.target.value)
+                      }
+                      className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 transition-all appearance-none cursor-pointer"
+                      required={col.required}
+                    >
+                      <option value="">Select Item</option>
+                      {relationOptions[col.key]?.map((opt) => (
+                        <option key={opt.id} value={opt.id}>
+                          {opt.label}
+                        </option>
+                      ))}
+                    </select>
+                    {relationOptions[col.key] === undefined && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="w-4 h-4 text-neutral-500 animate-spin" />
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <input

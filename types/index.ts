@@ -1,9 +1,10 @@
 export interface ColumnDefinition {
   key: string;
-  type: "string" | "integer" | "boolean" | "datetime";
+  type: "string" | "integer" | "boolean" | "datetime" | "relation";
   required: boolean;
   default?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   array?: boolean;
+  relationTableId?: string;
 }
 
 export interface RowData {

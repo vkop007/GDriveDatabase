@@ -9,10 +9,11 @@ import { createFileInFolder } from "../../lib/gdrive/operations";
 // Types for Table Structure
 export interface ColumnDefinition {
   key: string;
-  type: "string" | "integer" | "boolean" | "datetime";
+  type: "string" | "integer" | "boolean" | "datetime" | "relation";
   required: boolean;
   default?: any;
   array?: boolean;
+  relationTableId?: string;
 }
 
 export interface RowData {
@@ -117,6 +118,7 @@ export async function updateTableSchema(formData: FormData) {
   const required = formData.get("required") === "on";
   const isArray = formData.get("array") === "on";
   const defaultValue = formData.get("default") as string;
+  const relationTableId = formData.get("relationTableId") as string;
 
   if (!fileId || !key || !type) {
     throw new Error("Missing parameters");
@@ -134,6 +136,7 @@ export async function updateTableSchema(formData: FormData) {
     type,
     required,
     array: isArray,
+    relationTableId: type === "relation" ? relationTableId : undefined,
     default: defaultValue || undefined,
   };
 
@@ -420,7 +423,39 @@ export async function getParentInfo(
     const data = await response.json();
     return { id: data.id, name: data.name };
   } catch (error) {
-    console.error("Error getting parent info:", error);
     return null;
+  }
+}
+
+export async function getSimpleTableData(tableId: string) {
+  try {
+    console.log("Fetching simple table data for:", tableId);
+    const table = await getTableData(tableId);
+    if (!table) {
+      console.log("Table not found:", tableId);
+      return [];
+    }
+
+    console.log("Table found. Doc count:", table.documents.length);
+
+    // Find the first string column that isn't an ID or system field to use as a label
+    // If none found, just use the second column or $id
+    const labelField =
+      table.schema.find(
+        (c) =>
+          c.type === "string" && !c.key.startsWith("$") && c.key !== "password"
+      )?.key || "$id";
+
+    console.log("Using label field:", labelField);
+
+    const results = table.documents.map((doc) => ({
+      id: doc.$id,
+      label: doc[labelField] || doc.$id,
+    }));
+    console.log("Returning results:", results);
+    return results;
+  } catch (error) {
+    console.error("Error fetching simple table data:", error);
+    return [];
   }
 }

@@ -6,9 +6,11 @@ import { Table2 } from "lucide-react";
 export default function DataView({
   table,
   fileId,
+  relationLookup = {},
 }: {
   table: TableFile;
   fileId: string;
+  relationLookup?: Record<string, Record<string, string>>;
 }) {
   return (
     <div className="space-y-6">
@@ -28,7 +30,11 @@ export default function DataView({
         <AddRowForm fileId={fileId} schema={table.schema} />
       </div>
 
-      <DataTable table={table} fileId={fileId} />
+      <DataTable
+        table={table}
+        fileId={fileId}
+        relationLookup={relationLookup}
+      />
     </div>
   );
 }
