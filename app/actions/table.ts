@@ -154,6 +154,7 @@ export async function updateTableSchema(formData: FormData) {
   await saveTableContent(fileId, table);
 
   revalidatePath(`/dashboard/table/${fileId}`);
+  revalidateTag("database-tree", "max");
 }
 
 export async function deleteColumn(formData: FormData) {
@@ -182,6 +183,7 @@ export async function deleteColumn(formData: FormData) {
   await saveTableContent(fileId, table);
 
   revalidatePath(`/dashboard/table/${fileId}`);
+  revalidateTag("database-tree", "max");
 }
 
 export async function addDocument(formData: FormData) {

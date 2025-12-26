@@ -24,7 +24,15 @@ import { useRouter } from "next/navigation";
 interface TreeData {
   id: string;
   name: string;
-  tables: { id: string; name: string }[];
+  tables: {
+    id: string;
+    name: string;
+    schema?: {
+      key: string;
+      type: string;
+      relationTableId?: string;
+    }[];
+  }[];
 }
 
 interface GraphVisualizerProps {
@@ -135,6 +143,19 @@ function TableNode({ data }: { data: any }) {
   return (
     <div className="group relative transition-all duration-400 hover:-translate-y-1.5 cursor-pointer">
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
+      {/* Add handles for left/right connections for relationships */}
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="right"
+        style={{ opacity: 0 }}
+      />
+      <Handle
+        type="target"
+        position={Position.Left}
+        id="left"
+        style={{ opacity: 0 }}
+      />
 
       {/* Glow effect */}
       <div className="absolute -inset-3 rounded-[16px] bg-gradient-to-br from-cyan-500/10 via-teal-500/10 to-cyan-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-all duration-400" />
@@ -143,7 +164,7 @@ function TableNode({ data }: { data: any }) {
       <div className="absolute -inset-[1px] rounded-[14px] bg-gradient-to-br from-cyan-500/30 via-transparent to-teal-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
 
       <div
-        className="relative min-w-[180px] px-5 py-4 rounded-xl 
+        className="relative min-w-[200px] px-5 py-4 rounded-xl 
         bg-gradient-to-br from-neutral-900/90 via-neutral-900/85 to-neutral-850/80
         backdrop-blur-xl
         border border-neutral-700/40 
@@ -152,7 +173,7 @@ function TableNode({ data }: { data: any }) {
         group-hover:border-cyan-500/25 
         group-hover:shadow-[0_6px_28px_rgba(0,0,0,0.5),0_0_40px_rgba(34,211,238,0.1)]"
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 mb-3 pb-3 border-b border-neutral-800">
           {/* Icon with subtle gradient */}
           <div className="relative">
             <div className="absolute inset-0 rounded-lg bg-cyan-500/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
@@ -166,6 +187,39 @@ function TableNode({ data }: { data: any }) {
           <span className="text-sm font-medium text-neutral-200 group-hover:text-cyan-50 transition-colors duration-300">
             {data.label}
           </span>
+        </div>
+
+        {/* Columns List */}
+        <div className="space-y-1">
+          {data.schema && data.schema.length > 0 ? (
+            data.schema.slice(0, 5).map((col: any) => (
+              <div
+                key={col.key}
+                className="flex items-center justify-between text-xs"
+              >
+                <span className="text-neutral-400">{col.key}</span>
+                <span
+                  className={`px-1.5 py-0.5 rounded text-[10px] bg-neutral-800/50 
+                            ${
+                              col.type === "relation"
+                                ? "text-purple-400"
+                                : col.type === "storage"
+                                ? "text-orange-400"
+                                : "text-neutral-500"
+                            }`}
+                >
+                  {col.type}
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className="text-xs text-neutral-600 italic">No columns</div>
+          )}
+          {data.schema && data.schema.length > 5 && (
+            <div className="text-[10px] text-neutral-600 pt-1">
+              +{data.schema.length - 5} more
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -241,6 +295,7 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
             label: t.name,
             tableId: t.id,
             dbId: db.id,
+            schema: t.schema,
           },
         });
 
@@ -256,6 +311,36 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
             strokeDasharray: "6 3",
           },
         });
+
+        // Add relationships
+        if (t.schema) {
+          t.schema.forEach((col) => {
+            if (col.type === "relation" && col.relationTableId) {
+              const targetId = `table-${col.relationTableId}`;
+              // We only add edge if target exists in our graph (cross-db relations might be tricky if not loaded)
+              // But assume flat tree structure allows checking existence later or just adding edge
+
+              edges.push({
+                id: `${tableId}-${targetId}`,
+                source: tableId,
+                target: targetId,
+                sourceHandle: "right", // use side handles for relations
+                targetHandle: "left",
+                type: "default",
+                animated: true,
+                style: {
+                  stroke: "#a855f7", // purple for relations
+                  strokeWidth: 1.5,
+                },
+                label: col.key,
+                labelStyle: { fill: "#d8b4fe", fontWeight: 500, fontSize: 10 },
+                labelBgStyle: { fill: "#3b0764", fillOpacity: 0.7 },
+                labelBgPadding: [4, 2],
+                labelBgBorderRadius: 4,
+              });
+            }
+          });
+        }
       });
     });
 
