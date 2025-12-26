@@ -331,7 +331,7 @@ export default function JsonTableEditor({
                       >
                         <input
                           type="text"
-                          className="w-full h-full px-4 py-3 bg-transparent border-none focus:ring-2 focus:ring-inset focus:ring-purple-500/50 outline-none text-neutral-300 placeholder-neutral-800 transition-all font-mono text-xs"
+                          className="w-full h-full px-4 py-3 bg-transparent border-none focus:ring-2 focus:ring-inset focus:ring-neutral-500/50 outline-none text-neutral-300 placeholder-neutral-800 transition-all font-mono text-xs"
                           value={
                             typeof row[col] === "object"
                               ? JSON.stringify(row[col])
@@ -398,7 +398,7 @@ export default function JsonTableEditor({
             value={rawContent}
             onChange={(e) => handleRawChange(e.target.value)}
             rows={20}
-            className="relative w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm font-mono focus:ring-2 focus:ring-purple-500/50 focus:border-transparent outline-none transition-all placeholder:text-neutral-600 text-neutral-300 leading-relaxed"
+            className="relative w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm font-mono focus:ring-2 focus:ring-neutral-500/50 focus:border-transparent outline-none transition-all placeholder:text-neutral-600 text-neutral-300 leading-relaxed"
             spellCheck={false}
           />
           {error && (

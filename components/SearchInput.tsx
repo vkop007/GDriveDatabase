@@ -19,7 +19,7 @@ export default function SearchInput({
       <input
         type="text"
         placeholder={placeholder}
-        className="w-full md:w-64 py-2 pl-10 pr-3 text-sm bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all"
+        className="w-full md:w-64 py-2 pl-10 pr-3 text-sm bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/20 transition-all"
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
       />

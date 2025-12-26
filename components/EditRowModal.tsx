@@ -213,6 +213,45 @@ export default function EditRowModal({
                       </span>
                     </label>
                   </div>
+                ) : col.type === "datetime" ? (
+                  <input
+                    type="datetime-local"
+                    value={(() => {
+                      const val = formData[col.key];
+                      if (!val) return "";
+                      try {
+                        const date = new Date(val);
+                        // Format: YYYY-MM-DDTHH:mm
+                        const year = date.getFullYear();
+                        const month = String(date.getMonth() + 1).padStart(
+                          2,
+                          "0"
+                        );
+                        const day = String(date.getDate()).padStart(2, "0");
+                        const hours = String(date.getHours()).padStart(2, "0");
+                        const minutes = String(date.getMinutes()).padStart(
+                          2,
+                          "0"
+                        );
+                        return `${year}-${month}-${day}T${hours}:${minutes}`;
+                      } catch {
+                        return "";
+                      }
+                    })()}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      if (newValue) {
+                        handleInputChange(
+                          col.key,
+                          new Date(newValue).toISOString()
+                        );
+                      } else {
+                        handleInputChange(col.key, "");
+                      }
+                    }}
+                    className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all scheme-dark"
+                    required={col.required}
+                  />
                 ) : col.type === "storage" ? (
                   <div className="relative">
                     <select
