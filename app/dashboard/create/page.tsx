@@ -23,7 +23,7 @@ export default function CreateDocument() {
               type="text"
               required
               placeholder="data.json"
-              className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
+              className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-neutral-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
             />
           </div>
 
@@ -40,7 +40,7 @@ export default function CreateDocument() {
               required
               rows={10}
               placeholder='{"key": "value"}'
-              className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm font-mono focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
+              className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm font-mono focus:ring-2 focus:ring-neutral-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
               defaultValue="{}"
             />
           </div>

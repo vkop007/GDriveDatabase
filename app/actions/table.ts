@@ -154,7 +154,7 @@ export async function updateTableSchema(formData: FormData) {
   await saveTableContent(fileId, table);
 
   revalidatePath(`/dashboard/table/${fileId}`);
-  revalidateTag("database-tree", "max");
+  revalidateTag("database-tree", { expire: 0 });
 }
 
 export async function deleteColumn(formData: FormData) {
@@ -183,7 +183,7 @@ export async function deleteColumn(formData: FormData) {
   await saveTableContent(fileId, table);
 
   revalidatePath(`/dashboard/table/${fileId}`);
-  revalidateTag("database-tree", "max");
+  revalidateTag("database-tree", { expire: 0 });
 }
 
 export async function addDocument(formData: FormData) {
@@ -274,7 +274,7 @@ export async function updateDocument(formData: FormData) {
     console.log("[updateDocument] Saved successfully!");
 
     revalidatePath(`/dashboard/table/${fileId}`);
-    revalidateTag(`table-data-${fileId}`, "max");
+    revalidateTag(`table-data-${fileId}`, { expire: 0 });
     return { success: true };
   } catch (error) {
     console.error("[updateDocument] Error:", error);
