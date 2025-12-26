@@ -345,6 +345,18 @@ export const listCollections = async (databaseId: string) => {
 
 export const getDatabaseTree = async () => {
   const auth = await getAuth();
+
+  // Initialize service needed for reading file content
+  const driveService = initDriveService(
+    {
+      client_id: auth.clientId,
+      client_secret: auth.clientSecret,
+      project_id: auth.projectId,
+      redirect_uris: ["http://localhost:3000/oauth2callback"],
+    },
+    auth.tokens
+  );
+
   return unstable_cache(
     async () => {
       try {
@@ -357,10 +369,32 @@ export const getDatabaseTree = async () => {
           databases.map(async (db: any) => {
             // This runs in parallel for each database
             const tables = await _listCollections(db.id, auth);
+
+            // Fetch schema for each table (Parallel)
+            const tablesWithSchema = await Promise.all(
+              tables.map(async (t: any) => {
+                try {
+                  const content = await driveService.selectJsonContent(t.id);
+                  // selectJsonContent returns the parsed object directly
+                  return {
+                    id: t.id,
+                    name: t.name,
+                    schema: content.schema || [],
+                  };
+                } catch (e) {
+                  console.error(
+                    `Failed to fetch schema for table ${t.name}`,
+                    e
+                  );
+                  return { id: t.id, name: t.name, schema: [] };
+                }
+              })
+            );
+
             return {
               id: db.id,
               name: db.name,
-              tables: tables.map((t: any) => ({ id: t.id, name: t.name })),
+              tables: tablesWithSchema,
             };
           })
         );
