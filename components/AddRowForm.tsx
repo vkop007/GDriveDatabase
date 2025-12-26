@@ -83,15 +83,15 @@ export default function AddRowForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 shadow-2xl animate-in fade-in zoom-in duration-200">
+      <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-neutral-800 shadow-2xl animate-in fade-in zoom-in duration-200">
         {/* Glow effect */}
         <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 blur-2xl rounded-full pointer-events-none" />
 
         {/* Header */}
-        <div className="relative flex justify-between items-center p-6 border-b border-neutral-800 bg-gradient-to-r from-neutral-900 to-neutral-800/50">
+        <div className="relative flex justify-between items-center p-6 border-b border-neutral-800 bg-linear-to-r from-neutral-900 to-neutral-800/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/30 to-primary/20 flex items-center justify-center border border-primary/20">
+            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary/30 to-primary/20 flex items-center justify-center border border-primary/20">
               <Table2 className="w-5 h-5 text-primary" />
             </div>
             <div>
@@ -219,6 +219,13 @@ export default function AddRowForm({
                         </span>
                       </label>
                     </div>
+                  ) : col.type === "datetime" ? (
+                    <input
+                      type="datetime-local"
+                      name={col.key}
+                      className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all scheme-dark"
+                      required={col.required}
+                    />
                   ) : col.type === "storage" ? (
                     <div className="relative">
                       <select

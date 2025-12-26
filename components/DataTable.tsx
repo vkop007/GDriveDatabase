@@ -123,11 +123,14 @@ export default function DataTable({
 
   return (
     <>
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900/80 via-neutral-900 to-neutral-800/50">
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900/90 via-neutral-900 to-neutral-800/60 shadow-xl">
+        {/* Subtle glow effect */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-neutral-800">
+              <tr className="border-b border-neutral-800 bg-neutral-900/80">
                 <th className="w-12 px-4 py-4">
                   <div className="flex items-center justify-center">
                     <input
@@ -139,23 +142,29 @@ export default function DataTable({
                         }
                       }}
                       onChange={toggleAll}
-                      className="w-4 h-4 rounded bg-neutral-950 border-neutral-700 text-primary focus:ring-primary/20 focus:ring-offset-0 cursor-pointer"
+                      className="w-4 h-4 rounded bg-neutral-950 border-neutral-600 text-primary focus:ring-primary/30 focus:ring-offset-0 cursor-pointer transition-all"
                       disabled={allIds.length === 0}
                     />
                   </div>
                 </th>
                 {visibleColumns.map((col) => (
-                  <th
-                    key={col.key}
-                    className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider"
-                  >
-                    <span
-                      className={
-                        col.key.startsWith("$") ? "text-neutral-600" : ""
-                      }
-                    >
-                      {col.key}
-                    </span>
+                  <th key={col.key} className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-xs font-semibold uppercase tracking-wider ${
+                          col.key.startsWith("$")
+                            ? "text-neutral-600"
+                            : "text-neutral-400"
+                        }`}
+                      >
+                        {col.key}
+                      </span>
+                      {!col.key.startsWith("$") && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-500 font-medium">
+                          {col.type}
+                        </span>
+                      )}
+                    </div>
                   </th>
                 ))}
                 <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">
@@ -170,16 +179,16 @@ export default function DataTable({
                     colSpan={visibleColumns.length + 2}
                     className="text-center py-16"
                   >
-                    <div className="flex flex-col items-center gap-4">
-                      <div className="w-16 h-16 rounded-2xl bg-neutral-800/50 flex items-center justify-center">
-                        <Database className="w-8 h-8 text-neutral-600" />
+                    <div className="flex flex-col items-center gap-4 py-4">
+                      <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-neutral-800/80 to-neutral-800/30 flex items-center justify-center border border-neutral-700/50">
+                        <Database className="w-10 h-10 text-neutral-500" />
                       </div>
-                      <div>
-                        <p className="text-neutral-400 font-medium">
+                      <div className="text-center">
+                        <p className="text-neutral-300 font-medium text-lg">
                           No data yet
                         </p>
-                        <p className="text-sm text-neutral-600 mt-1">
-                          Add your first row using the button above
+                        <p className="text-sm text-neutral-500 mt-1 max-w-xs">
+                          Add your first row to get started with your table
                         </p>
                       </div>
                     </div>
