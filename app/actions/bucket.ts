@@ -24,7 +24,13 @@ async function _listBucketFiles(auth: any) {
     const response = await operations.listOperations.listFilesInFolder(
       bucketId
     );
-    return response.data?.files || [];
+    const files = response.data?.files || [];
+
+    // Filter out database tables (which are JSON files) and other system files
+    // We only want to show "bucket" assets (images, videos, PDFs, etc.)
+    return files.filter(
+      (f: any) => f.mimeType !== "application/json" && !f.name.endsWith(".json")
+    );
   } catch (error) {
     console.error("Error listing bucket files:", error);
     return [];

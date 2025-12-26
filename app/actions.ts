@@ -305,7 +305,7 @@ export async function deleteDatabase(formData: FormData) {
   await operations.fileOperations.deleteFile(fileId);
   revalidateTag("databases", { expire: 0 });
   revalidateTag("database-tree", { expire: 0 });
-  redirect("/dashboard");
+  return { success: true };
 }
 
 // Internal fetch for collections
@@ -403,7 +403,7 @@ export async function deleteCollection(formData: FormData) {
 
   revalidateTag(`collections-${parentId}`, { expire: 0 });
   revalidateTag("database-tree", { expire: 0 });
-  redirect(`/dashboard/database/${parentId}`);
+  return { success: true };
 }
 
 export async function createDocument(formData: FormData) {
