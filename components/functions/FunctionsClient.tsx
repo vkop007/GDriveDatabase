@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import {
   Plus,
@@ -13,8 +12,10 @@ import {
   Zap,
   Loader2,
   RefreshCw,
+  FileText,
 } from "lucide-react";
 import { FunctionInfo, enableAutoRun } from "@/app/actions/function";
+import LogViewerModal from "./LogViewerModal";
 import CreateFunctionModal from "./CreateFunctionModal";
 import RunFunctionModal from "./RunFunctionModal";
 import EditFunctionModal from "./EditFunctionModal";
@@ -39,6 +40,7 @@ export default function FunctionsClient({
   const [deletingFunction, setDeletingFunction] = useState<FunctionInfo | null>(
     null
   );
+  const [viewingLogs, setViewingLogs] = useState<FunctionInfo | null>(null);
 
   const handleFunctionCreated = (newFunction: FunctionInfo) => {
     setFunctions((prev) => [...prev, newFunction]);
@@ -300,6 +302,13 @@ export default function FunctionsClient({
                     Run
                   </button>
                   <button
+                    onClick={() => setViewingLogs(func)}
+                    className="p-2 rounded-lg bg-neutral-800/50 border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-600 transition-all"
+                    title="View Logs"
+                  >
+                    <FileText className="w-4 h-4" />
+                  </button>
+                  <button
                     onClick={() => setEditingFunction(func)}
                     className="p-2 rounded-lg bg-neutral-800/50 border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-600 transition-all"
                   >
@@ -349,6 +358,15 @@ export default function FunctionsClient({
           onClose={() => setDeletingFunction(null)}
           func={deletingFunction}
           onDeleted={handleFunctionDeleted}
+        />
+      )}
+
+      {viewingLogs && (
+        <LogViewerModal
+          isOpen={!!viewingLogs}
+          onClose={() => setViewingLogs(null)}
+          functionId={viewingLogs.id}
+          functionName={viewingLogs.name}
         />
       )}
     </div>

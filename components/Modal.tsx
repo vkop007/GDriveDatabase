@@ -9,6 +9,7 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  maxWidth?: string;
 }
 
 export default function Modal({
@@ -16,6 +17,7 @@ export default function Modal({
   onClose,
   title,
   children,
+  maxWidth = "max-w-md",
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -48,7 +50,7 @@ export default function Modal({
       />
 
       {/* Modal Container */}
-      <div className="relative w-full max-w-md animate-slide-up">
+      <div className={`relative w-full ${maxWidth} animate-slide-up`}>
         {/* Outer glow */}
         <div className="absolute -inset-1 bg-linear-to-r from-primary/30 via-purple-500/20 to-primary/30 rounded-[20px] blur-xl opacity-60" />
 
@@ -63,7 +65,7 @@ export default function Modal({
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="absolute inset-0 rounded-xl bg-primary/30 blur-md" />
-                <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20">
+                <div className="relative w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20">
                   <div className="w-2.5 h-2.5 rounded-full bg-white shadow-md" />
                 </div>
               </div>
