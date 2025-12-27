@@ -29,30 +29,38 @@ export async function getOrCreateBucketFolder(auth?: any) {
     (f: any) => f.name === BUCKET_FOLDER_NAME && !f.trashed
   );
 
-  if (existing) {
+  if (existing?.id) {
     return existing.id;
   }
 
   // 2. Create if not exists (in root GDriveDatabase folder logic)
-  // Ideally we should reuse one logic for folder finding, but for now:
   try {
     const rootResponse = await operations.folderOperations.getFolderIdByName(
       "GDriveDatabase"
     );
-    const rootId = rootResponse.folderId;
+    const rootId = rootResponse?.folderId;
     if (rootId) {
       const createResponse = await operations.folderOperations.createFolder(
         BUCKET_FOLDER_NAME,
         rootId
       );
-      return createResponse.data.id;
+      if (createResponse?.data?.id) {
+        return createResponse.data.id;
+      }
     }
-  } catch (e) {}
+  } catch (e) {
+    console.error("Error finding/creating bucket in GDriveDatabase folder:", e);
+  }
 
   // Fallback to absolute root
   const createResponse = await operations.folderOperations.createFolder(
     BUCKET_FOLDER_NAME
   );
+
+  if (!createResponse?.data?.id) {
+    throw new Error("Failed to create bucket folder");
+  }
+
   return createResponse.data.id;
 }
 

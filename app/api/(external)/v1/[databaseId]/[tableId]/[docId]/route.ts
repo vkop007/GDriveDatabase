@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiAuth } from "../../../../../actions";
-import { TableFile } from "../../../../../../types";
+import { getApiAuth } from "@/app/actions";
+import { TableFile, RowData } from "@/types";
 
+// GET - Get single document by ID
 export async function GET(
   req: NextRequest,
   {
@@ -19,6 +20,11 @@ export async function GET(
     const { tableId, docId } = await params;
 
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
+
+    if (!table) {
+      return NextResponse.json({ error: "Table not found" }, { status: 404 });
+    }
+
     const doc = table.documents.find((d) => d.$id === docId);
 
     if (!doc) {
@@ -31,13 +37,13 @@ export async function GET(
     return NextResponse.json(doc);
   } catch (error) {
     console.error("API Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
+// PATCH - Update single document
 export async function PATCH(
   req: NextRequest,
   {
@@ -56,6 +62,11 @@ export async function PATCH(
     const body = await req.json();
 
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
+
+    if (!table) {
+      return NextResponse.json({ error: "Table not found" }, { status: 404 });
+    }
+
     const docIndex = table.documents.findIndex((d) => d.$id === docId);
 
     if (docIndex === -1) {
@@ -65,27 +76,36 @@ export async function PATCH(
       );
     }
 
-    const updatedDoc = {
+    // Update document fields (preserve system fields)
+    const updatedDoc: RowData = {
       ...table.documents[docIndex],
       ...body,
-      $updatedAt: new Date().toISOString(),
-      $id: docId, // Ensure ID doesn't change
+      $id: docId, // Preserve $id
+      $createdAt: table.documents[docIndex].$createdAt, // Preserve createdAt
+      $updatedAt: new Date().toISOString(), // Update timestamp
     };
 
     table.documents[docIndex] = updatedDoc;
 
-    await driveService.updateJsonContent(tableId, table);
+    const updateResult = await driveService.updateJsonContent(tableId, table);
+
+    if (!updateResult.success) {
+      return NextResponse.json(
+        { error: `Failed to update: ${updateResult.error}` },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(updatedDoc);
   } catch (error) {
     console.error("API Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 
+// DELETE - Delete single document
 export async function DELETE(
   req: NextRequest,
   {
@@ -103,24 +123,37 @@ export async function DELETE(
     const { tableId, docId } = await params;
 
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
-    const initialLength = table.documents.length;
-    table.documents = table.documents.filter((d) => d.$id !== docId);
 
-    if (table.documents.length === initialLength) {
+    if (!table) {
+      return NextResponse.json({ error: "Table not found" }, { status: 404 });
+    }
+
+    const docIndex = table.documents.findIndex((d) => d.$id === docId);
+
+    if (docIndex === -1) {
       return NextResponse.json(
         { error: "Document not found" },
         { status: 404 }
       );
     }
 
-    await driveService.updateJsonContent(tableId, table);
+    // Remove the document
+    table.documents.splice(docIndex, 1);
 
-    return NextResponse.json({ success: true });
+    const updateResult = await driveService.updateJsonContent(tableId, table);
+
+    if (!updateResult.success) {
+      return NextResponse.json(
+        { error: `Failed to delete: ${updateResult.error}` },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, deletedId: docId });
   } catch (error) {
     console.error("API Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

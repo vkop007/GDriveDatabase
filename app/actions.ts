@@ -142,6 +142,10 @@ export async function getApiAuth(apiKey: string) {
       throw new Error("Invalid API Key");
     }
 
+    // Reset the driveService singleton to ensure fresh tokens are used
+    const { resetDriveService } = await import("gdrivekit");
+    resetDriveService();
+
     const driveService = initDriveService(
       {
         client_id: secrets.clientId,

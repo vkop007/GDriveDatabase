@@ -12,6 +12,8 @@ import {
   Search,
   Settings,
   FolderPlus,
+  Upload,
+  HardDrive,
 } from "lucide-react";
 
 export function DocsTabs() {
@@ -75,79 +77,115 @@ const db = new GDatabase("YOUR_API_KEY", "https://your-app.com");`}
         </div>
       </div>
 
-      {/* Create Database & Schema */}
+      {/* Schema Management */}
       <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
         <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
           <div className="p-2 rounded-lg bg-linear-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/20">
-            <FolderPlus className="w-5 h-5 text-purple-400" />
+            <Settings className="w-5 h-5 text-purple-400" />
           </div>
           <div>
             <h3 className="text-xl font-semibold text-white mb-1">
-              Create Database & Schema
+              Schema Management
             </h3>
             <p className="text-sm text-neutral-400">
-              Define your database structure programmatically.
+              Define and modify your table structure programmatically.
             </p>
           </div>
         </div>
         <div className="p-6 space-y-8">
-          {/* Create Database */}
+          {/* Get Schema */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1.5">
-                <FolderPlus className="w-3 h-3" />
-                DATABASE
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-500/10 text-green-400 border border-green-500/20 flex items-center gap-1.5">
+                <Search className="w-3 h-3" />
+                GET
               </span>
               <h4 className="text-sm font-medium text-white">
-                Create a new database
+                Get current schema
               </h4>
             </div>
             <CodeBlock
-              code={`// Create a new database
-const myDatabase = await db.createDatabase("my-store");
+              code={`// Get schema client for a table
+const schema = db.database("my-db").table("my-table").schema();
 
-console.log(myDatabase.id);  // Database ID for future reference`}
-              id="create-db"
+// Get current schema
+const { schema: columns } = await schema.get();
+console.log("Columns:", columns);`}
+              id="schema-get"
             />
           </div>
 
-          {/* Define Schema */}
+          {/* Add Column */}
           <div>
             <div className="flex items-center gap-2 mb-3">
               <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1.5">
-                <Settings className="w-3 h-3" />
-                SCHEMA
+                <PlusCircle className="w-3 h-3" />
+                ADD
               </span>
               <h4 className="text-sm font-medium text-white">
-                Define table schema
+                Add new columns
               </h4>
             </div>
             <CodeBlock
-              code={`// Create a table with schema
-const usersTable = await db
-  .database("my-store")
-  .createTable("users", {
-    schema: [
-      { key: "name", type: "string", required: true },
-      { key: "email", type: "string", required: true },
-      { key: "age", type: "integer" },
-      { key: "active", type: "boolean" },
-      { key: "tags", type: "string", array: true },
-      { key: "createdAt", type: "datetime" }
-    ]
-  });
+              code={`// Add a required column
+await schema.addColumn({
+  key: "email",
+  type: "string",
+  required: true,
+});
 
-// Create another table with a relation
-const postsTable = await db
-  .database("my-store")
-  .createTable("posts", {
-    schema: [
-      { key: "title", type: "string", required: true },
-      { key: "content", type: "string" },
-      { key: "authorId", type: "relation", relationTableId: usersTable.id }
-    ]
-  });`}
-              id="create-schema"
+// Add column with default value
+await schema.addColumn({
+  key: "status",
+  type: "string",
+  default: "pending",
+});
+
+// Add an array column
+await schema.addColumn({
+  key: "tags",
+  type: "string",
+  array: true,
+});
+
+// Add a relation column
+await schema.addColumn({
+  key: "authorId",
+  type: "relation",
+  relationTableId: "users-table-id",
+});`}
+              id="schema-add"
+            />
+          </div>
+
+          {/* Update & Delete Column */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
+                <RefreshCw className="w-3 h-3" />
+                UPDATE
+              </span>
+              <h4 className="text-sm font-medium text-white">
+                Modify or remove columns
+              </h4>
+            </div>
+            <CodeBlock
+              code={`// Update column properties
+await schema.updateColumn("status", {
+  required: true,
+  default: "active",
+});
+
+// Delete a column (also removes data from all documents)
+await schema.deleteColumn("old_field");
+
+// Replace entire schema (keeps system columns)
+await schema.set([
+  { key: "title", type: "string", required: true },
+  { key: "content", type: "string" },
+  { key: "published", type: "boolean", default: false },
+]);`}
+              id="schema-update"
             />
           </div>
         </div>
@@ -266,6 +304,220 @@ console.log(newUser.$id); // Auto-generated unique ID`}
         </div>
       </div>
 
+      {/* Table Relationships */}
+      <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
+        <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
+          <div className="p-2 rounded-lg bg-linear-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/20">
+            <Database className="w-5 h-5 text-violet-400" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-white mb-1">
+              Table Relationships
+            </h3>
+            <p className="text-sm text-neutral-400">
+              Link tables together using relation columns.
+            </p>
+          </div>
+        </div>
+        <div className="p-6 space-y-8">
+          {/* One-to-Many */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 flex items-center gap-1.5">
+                <FolderPlus className="w-3 h-3" />
+                ONE-TO-MANY
+              </span>
+              <h4 className="text-sm font-medium text-white">
+                Link posts to authors
+              </h4>
+            </div>
+            <CodeBlock
+              code={`// 1. Create Users table
+const usersSchema = db.database("my-db").table("users-id").schema();
+await usersSchema.set([
+  { key: "name", type: "string", required: true },
+  { key: "email", type: "string", required: true },
+]);
+
+// 2. Create Posts table with relation to Users
+const postsSchema = db.database("my-db").table("posts-id").schema();
+await postsSchema.set([
+  { key: "title", type: "string", required: true },
+  { key: "content", type: "string" },
+  { key: "authorId", type: "relation", relationTableId: "users-id" },
+]);
+
+// 3. Create a user
+const user = await db.database("my-db").table("users-id").create({
+  name: "John Doe",
+  email: "john@example.com",
+});
+
+// 4. Create a post linked to the user
+const post = await db.database("my-db").table("posts-id").create({
+  title: "My First Post",
+  content: "Hello World!",
+  authorId: user.$id, // Reference the user's ID
+});`}
+              id="relation-one"
+            />
+          </div>
+
+          {/* Query with Relations */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-500/10 text-green-400 border border-green-500/20 flex items-center gap-1.5">
+                <Search className="w-3 h-3" />
+                QUERY
+              </span>
+              <h4 className="text-sm font-medium text-white">
+                Resolve related data
+              </h4>
+            </div>
+            <CodeBlock
+              code={`// Fetch posts and users
+const posts = await db.database("my-db").table("posts-id").list();
+const users = await db.database("my-db").table("users-id").list();
+
+// Join the data client-side
+const postsWithAuthor = posts.map(post => ({
+  ...post,
+  author: users.find(u => u.$id === post.authorId),
+}));
+
+console.log(postsWithAuthor[0].author.name); // "John Doe"`}
+              id="relation-query"
+            />
+          </div>
+
+          {/* Many-to-Many */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1.5">
+                <RefreshCw className="w-3 h-3" />
+                MANY-TO-MANY
+              </span>
+              <h4 className="text-sm font-medium text-white">
+                Posts with multiple tags
+              </h4>
+            </div>
+            <CodeBlock
+              code={`// Create Tags table
+await db.database("my-db").table("tags-id").schema().set([
+  { key: "name", type: "string", required: true },
+]);
+
+// Add tagIds array column to Posts
+await db.database("my-db").table("posts-id").schema().addColumn({
+  key: "tagIds",
+  type: "string",
+  array: true, // Store multiple tag IDs
+});
+
+// Create tags
+const tag1 = await db.database("my-db").table("tags-id").create({ name: "javascript" });
+const tag2 = await db.database("my-db").table("tags-id").create({ name: "tutorial" });
+
+// Create post with multiple tags
+await db.database("my-db").table("posts-id").create({
+  title: "JS Tutorial",
+  tagIds: [tag1.$id, tag2.$id],
+});`}
+              id="relation-many"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Storage Bucket */}
+      <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
+        <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
+          <div className="p-2 rounded-lg bg-linear-to-br from-pink-500/20 to-rose-500/20 border border-pink-500/20">
+            <HardDrive className="w-5 h-5 text-pink-400" />
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-white mb-1">
+              Storage Bucket
+            </h3>
+            <p className="text-sm text-neutral-400">
+              Upload, manage, and serve files from Google Drive storage.
+            </p>
+          </div>
+        </div>
+        <div className="p-6 space-y-8">
+          {/* Upload Files */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1.5">
+                <Upload className="w-3 h-3" />
+                UPLOAD
+              </span>
+              <h4 className="text-sm font-medium text-white">
+                Upload files to bucket
+              </h4>
+            </div>
+            <CodeBlock
+              code={`// Get bucket client
+const bucket = db.bucket();
+
+// Upload a single file (Browser)
+const fileInput = document.querySelector('input[type="file"]');
+const result = await bucket.upload(fileInput.files[0]);
+
+if (result.success) {
+  console.log("Uploaded:", result.files[0].id);
+  
+  // Get public URL
+  const url = bucket.getPublicUrl(result.files[0].id);
+}
+
+// Upload multiple files
+const files = Array.from(fileInput.files);
+await bucket.upload(files);
+
+// Upload from URL
+await bucket.uploadFromUrl(
+  "https://example.com/image.png",
+  "my-image.png"
+);
+
+// Upload from Buffer (Node.js)
+const buffer = await fetch(url).then(r => r.arrayBuffer());
+await bucket.uploadFromBuffer(buffer, "doc.pdf", "application/pdf");`}
+              id="bucket-upload"
+            />
+          </div>
+
+          {/* List & Delete */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-500/10 text-green-400 border border-green-500/20 flex items-center gap-1.5">
+                <Search className="w-3 h-3" />
+                LIST
+              </span>
+              <h4 className="text-sm font-medium text-white">
+                List and manage files
+              </h4>
+            </div>
+            <CodeBlock
+              code={`// List all files in bucket
+const { files } = await bucket.list();
+
+files.forEach(file => {
+  console.log(\`\${file.name} (\${file.size} bytes)\`);
+});
+
+// Delete a file
+await bucket.delete("file-id");
+
+// Get thumbnail for images/videos
+const thumb = bucket.getThumbnailUrl("file-id", 200);`}
+              id="bucket-list"
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Data Types */}
       <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
         <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
@@ -345,7 +597,8 @@ console.log(newUser.$id); // Auto-generated unique ID`}
             Complete Example
           </h3>
           <p className="text-sm text-neutral-400">
-            A full workflow from setup to CRUD operations.
+            A full workflow from setup to CRUD operations with schema and
+            bucket.
           </p>
         </div>
         <div className="p-6">
@@ -355,37 +608,44 @@ console.log(newUser.$id); // Auto-generated unique ID`}
 // 1. Initialize
 const db = new GDatabase("YOUR_API_KEY", "https://your-app.com");
 
-// 2. Create database
-const store = await db.createDatabase("e-commerce");
+// 2. Define schema for a table
+const schema = db.database("store-id").table("products-id").schema();
 
-// 3. Define schemas
-await db.database(store.id).createTable("products", {
-  schema: [
-    { key: "name", type: "string", required: true },
-    { key: "price", type: "integer", required: true },
-    { key: "inStock", type: "boolean" },
-    { key: "categories", type: "string", array: true }
-  ]
-});
+await schema.set([
+  { key: "name", type: "string", required: true },
+  { key: "price", type: "integer", required: true },
+  { key: "image", type: "storage" },
+  { key: "categories", type: "string", array: true }
+]);
 
-// 4. Add documents
+// 3. Upload product image to bucket
+const bucket = db.bucket();
+const imageResult = await bucket.uploadFromUrl(
+  "https://example.com/product.jpg",
+  "headphones.jpg"
+);
+
+// 4. Create document with image reference
 const product = await db
-  .database(store.id)
-  .table("products")
+  .database("store-id")
+  .table("products-id")
   .create({
     name: "Wireless Headphones",
     price: 79,
-    inStock: true,
+    image: imageResult.files[0].id,
     categories: ["electronics", "audio"]
   });
 
 // 5. Query documents
-const allProducts = await db
-  .database(store.id)
-  .table("products")
+const products = await db
+  .database("store-id")
+  .table("products-id")
   .list();
 
-console.log(\`Total products: \${allProducts.length}\`);`}
+console.log(\`Total products: \${products.length}\`);
+
+// 6. Get public URL for image
+const imageUrl = bucket.getPublicUrl(product.image);`}
             id="complete-example"
           />
         </div>
