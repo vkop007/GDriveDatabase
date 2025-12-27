@@ -16,9 +16,15 @@ interface CreateFunctionModalProps {
 
 const TEMPLATE_CODE = `// Your function code here
 // Access parameters with 'params' object
-// Return a value to see it in the output
 
-return { message: "Hello from my function!", timestamp: new Date().toISOString() };`;
+console.log("Function execution started");
+console.log("Params received:", JSON.stringify(params));
+
+// Return a value to see it in the output
+return { 
+  message: "Hello from my function!", 
+  timestamp: new Date().toISOString() 
+};`;
 
 export default function CreateFunctionModal({
   isOpen,
