@@ -1,6 +1,15 @@
+"use client";
+
+import { useState } from "react";
 import { TableFile } from "../../../../../../types";
 import AddRowForm from "../../../../../../components/AddRowForm";
 import DataTable from "../../../../../../components/DataTable";
+import { QueryBuilder } from "../../../../../../components/query";
+import {
+  QueryState,
+  defaultQueryState,
+  applyQuery,
+} from "../../../../../../lib/query";
 import { Table2 } from "lucide-react";
 
 export default function DataView({
@@ -12,6 +21,11 @@ export default function DataView({
   fileId: string;
   relationLookup?: Record<string, Record<string, string>>;
 }) {
+  const [query, setQuery] = useState<QueryState>(defaultQueryState);
+
+  // Apply query to get filtered/sorted/paginated data
+  const queryResult = applyQuery(table.documents, query);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -30,10 +44,28 @@ export default function DataView({
         <AddRowForm fileId={fileId} schema={table.schema} />
       </div>
 
+      {/* Query Builder */}
+      <QueryBuilder
+        columns={table.schema}
+        query={query}
+        onQueryChange={setQuery}
+        totalResults={table.documents.length}
+        filteredResults={queryResult.total}
+      />
+
+      {/* Data Table with filtered results */}
       <DataTable
-        table={table}
+        table={{ ...table, documents: queryResult.data }}
         fileId={fileId}
         relationLookup={relationLookup}
+        totalRows={queryResult.total}
+        totalPages={queryResult.totalPages}
+        currentPage={query.page}
+        pageSize={query.pageSize}
+        onPageChange={(page) => setQuery({ ...query, page })}
+        onPageSizeChange={(pageSize) =>
+          setQuery({ ...query, pageSize, page: 1 })
+        }
       />
     </div>
   );

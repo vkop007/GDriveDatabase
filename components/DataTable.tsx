@@ -5,6 +5,7 @@ import { bulkDeleteDocuments, deleteDocument } from "../app/actions/table";
 import { TableFile, RowData } from "../types";
 import BulkActionBar from "./BulkActionBar";
 import EditRowModal from "./EditRowModal";
+import { PaginationControls } from "./query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Database, Loader2 } from "lucide-react";
@@ -14,12 +15,25 @@ interface DataTableProps {
   table: TableFile;
   fileId: string;
   relationLookup?: Record<string, Record<string, string>>;
+  // Pagination props (optional for backwards compatibility)
+  totalRows?: number;
+  totalPages?: number;
+  currentPage?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
 }
 
 export default function DataTable({
   table,
   fileId,
   relationLookup = {},
+  totalRows,
+  totalPages = 1,
+  currentPage = 1,
+  pageSize = 25,
+  onPageChange,
+  onPageSizeChange,
 }: DataTableProps) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -342,8 +356,17 @@ export default function DataTable({
           </table>
         </div>
 
-        {/* Table footer with row count */}
-        {table.documents.length > 0 && (
+        {/* Table footer with pagination */}
+        {totalRows !== undefined && onPageChange && onPageSizeChange ? (
+          <PaginationControls
+            page={currentPage}
+            pageSize={pageSize}
+            total={totalRows}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+            onPageSizeChange={onPageSizeChange}
+          />
+        ) : table.documents.length > 0 ? (
           <div className="px-6 py-3 border-t border-neutral-800/50 bg-neutral-900/50">
             <p className="text-xs text-neutral-500">
               Showing{" "}
@@ -358,7 +381,7 @@ export default function DataTable({
               )}
             </p>
           </div>
-        )}
+        ) : null}
       </div>
 
       <BulkActionBar
