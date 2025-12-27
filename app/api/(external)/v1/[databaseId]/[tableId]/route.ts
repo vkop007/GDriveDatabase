@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiAuth } from "../../../../actions";
-import { TableFile, RowData } from "../../../../../types";
+import { getApiAuth } from "@/app/actions";
+import { TableFile, RowData } from "@/types";
 
 export async function GET(
   req: NextRequest,
@@ -20,13 +20,19 @@ export async function GET(
     // We use selectJsonContent which returns the parsed JSON
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
 
-    return NextResponse.json(table.documents);
+    if (!table) {
+      return NextResponse.json(
+        { error: "Table not found or empty" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(table.documents || []);
   } catch (error) {
     console.error("API Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
 

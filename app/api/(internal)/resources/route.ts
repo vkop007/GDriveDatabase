@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { fetchWithAuth } from "../../../lib/gdrive/auth";
+import { fetchWithAuth } from "@/lib/gdrive/auth";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
