@@ -10,7 +10,7 @@
 :root {
   /* Layout */
   --sidebar-width: 16rem;
-  
+
   /* Colors - Light Mode */
   --background: #ffffff;
   --foreground: #171717;
@@ -19,7 +19,7 @@
   --sidebar-foreground: #171717;
   --sidebar-accent: #f5f5f5;
   --sidebar-accent-foreground: #171717;
-  
+
   /* Brand Colors */
   --primary: #eb0081; /* Fuchsia-400 (Lighter & More Vibrant) */
   --text--primary: #ffffff; /* Fuchsia-400 (Lighter & More Vibrant) */
@@ -40,7 +40,7 @@
   --color-primary-foreground: var(--primary-foreground);
   --color-primary-from: var(--primary-gradient-from);
   --color-primary-to: var(--primary-gradient-to);
-  
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -74,7 +74,12 @@ body {
   overflow: hidden;
   border-radius: 1rem;
   border: 1px solid rgb(38, 38, 38);
-  background: linear-gradient(to bottom right, rgb(23, 23, 23), rgb(23, 23, 23), rgba(38, 38, 38, 0.5));
+  background: linear-gradient(
+    to bottom right,
+    rgb(23, 23, 23),
+    rgb(23, 23, 23),
+    rgba(38, 38, 38, 0.5)
+  );
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
@@ -94,7 +99,7 @@ body {
 }
 
 .card-glow::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;
@@ -188,7 +193,11 @@ body {
 }
 
 .icon-box-purple {
-  background: linear-gradient(to bottom right, rgba(168, 85, 247, 0.3), rgba(168, 85, 247, 0.1));
+  background: linear-gradient(
+    to bottom right,
+    rgba(168, 85, 247, 0.3),
+    rgba(168, 85, 247, 0.1)
+  );
   border: 1px solid rgba(168, 85, 247, 0.2);
 }
 .icon-box-purple:hover,
@@ -197,7 +206,11 @@ body {
 }
 
 .icon-box-pink {
-  background: linear-gradient(to bottom right, rgba(236, 72, 153, 0.3), rgba(236, 72, 153, 0.1));
+  background: linear-gradient(
+    to bottom right,
+    rgba(236, 72, 153, 0.3),
+    rgba(236, 72, 153, 0.1)
+  );
   border: 1px solid rgba(236, 72, 153, 0.2);
 }
 .icon-box-pink:hover,
@@ -206,7 +219,11 @@ body {
 }
 
 .icon-box-blue {
-  background: linear-gradient(to bottom right, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.1));
+  background: linear-gradient(
+    to bottom right,
+    rgba(59, 130, 246, 0.3),
+    rgba(59, 130, 246, 0.1)
+  );
   border: 1px solid rgba(59, 130, 246, 0.2);
 }
 .icon-box-blue:hover,
@@ -215,7 +232,11 @@ body {
 }
 
 .icon-box-red {
-  background: linear-gradient(to bottom right, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.1));
+  background: linear-gradient(
+    to bottom right,
+    rgba(239, 68, 68, 0.3),
+    rgba(239, 68, 68, 0.1)
+  );
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 .icon-box-red:hover,
@@ -224,7 +245,11 @@ body {
 }
 
 .icon-box-green {
-  background: linear-gradient(to bottom right, rgba(34, 197, 94, 0.3), rgba(34, 197, 94, 0.1));
+  background: linear-gradient(
+    to bottom right,
+    rgba(34, 197, 94, 0.3),
+    rgba(34, 197, 94, 0.1)
+  );
   border: 1px solid rgba(34, 197, 94, 0.2);
 }
 .icon-box-green:hover,
@@ -419,7 +444,8 @@ body {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -438,7 +464,12 @@ body {
 }
 
 .text-gradient-purple {
-  background: linear-gradient(to right, white, rgba(192, 132, 252, 0.8), #c084fc);
+  background: linear-gradient(
+    to right,
+    white,
+    rgba(192, 132, 252, 0.8),
+    #c084fc
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -651,8 +682,10 @@ body {
 .floating-bar {
   position: fixed;
   bottom: 1.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin: 0 auto;
   z-index: 50;
   background: rgb(23, 23, 23);
   border: 1px solid rgb(64, 64, 64);
@@ -662,6 +695,13 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .floating-bar {
+    left: var(--sidebar-offset, 17rem);
+    transform: none;
+  }
 }
 
 /* ============================================
@@ -717,7 +757,6 @@ body {
   height: 1.5rem;
   background: rgb(64, 64, 64);
 }
-
 
 /* ================================
    BASE RESET
@@ -864,7 +903,7 @@ body {
 .react-flow__node.selected > div {
   /* Apply rounded shadow to match node shape */
   filter: drop-shadow(0 0 0 1.5px rgba(255, 0, 110, 0.5))
-          drop-shadow(0 0 20px rgba(255, 0, 110, 0.3));
+    drop-shadow(0 0 20px rgba(255, 0, 110, 0.3));
 }
 
 /* ================================
@@ -893,7 +932,6 @@ body {
   background: rgba(255, 0, 110, 0.35);
   color: white;
 }
-
 
 /* ================================
    MINIMAP – FIX WHITE SCREEN
