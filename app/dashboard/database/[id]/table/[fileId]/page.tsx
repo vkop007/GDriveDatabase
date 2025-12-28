@@ -8,7 +8,8 @@ import Link from "next/link";
 import { Database, ChevronRight, Table2, Layers, Settings } from "lucide-react";
 
 // Force dynamic rendering to ensure fresh data after edits
-export const dynamic = "force-dynamic";
+// Force dynamic rendering removed to enable caching
+// export const dynamic = "force-dynamic";
 
 export default async function TablePage({
   params,
@@ -166,6 +167,7 @@ export default async function TablePage({
             <DataView
               table={table}
               fileId={fileId}
+              databaseId={databaseId}
               relationLookup={relationLookup}
             />
           )}

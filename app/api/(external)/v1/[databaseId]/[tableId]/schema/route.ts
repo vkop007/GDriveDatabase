@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getApiAuth } from "@/app/actions";
 import { TableFile, ColumnDefinition } from "@/types";
+import { rebuildIndex } from "@/lib/indexing";
 
 // GET - Get table schema
 export async function GET(
@@ -50,7 +51,7 @@ export async function POST(
 
   try {
     const { driveService } = await getApiAuth(apiKey);
-    const { tableId } = await params;
+    const { databaseId, tableId } = await params;
     const body = await req.json();
 
     const {
@@ -61,6 +62,8 @@ export async function POST(
       default: defaultValue,
       relationTableId,
       validation,
+      unique = false,
+      indexed = false,
     } = body;
 
     if (!key || !type) {
@@ -96,6 +99,8 @@ export async function POST(
       default: defaultValue,
       relationTableId: type === "relation" ? relationTableId : undefined,
       validation,
+      unique,
+      indexed,
     };
 
     table.schema.push(newColumn);
@@ -110,6 +115,27 @@ export async function POST(
     }
 
     await driveService.updateJsonContent(tableId, table);
+
+    // If unique, build the index
+    if (unique) {
+      try {
+        const indexFileId = await rebuildIndex(
+          databaseId,
+          tableId,
+          key,
+          table.documents,
+          driveService
+        );
+        newColumn.indexFileId = indexFileId;
+
+        // Save table again to persist the indexFileId
+        await driveService.updateJsonContent(tableId, table);
+      } catch (e) {
+        console.error("Failed to build index for new column:", e);
+        // We don't fail the request, but log it.
+        // Ideally we might want to return a warning or revert.
+      }
+    }
 
     return NextResponse.json({ column: newColumn }, { status: 201 });
   } catch (error) {

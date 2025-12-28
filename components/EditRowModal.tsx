@@ -14,6 +14,7 @@ interface EditRowModalProps {
   isOpen: boolean;
   onClose: () => void;
   fileId: string;
+  databaseId: string;
   schema: ColumnDefinition[];
   document: RowData;
 }
@@ -41,6 +42,7 @@ export default function EditRowModal({
   isOpen,
   onClose,
   fileId,
+  databaseId,
   schema,
   document,
 }: EditRowModalProps) {
@@ -159,6 +161,7 @@ export default function EditRowModal({
 
       const submitData = new FormData();
       submitData.append("fileId", fileId);
+      submitData.append("databaseId", databaseId);
       submitData.append("docId", document.$id);
       submitData.append("data", JSON.stringify(processedData));
 

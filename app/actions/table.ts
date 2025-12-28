@@ -5,24 +5,16 @@ import { redirect } from "next/navigation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getAuth, fetchWithAuth } from "../../lib/gdrive/auth";
 import { createFileInFolder } from "../../lib/gdrive/operations";
-import { validateDocument, ValidationError } from "../../lib/validation";
-import { ColumnDefinition } from "../../types";
+import { validateDocument } from "../../lib/validation";
+import {
+  ColumnDefinition,
+  RowData,
+  TableFile,
+  ValidationError,
+} from "../../types";
 
 // Re-export ColumnDefinition for backward compatibility
 export type { ColumnDefinition };
-
-export interface RowData {
-  $id: string;
-  $createdAt: string;
-  $updatedAt: string;
-  [key: string]: any;
-}
-
-export interface TableFile {
-  name: string;
-  schema: ColumnDefinition[];
-  documents: RowData[];
-}
 
 export async function listCollections(databaseId: string) {
   try {
@@ -40,6 +32,22 @@ export async function listCollections(databaseId: string) {
     console.error("Error listing collections:", error);
     return [];
   }
+}
+
+// Helper to get fresh table data bypassing Next.js cache
+async function getFreshTableData(fileId: string): Promise<TableFile> {
+  const response = await fetchWithAuth(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+    { cache: "no-store", next: { revalidate: 0 } }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch table data: ${response.status} ${response.statusText}`
+    );
+  }
+
+  return (await response.json()) as TableFile;
 }
 
 // Re-export listCollections as listTables for clarity
@@ -90,20 +98,19 @@ export async function createTable(formData: FormData) {
 }
 
 export async function getTableData(fileId: string) {
-  const { tokens, clientId, clientSecret, projectId } = await getAuth();
-
-  const driveService = initDriveService(
-    {
-      client_id: clientId,
-      client_secret: clientSecret,
-      project_id: projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
-    },
-    tokens
+  const response = await fetchWithAuth(
+    `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
+    { next: { tags: [`table-data-${fileId}`] } }
   );
 
-  const response = await driveService.selectJsonContent(fileId);
-  return response as TableFile;
+  if (!response.ok) {
+    if (response.status === 404) return null;
+    throw new Error(
+      `Failed to fetch table data: ${response.status} ${response.statusText}`
+    );
+  }
+
+  return (await response.json()) as TableFile;
 }
 
 export async function updateTableSchema(formData: FormData) {
@@ -130,7 +137,8 @@ export async function updateTableSchema(formData: FormData) {
     throw new Error("Missing parameters");
   }
 
-  const table = await getTableData(fileId);
+  // Use FRESH data for schema updates
+  const table = await getFreshTableData(fileId);
 
   // Check if column already exists
   if (table.schema.some((c) => c.key === key)) {
@@ -184,6 +192,21 @@ export async function updateTableSchema(formData: FormData) {
     }
   }
 
+  // Import at top if not present, but we are inside function so we can't.
+  // We assume checkingUniqueConstraint and rebuildIndex are imported at top of file.
+  // Or we dynamically import or use the ones we added to imports.
+
+  interface UpdateSchemaResult {
+    success: boolean;
+    error?: string;
+    column?: ColumnDefinition;
+  }
+
+  // ... inside updateTableSchema ...
+  const validationUnique = formData.get("unique") === "on";
+
+  // ... (validation parsing) ...
+
   const newColumn: ColumnDefinition = {
     key,
     type,
@@ -192,6 +215,7 @@ export async function updateTableSchema(formData: FormData) {
     relationTableId: type === "relation" ? relationTableId : undefined,
     default: defaultValue || undefined,
     validation,
+    unique: validationUnique,
   };
 
   table.schema.push(newColumn);
@@ -207,7 +231,31 @@ export async function updateTableSchema(formData: FormData) {
 
   await saveTableContent(fileId, table);
 
+  // Rebuild index if unique
+  if (validationUnique) {
+    // Need databaseId
+    const databaseId = await getParentId(fileId);
+    if (databaseId) {
+      // Should exist
+      const { rebuildIndex } = await import("../../lib/indexing");
+      const indexFileId = await rebuildIndex(
+        databaseId,
+        fileId,
+        key,
+        table.documents
+      );
+
+      // Update schema with the new indexFileId
+      const colIndex = table.schema.findIndex((c) => c.key === key);
+      if (colIndex !== -1) {
+        table.schema[colIndex].indexFileId = indexFileId;
+        await saveTableContent(fileId, table);
+      }
+    }
+  }
+
   revalidatePath(`/dashboard/table/${fileId}`);
+  revalidateTag(`table-data-${fileId}`, { expire: 0 });
   revalidateTag("database-tree", { expire: 0 });
 }
 
@@ -224,8 +272,10 @@ export async function deleteColumn(formData: FormData) {
     throw new Error("Cannot delete system columns");
   }
 
-  const table = await getTableData(fileId);
+  const table = await getFreshTableData(fileId);
 
+  // Find column to get indexFileId if needed
+  const column = table.schema.find((c) => c.key === columnKey);
   // Remove column from schema
   table.schema = table.schema.filter((c) => c.key !== columnKey);
 
@@ -236,9 +286,38 @@ export async function deleteColumn(formData: FormData) {
 
   await saveTableContent(fileId, table);
 
+  // Clean up index if it exists (regardless if it was marked unique, good practice to clean up)
+  try {
+    const databaseId = await getParentId(fileId);
+    if (databaseId) {
+      // Should exist
+      const { deleteIndex } = await import("../../lib/indexing");
+      await deleteIndex(
+        databaseId,
+        fileId,
+        columnKey,
+        undefined,
+        column?.indexFileId
+      );
+    }
+  } catch (e) {
+    console.error("Failed to delete index file:", e);
+  }
+
   revalidatePath(`/dashboard/table/${fileId}`);
+  revalidateTag(`table-data-${fileId}`, { expire: 0 });
   revalidateTag("database-tree", { expire: 0 });
 }
+
+import { checkUniqueConstraint, updateIndex } from "../../lib/indexing";
+
+// Helper to get database ID from file ID (needed for indexes)
+// We assume 1-level tables (Database -> Table) for simplicity.
+// Actually getParentId helper is at bottom of file, let's move/import it.
+// We can assume parent of table is database folder.
+// But we need to get it dynamically.
+
+// ...
 
 export async function addDocument(formData: FormData): Promise<{
   success: boolean;
@@ -247,13 +326,18 @@ export async function addDocument(formData: FormData): Promise<{
 }> {
   const fileId = formData.get("fileId") as string;
   const dataStr = formData.get("data") as string;
+  let databaseId = formData.get("databaseId") as string;
 
   if (!fileId || !dataStr) {
     return { success: false, error: "Missing parameters" };
   }
 
   const data = JSON.parse(dataStr);
-  const table = await getTableData(fileId);
+  const table = await getFreshTableData(fileId);
+
+  if (!databaseId) {
+    databaseId = await getParentId(fileId);
+  }
 
   // Validate against schema with Zod
   const validation = validateDocument(data, table.schema);
@@ -267,6 +351,29 @@ export async function addDocument(formData: FormData): Promise<{
     };
   }
 
+  // Check Unique Constraints
+  const uniqueColumns = table.schema.filter((col) => col.unique);
+  if (databaseId) {
+    for (const col of uniqueColumns) {
+      const val = validation.data[col.key];
+      const check = await checkUniqueConstraint(
+        databaseId,
+        fileId,
+        col.key,
+        val,
+        undefined,
+        undefined,
+        col.indexFileId
+      );
+      if (!check.safe) {
+        return {
+          success: false,
+          error: `Unique constraint failed for field '${col.key}': ${check.error}`,
+        };
+      }
+    }
+  }
+
   const newDoc: RowData = {
     $id: crypto.randomUUID(),
     $createdAt: new Date().toISOString(),
@@ -277,6 +384,37 @@ export async function addDocument(formData: FormData): Promise<{
   try {
     table.documents.push(newDoc);
     await saveTableContent(fileId, table);
+
+    // Update Indexes
+    let schemaUpdated = false;
+    if (databaseId) {
+      for (const col of uniqueColumns) {
+        const val = newDoc[col.key];
+        const newIndexFileId = await updateIndex(
+          databaseId,
+          fileId,
+          col.key,
+          undefined, // old value
+          val, // new value
+          newDoc.$id,
+          undefined,
+          col.indexFileId
+        );
+
+        if (newIndexFileId && newIndexFileId !== col.indexFileId) {
+          col.indexFileId = newIndexFileId;
+          schemaUpdated = true;
+        }
+      }
+    }
+
+    if (schemaUpdated) {
+      await saveTableContent(fileId, table);
+    }
+
+    revalidatePath(`/dashboard/table/${fileId}`);
+    revalidateTag(`table-data-${fileId}`, { expire: 0 });
+
     return { success: true };
   } catch (error) {
     console.error("Error adding document:", error);
@@ -292,6 +430,7 @@ export async function updateDocument(formData: FormData): Promise<{
   const fileId = formData.get("fileId") as string;
   const docId = formData.get("docId") as string;
   const dataStr = formData.get("data") as string;
+  let databaseId = formData.get("databaseId") as string;
 
   console.log("[updateDocument] Called with:", { fileId, docId, dataStr });
 
@@ -304,12 +443,25 @@ export async function updateDocument(formData: FormData): Promise<{
     const data = JSON.parse(dataStr);
     console.log("[updateDocument] Parsed data:", data);
 
-    const table = await getTableData(fileId);
+    const table = await getFreshTableData(fileId);
     console.log(
       "[updateDocument] Got table with",
       table.documents.length,
       "documents"
     );
+
+    // Find document index FIRST
+    const docIndex = table.documents.findIndex((d) => d.$id === docId);
+    console.log("[updateDocument] Found document at index:", docIndex);
+
+    if (docIndex === -1) {
+      console.log("[updateDocument] Document not found");
+      return { success: false, error: "Document not found" };
+    }
+
+    if (!databaseId) {
+      databaseId = await getParentId(fileId);
+    }
 
     // Validate against schema with Zod
     const validation = validateDocument(data, table.schema);
@@ -324,13 +476,40 @@ export async function updateDocument(formData: FormData): Promise<{
       };
     }
 
-    const docIndex = table.documents.findIndex((d) => d.$id === docId);
-    console.log("[updateDocument] Found document at index:", docIndex);
+    // Check Unique Constraints
+    const uniqueColumns = table.schema.filter((col) => col.unique);
 
-    if (docIndex === -1) {
-      console.log("[updateDocument] Document not found");
-      return { success: false, error: "Document not found" };
+    if (databaseId) {
+      for (const col of uniqueColumns) {
+        // Compare with existing value in table (using docIndex which is now safe)
+        if (validation.data[col.key] !== table.documents[docIndex][col.key]) {
+          // Only check if value changed
+          const val = validation.data[col.key];
+          const check = await checkUniqueConstraint(
+            databaseId,
+            fileId,
+            col.key,
+            val,
+            docId, // Exclude self
+            undefined,
+            col.indexFileId
+          );
+          if (!check.safe) {
+            return {
+              success: false,
+              error: `Unique constraint failed for field '${col.key}': ${check.error}`,
+            };
+          }
+        }
+      }
     }
+
+    // Capture old values for index update
+    const oldDoc = table.documents[docIndex];
+    const oldValues: Record<string, any> = {};
+    uniqueColumns.forEach((col) => {
+      oldValues[col.key] = oldDoc[col.key];
+    });
 
     // Preserve system fields and update with new data
     const updatedDoc: RowData = {
@@ -347,6 +526,36 @@ export async function updateDocument(formData: FormData): Promise<{
     console.log("[updateDocument] Saving to Drive...");
     await saveTableContent(fileId, table);
     console.log("[updateDocument] Saved successfully!");
+
+    // Update Indexes
+    let schemaUpdated = false;
+    if (databaseId) {
+      for (const col of uniqueColumns) {
+        const newVal = updatedDoc[col.key];
+        const oldVal = oldValues[col.key];
+
+        if (newVal !== oldVal) {
+          const newIndexFileId = await updateIndex(
+            databaseId,
+            fileId,
+            col.key,
+            oldVal,
+            newVal,
+            docId,
+            undefined,
+            col.indexFileId
+          );
+          if (newIndexFileId && newIndexFileId !== col.indexFileId) {
+            col.indexFileId = newIndexFileId;
+            schemaUpdated = true;
+          }
+        }
+      }
+    }
+
+    if (schemaUpdated) {
+      await saveTableContent(fileId, table);
+    }
 
     revalidatePath(`/dashboard/table/${fileId}`);
     revalidateTag(`table-data-${fileId}`, { expire: 0 });
@@ -365,11 +574,12 @@ export async function deleteDocument(formData: FormData) {
     throw new Error("Missing parameters");
   }
 
-  const table = await getTableData(fileId);
+  const table = await getFreshTableData(fileId);
   table.documents = table.documents.filter((d) => d.$id !== docId);
 
   await saveTableContent(fileId, table);
   revalidatePath(`/dashboard/table/${fileId}`);
+  revalidateTag(`table-data-${fileId}`, { expire: 0 });
 }
 
 export async function bulkDeleteDocuments(fileId: string, docIds: string[]) {
@@ -378,7 +588,7 @@ export async function bulkDeleteDocuments(fileId: string, docIds: string[]) {
   }
 
   try {
-    const table = await getTableData(fileId);
+    const table = await getFreshTableData(fileId);
     const docIdSet = new Set(docIds);
     const initialCount = table.documents.length;
 
@@ -388,6 +598,7 @@ export async function bulkDeleteDocuments(fileId: string, docIds: string[]) {
 
     await saveTableContent(fileId, table);
     revalidatePath(`/dashboard/table/${fileId}`);
+    revalidateTag(`table-data-${fileId}`, { expire: 0 });
 
     return { success: true, deletedCount };
   } catch (error) {

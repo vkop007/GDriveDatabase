@@ -87,21 +87,31 @@ export async function getOrCreateSystemFolder(auth?: any) {
 import { fetchWithAuth } from "./auth";
 
 // Custom move file implementation to bypass gdrivekit issue or limitations
-export async function moveFile(fileId: string, folderId: string) {
+export async function moveFile(
+  fileId: string,
+  folderId: string,
+  driveService?: GoogleDriveService
+) {
   console.log(
     `[moveFile] Attempting to move file ${fileId} to folder ${folderId}`
   );
 
   try {
-    // 2. Move file (add new parent, remove old parents)
-    const moveResponse = await operations.fileOperations.moveFile(
-      fileId,
-      folderId
-    );
+    if (driveService) {
+      // Use driveService if available
+      // Note: driveService.moveFile might not preserve name, but usually does
+      await driveService.moveFile(fileId, folderId);
+    } else {
+      // 2. Move file (add new parent, remove old parents)
+      const moveResponse = await operations.fileOperations.moveFile(
+        fileId,
+        folderId
+      );
 
-    if (!moveResponse.success) {
-      const errorText = await moveResponse.text();
-      throw new Error(`Failed to move file: ${errorText}`);
+      if (!moveResponse.success) {
+        const errorText = await moveResponse.text();
+        throw new Error(`Failed to move file: ${errorText}`);
+      }
     }
 
     console.log(`[moveFile] Successfully moved file.`);
@@ -112,42 +122,67 @@ export async function moveFile(fileId: string, folderId: string) {
   }
 }
 
+import { GoogleDriveService } from "gdrivekit";
+
 export async function createFileInFolder(
   folderId: string,
   name: string,
-  content: any
+  content: any,
+  driveService?: GoogleDriveService
 ) {
-  await getAuth();
+  if (!driveService) {
+    await getAuth();
+  }
 
   try {
-    // Phase 1: Create the file
-    const createResult = await operations.jsonOperations.createJsonFile(
-      content,
-      name
-    );
+    let fileId: string;
 
-    if (!createResult.success || !createResult.data?.id) {
-      throw new Error("Failed to create file via gdrivekit");
+    if (driveService) {
+      // Use driveService if available
+      const result = await driveService.createJsonFile(name, content);
+      console.log(
+        "[createFileInFolder] driveService.createJsonFile result:",
+        JSON.stringify(result)
+      );
+
+      // Check for common return patterns
+      if (result && (result as any).id) {
+        fileId = (result as any).id;
+      } else if (result && (result as any).data && (result as any).data.id) {
+        fileId = (result as any).data.id;
+      } else {
+        throw new Error(
+          "Failed to create file via driveService: ID not found in response"
+        );
+      }
+    } else {
+      // Fallback to operations (cookie auth)
+      const createResult = await operations.jsonOperations.createJsonFile(
+        content,
+        name
+      );
+      if (!createResult.success || !createResult.data?.id) {
+        throw new Error("Failed to create file via gdrivekit");
+      }
+      fileId = createResult.data.id;
     }
 
-    const fileId = createResult.data.id;
     console.log(
       `[createFileInFolder] Created file with ID: ${fileId}. Moving to ${folderId}...`
     );
 
     // Phase 2: Move to correct folder
-    const moveResult = await moveFile(fileId, folderId);
+    const moveResult = await moveFile(fileId, folderId, driveService);
     console.log(
       `[createFileInFolder] Move result:`,
       JSON.stringify(moveResult)
     );
 
     if (!moveResult.success) {
-      // Cleanup if move fails? Ideally yes, but keeping it simple for now
       throw new Error("Failed to move created file to target folder");
     }
 
-    return { status: 200, success: true, data: createResult.data };
+    return { status: 200, success: true, data: { id: fileId } };
   } catch (error) {
     console.error("Error creating file in folder:", error);
     throw error;

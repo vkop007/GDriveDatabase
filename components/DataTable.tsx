@@ -14,6 +14,7 @@ import { useConfirm } from "../contexts/ConfirmContext";
 interface DataTableProps {
   table: TableFile;
   fileId: string;
+  databaseId: string;
   relationLookup?: Record<string, Record<string, string>>;
   // Pagination props (optional for backwards compatibility)
   totalRows?: number;
@@ -27,6 +28,7 @@ interface DataTableProps {
 export default function DataTable({
   table,
   fileId,
+  databaseId,
   relationLookup = {},
   totalRows,
   totalPages = 1,
@@ -181,6 +183,11 @@ export default function DataTable({
                           {col.validation && (
                             <span title="Has validation rules">
                               <Shield className="w-3 h-3 text-emerald-500" />
+                            </span>
+                          )}
+                          {col.unique && (
+                            <span title="Unique Value">
+                              <Shield className="w-3 h-3 text-purple-500" />
                             </span>
                           )}
                         </>
@@ -401,12 +408,12 @@ export default function DataTable({
         onClear={clearSelection}
         isDeleting={isDeleting}
       />
-
       {editingDocument && (
         <EditRowModal
           isOpen={!!editingDocument}
           onClose={() => setEditingDocument(null)}
           fileId={fileId}
+          databaseId={databaseId}
           schema={table.schema}
           document={editingDocument}
         />

@@ -1,13 +1,11 @@
 // Validation utilities using Zod
 
 import { z } from "zod";
-import type { ColumnDefinition, ValidationRules } from "../types";
-
-export interface ValidationError {
-  field: string;
-  message: string;
-  code: string;
-}
+import type {
+  ColumnDefinition,
+  ValidationRules,
+  ValidationError,
+} from "../types";
 
 // Build Zod schema from a single column definition
 function buildColumnSchema(col: ColumnDefinition): z.ZodType {

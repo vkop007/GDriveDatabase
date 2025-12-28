@@ -1,13 +1,8 @@
 "use client";
 
 import { X } from "lucide-react";
-import { ColumnDefinition } from "../../types";
-import {
-  FilterCondition,
-  FilterOperator,
-  operatorLabels,
-  operatorsByType,
-} from "../../lib/query";
+import { ColumnDefinition, FilterCondition, FilterOperator } from "../../types";
+import { operatorLabels, operatorsByType } from "../../lib/query";
 
 interface FilterRowProps {
   filter: FilterCondition;
