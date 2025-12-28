@@ -60,6 +60,7 @@ export async function POST(
       array = false,
       default: defaultValue,
       relationTableId,
+      validation,
     } = body;
 
     if (!key || !type) {
@@ -94,6 +95,7 @@ export async function POST(
       array,
       default: defaultValue,
       relationTableId: type === "relation" ? relationTableId : undefined,
+      validation,
     };
 
     table.schema.push(newColumn);

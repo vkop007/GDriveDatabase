@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { processAndUploadFiles } from "../../../../lib/gdrive/bucket-service";
+import { processAndUploadFiles } from "@/lib/gdrive/bucket-service";
 
 export async function POST(request: NextRequest) {
   try {

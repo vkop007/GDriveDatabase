@@ -8,7 +8,7 @@ import EditRowModal from "./EditRowModal";
 import { PaginationControls } from "./query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2, Database, Loader2 } from "lucide-react";
+import { Pencil, Trash2, Database, Loader2, Shield } from "lucide-react";
 import { useConfirm } from "../contexts/ConfirmContext";
 
 interface DataTableProps {
@@ -174,9 +174,16 @@ export default function DataTable({
                         {col.key}
                       </span>
                       {!col.key.startsWith("$") && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-500 font-medium">
-                          {col.type}
-                        </span>
+                        <>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-500 font-medium">
+                            {col.type}
+                          </span>
+                          {col.validation && (
+                            <span title="Has validation rules">
+                              <Shield className="w-3 h-3 text-emerald-500" />
+                            </span>
+                          )}
+                        </>
                       )}
                     </div>
                   </th>
@@ -289,23 +296,27 @@ export default function DataTable({
                                 <span className="text-neutral-600">—</span>
                               )
                             ) : col.array ? (
-                              <div className="flex flex-wrap gap-1.5">
-                                {Array.isArray(value) ? (
-                                  value.slice(0, 3).map((item, i) => (
-                                    <span
-                                      key={i}
-                                      className="inline-flex px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 text-xs border border-blue-500/20"
-                                    >
-                                      {String(item)}
-                                    </span>
-                                  ))
+                              <div className="flex items-center gap-1 max-w-[200px] overflow-hidden">
+                                {Array.isArray(value) && value.length > 0 ? (
+                                  <>
+                                    {value.slice(0, 2).map((item, i) => (
+                                      <span
+                                        key={i}
+                                        className="inline-flex px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 text-xs border border-blue-500/20 whitespace-nowrap"
+                                      >
+                                        {String(item).length > 10
+                                          ? `${String(item).slice(0, 10)}...`
+                                          : String(item)}
+                                      </span>
+                                    ))}
+                                    {value.length > 2 && (
+                                      <span className="text-xs text-neutral-500 whitespace-nowrap">
+                                        +{value.length - 2}
+                                      </span>
+                                    )}
+                                  </>
                                 ) : (
                                   <span className="text-neutral-500">—</span>
-                                )}
-                                {Array.isArray(value) && value.length > 3 && (
-                                  <span className="text-xs text-neutral-500">
-                                    +{value.length - 3} more
-                                  </span>
                                 )}
                               </div>
                             ) : (

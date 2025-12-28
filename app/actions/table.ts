@@ -5,16 +5,11 @@ import { redirect } from "next/navigation";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { getAuth, fetchWithAuth } from "../../lib/gdrive/auth";
 import { createFileInFolder } from "../../lib/gdrive/operations";
+import { validateDocument, ValidationError } from "../../lib/validation";
+import { ColumnDefinition } from "../../types";
 
-// Types for Table Structure
-export interface ColumnDefinition {
-  key: string;
-  type: "string" | "integer" | "boolean" | "datetime" | "relation" | "storage";
-  required: boolean;
-  default?: any;
-  array?: boolean;
-  relationTableId?: string;
-}
+// Re-export ColumnDefinition for backward compatibility
+export type { ColumnDefinition };
 
 export interface RowData {
   $id: string;
@@ -120,6 +115,17 @@ export async function updateTableSchema(formData: FormData) {
   const defaultValue = formData.get("default") as string;
   const relationTableId = formData.get("relationTableId") as string;
 
+  // Parse validation rules from form data
+  const validationMinLength = formData.get("validation_minLength") as string;
+  const validationMaxLength = formData.get("validation_maxLength") as string;
+  const validationPattern = formData.get("validation_pattern") as string;
+  const validationEmail = formData.get("validation_email") === "on";
+  const validationUrl = formData.get("validation_url") === "on";
+  const validationEnum = formData.get("validation_enum") as string;
+  const validationMin = formData.get("validation_min") as string;
+  const validationMax = formData.get("validation_max") as string;
+  const validationMessage = formData.get("validation_message") as string;
+
   if (!fileId || !key || !type) {
     throw new Error("Missing parameters");
   }
@@ -131,6 +137,53 @@ export async function updateTableSchema(formData: FormData) {
     throw new Error("Column already exists");
   }
 
+  // Build validation object if any rules are set
+  let validation: import("../../types").ValidationRules | undefined;
+  if (
+    validationMinLength ||
+    validationMaxLength ||
+    validationPattern ||
+    validationEmail ||
+    validationUrl ||
+    validationEnum ||
+    validationMin ||
+    validationMax ||
+    validationMessage
+  ) {
+    validation = {};
+
+    if (validationMinLength) {
+      validation.minLength = parseInt(validationMinLength, 10);
+    }
+    if (validationMaxLength) {
+      validation.maxLength = parseInt(validationMaxLength, 10);
+    }
+    if (validationPattern) {
+      validation.pattern = validationPattern;
+    }
+    if (validationEmail) {
+      validation.email = true;
+    }
+    if (validationUrl) {
+      validation.url = true;
+    }
+    if (validationEnum) {
+      validation.enum = validationEnum
+        .split(",")
+        .map((v) => v.trim())
+        .filter((v) => v.length > 0);
+    }
+    if (validationMin) {
+      validation.min = parseInt(validationMin, 10);
+    }
+    if (validationMax) {
+      validation.max = parseInt(validationMax, 10);
+    }
+    if (validationMessage) {
+      validation.message = validationMessage;
+    }
+  }
+
   const newColumn: ColumnDefinition = {
     key,
     type,
@@ -138,6 +191,7 @@ export async function updateTableSchema(formData: FormData) {
     array: isArray,
     relationTableId: type === "relation" ? relationTableId : undefined,
     default: defaultValue || undefined,
+    validation,
   };
 
   table.schema.push(newColumn);
@@ -186,35 +240,39 @@ export async function deleteColumn(formData: FormData) {
   revalidateTag("database-tree", { expire: 0 });
 }
 
-export async function addDocument(formData: FormData) {
+export async function addDocument(formData: FormData): Promise<{
+  success: boolean;
+  error?: string;
+  errors?: ValidationError[];
+}> {
   const fileId = formData.get("fileId") as string;
   const dataStr = formData.get("data") as string;
 
   if (!fileId || !dataStr) {
-    throw new Error("Missing parameters");
+    return { success: false, error: "Missing parameters" };
   }
 
   const data = JSON.parse(dataStr);
   const table = await getTableData(fileId);
 
+  // Validate against schema with Zod
+  const validation = validateDocument(data, table.schema);
+  if (!validation.success) {
+    return {
+      success: false,
+      errors: validation.errors,
+      error: validation.errors
+        .map((e) => `${e.field}: ${e.message}`)
+        .join(", "),
+    };
+  }
+
   const newDoc: RowData = {
     $id: crypto.randomUUID(),
     $createdAt: new Date().toISOString(),
     $updatedAt: new Date().toISOString(),
-    ...data,
+    ...validation.data,
   };
-
-  // Validate against schema (basic validation)
-  for (const col of table.schema) {
-    if (
-      col.required &&
-      newDoc[col.key] === undefined &&
-      !col.key.startsWith("$")
-    ) {
-      // Allow missing if it has a default? Logic handled in UI mostly, but good to check
-      // For now, we trust the UI/Input
-    }
-  }
 
   try {
     table.documents.push(newDoc);
@@ -226,7 +284,11 @@ export async function addDocument(formData: FormData) {
   }
 }
 
-export async function updateDocument(formData: FormData) {
+export async function updateDocument(formData: FormData): Promise<{
+  success: boolean;
+  error?: string;
+  errors?: ValidationError[];
+}> {
   const fileId = formData.get("fileId") as string;
   const docId = formData.get("docId") as string;
   const dataStr = formData.get("data") as string;
@@ -249,6 +311,19 @@ export async function updateDocument(formData: FormData) {
       "documents"
     );
 
+    // Validate against schema with Zod
+    const validation = validateDocument(data, table.schema);
+    if (!validation.success) {
+      console.log("[updateDocument] Validation failed:", validation.errors);
+      return {
+        success: false,
+        errors: validation.errors,
+        error: validation.errors
+          .map((e) => `${e.field}: ${e.message}`)
+          .join(", "),
+      };
+    }
+
     const docIndex = table.documents.findIndex((d) => d.$id === docId);
     console.log("[updateDocument] Found document at index:", docIndex);
 
@@ -260,7 +335,7 @@ export async function updateDocument(formData: FormData) {
     // Preserve system fields and update with new data
     const updatedDoc: RowData = {
       ...table.documents[docIndex],
-      ...data,
+      ...validation.data,
       $id: docId, // Ensure $id is not changed
       $createdAt: table.documents[docIndex].$createdAt, // Preserve original
       $updatedAt: new Date().toISOString(), // Update timestamp

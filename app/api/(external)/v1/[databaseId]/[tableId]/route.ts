@@ -53,23 +53,26 @@ export async function POST(
 
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
 
+    // Validate request body
+    const { validateDocument } = await import("@/lib/validation");
+    const validation = validateDocument(body, table.schema);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: "Validation failed",
+          details: validation.errors,
+        },
+        { status: 400 }
+      );
+    }
+
     const newDoc: RowData = {
       $id: crypto.randomUUID(),
       $createdAt: new Date().toISOString(),
       $updatedAt: new Date().toISOString(),
-      ...body,
+      ...validation.data, // Use validated (and coerced) data
     };
-
-    // Basic validation
-    for (const col of table.schema) {
-      if (
-        col.required &&
-        newDoc[col.key] === undefined &&
-        !col.key.startsWith("$")
-      ) {
-        // simple validation, maybe skip for now or just warn
-      }
-    }
 
     table.documents.push(newDoc);
 
