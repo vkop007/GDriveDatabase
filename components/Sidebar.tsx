@@ -15,6 +15,7 @@ import {
   PanelLeft,
   Network,
   FunctionSquare,
+  Gamepad2,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -249,7 +250,27 @@ export default function Sidebar({ treeData }: SidebarProps) {
             {!isCollapsed && "Functions"}
           </Link>
 
-          {/* Explorer Section */}
+          {/* API Playground */}
+          <Link
+            href="/dashboard/playground"
+            className={`group flex items-center ${
+              isCollapsed ? "justify-center" : "gap-3"
+            } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+              pathname === "/dashboard/playground"
+                ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25 shadow-lg shadow-primary/10"
+                : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
+            }`}
+            title={isCollapsed ? "Playground" : undefined}
+          >
+            <Gamepad2
+              className={`w-4 h-4 transition-all duration-200 ${
+                pathname === "/dashboard/playground"
+                  ? "text-primary drop-shadow-sm"
+                  : "group-hover:text-primary group-hover:scale-110"
+              }`}
+            />
+            {!isCollapsed && "Playground"}
+          </Link>
           {!isCollapsed && (
             <div className="pt-6 pb-2 px-1">
               <div className="flex items-center gap-3">
