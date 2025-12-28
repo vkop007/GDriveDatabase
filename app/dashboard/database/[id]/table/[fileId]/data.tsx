@@ -1,24 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { TableFile } from "../../../../../../types";
+import { TableFile, QueryState } from "../../../../../../types";
 import AddRowForm from "../../../../../../components/AddRowForm";
 import DataTable from "../../../../../../components/DataTable";
 import { QueryBuilder } from "../../../../../../components/query";
-import {
-  QueryState,
-  defaultQueryState,
-  applyQuery,
-} from "../../../../../../lib/query";
+import { defaultQueryState, applyQuery } from "../../../../../../lib/query";
 import { Table2 } from "lucide-react";
 
 export default function DataView({
   table,
   fileId,
+  databaseId,
   relationLookup = {},
 }: {
   table: TableFile;
   fileId: string;
+  databaseId: string;
   relationLookup?: Record<string, Record<string, string>>;
 }) {
   const [query, setQuery] = useState<QueryState>(defaultQueryState);
@@ -41,7 +39,11 @@ export default function DataView({
             </p>
           </div>
         </div>
-        <AddRowForm fileId={fileId} schema={table.schema} />
+        <AddRowForm
+          fileId={fileId}
+          databaseId={databaseId}
+          schema={table.schema}
+        />
       </div>
 
       {/* Query Builder */}
@@ -57,6 +59,7 @@ export default function DataView({
       <DataTable
         table={{ ...table, documents: queryResult.data }}
         fileId={fileId}
+        databaseId={databaseId}
         relationLookup={relationLookup}
         totalRows={queryResult.total}
         totalPages={queryResult.totalPages}

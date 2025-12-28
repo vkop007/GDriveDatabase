@@ -1,8 +1,7 @@
 "use client";
 
 import { X, ArrowUpDown, ArrowUp, ArrowDown, Plus } from "lucide-react";
-import { ColumnDefinition } from "../../types";
-import { SortConfig } from "../../lib/query";
+import { ColumnDefinition, SortConfig } from "../../types";
 
 interface SortControlsProps {
   sortConfigs: SortConfig[];

@@ -26,6 +26,9 @@ export interface ColumnDefinition {
   array?: boolean;
   relationTableId?: string;
   validation?: ValidationRules;
+  unique?: boolean;
+  indexed?: boolean;
+  indexFileId?: string;
 }
 
 export interface RowData {
@@ -48,3 +51,44 @@ export interface JsonTableEditorProps {
 }
 
 export type JsonType = "array" | "object";
+
+export interface ValidationError {
+  field: string;
+  message: string;
+  code: string;
+}
+
+// Query state types
+export interface FilterCondition {
+  id: string;
+  column: string;
+  operator: FilterOperator;
+  value: string;
+}
+
+export type FilterOperator =
+  | "eq"
+  | "neq"
+  | "contains"
+  | "gt"
+  | "lt"
+  | "gte"
+  | "lte";
+
+export interface SortConfig {
+  column: string;
+  direction: "asc" | "desc";
+}
+
+export interface QueryState {
+  filters: FilterCondition[];
+  sort: SortConfig[];
+  page: number;
+  pageSize: number;
+}
+
+export interface QueryResult {
+  data: RowData[];
+  total: number;
+  totalPages: number;
+}

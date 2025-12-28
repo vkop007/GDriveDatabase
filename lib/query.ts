@@ -1,41 +1,13 @@
 "use client";
 
-import { RowData } from "../types";
-
-// Query state types
-export interface FilterCondition {
-  id: string;
-  column: string;
-  operator: FilterOperator;
-  value: string;
-}
-
-export type FilterOperator =
-  | "eq"
-  | "neq"
-  | "contains"
-  | "gt"
-  | "lt"
-  | "gte"
-  | "lte";
-
-export interface SortConfig {
-  column: string;
-  direction: "asc" | "desc";
-}
-
-export interface QueryState {
-  filters: FilterCondition[];
-  sort: SortConfig[];
-  page: number;
-  pageSize: number;
-}
-
-export interface QueryResult {
-  data: RowData[];
-  total: number;
-  totalPages: number;
-}
+import {
+  RowData,
+  FilterCondition,
+  FilterOperator,
+  SortConfig,
+  QueryState,
+  QueryResult,
+} from "../types";
 
 // Operator labels for UI
 export const operatorLabels: Record<FilterOperator, string> = {

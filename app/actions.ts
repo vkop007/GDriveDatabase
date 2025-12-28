@@ -139,12 +139,19 @@ export async function getApiAuth(apiKey: string) {
     const secrets = JSON.parse(data);
 
     if (secrets.apiKey !== apiKey) {
+      console.error("[getApiAuth] API Key mismatch");
       throw new Error("Invalid API Key");
     }
 
     // Reset the driveService singleton to ensure fresh tokens are used
     const { resetDriveService } = await import("gdrivekit");
     resetDriveService();
+
+    // Check if tokens are present
+    if (!secrets.tokens) {
+      console.error("[getApiAuth] No tokens in secrets");
+      throw new Error("No tokens available");
+    }
 
     const driveService = initDriveService(
       {
@@ -158,6 +165,7 @@ export async function getApiAuth(apiKey: string) {
 
     return { ...secrets, driveService };
   } catch (error) {
+    console.error("[getApiAuth] Authentication failed with error:", error);
     throw new Error("API Authentication failed");
   }
 }

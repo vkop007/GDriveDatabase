@@ -100,6 +100,40 @@ export async function PATCH(
       );
     }
 
+    // Check Unique Constraints
+    const { checkUniqueConstraint, updateIndex, deleteIndex } = await import(
+      "@/lib/indexing"
+    );
+    const { databaseId } = await params;
+
+    const uniqueColumns = table.schema.filter((col) => col.unique);
+    const oldDoc = table.documents[docIndex];
+
+    // Only check constraints for fields that are being changed
+    // Only check constraints for fields that are being changed
+    for (const col of uniqueColumns) {
+      if (body[col.key] !== undefined && body[col.key] !== oldDoc[col.key]) {
+        const val = validation.data[col.key];
+        const check = await checkUniqueConstraint(
+          databaseId,
+          tableId,
+          col.key,
+          val,
+          docId, // Exclude self
+          driveService,
+          col.indexFileId // Pass indexFileId
+        );
+        if (!check.safe) {
+          return NextResponse.json(
+            {
+              error: `Unique constraint failed for field '${col.key}': ${check.error}`,
+            },
+            { status: 409 }
+          );
+        }
+      }
+    }
+
     // Update document fields (preserve system fields)
     const updatedDoc: RowData = {
       ...validation.data, // Use validated data
@@ -110,13 +144,35 @@ export async function PATCH(
 
     table.documents[docIndex] = updatedDoc;
 
-    const updateResult = await driveService.updateJsonContent(tableId, table);
+    await driveService.updateJsonContent(tableId, table);
 
-    if (!updateResult.success) {
-      return NextResponse.json(
-        { error: `Failed to update: ${updateResult.error}` },
-        { status: 500 }
-      );
+    // Update Indexes
+    let schemaUpdated = false;
+    for (const col of uniqueColumns) {
+      const newVal = updatedDoc[col.key];
+      const oldVal = oldDoc[col.key]; // Use captured oldDoc
+
+      if (newVal !== oldVal) {
+        const newIndexFileId = await updateIndex(
+          databaseId,
+          tableId,
+          col.key,
+          oldVal,
+          newVal,
+          docId,
+          driveService,
+          col.indexFileId
+        );
+
+        if (newIndexFileId && newIndexFileId !== col.indexFileId) {
+          col.indexFileId = newIndexFileId;
+          schemaUpdated = true;
+        }
+      }
+    }
+
+    if (schemaUpdated) {
+      await driveService.updateJsonContent(tableId, table);
     }
 
     return NextResponse.json(updatedDoc);
@@ -143,7 +199,7 @@ export async function DELETE(
 
   try {
     const { driveService } = await getApiAuth(apiKey);
-    const { tableId, docId } = await params;
+    const { databaseId, tableId, docId } = await params;
 
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
 
@@ -160,8 +216,26 @@ export async function DELETE(
       );
     }
 
+    const docToDelete = table.documents[docIndex];
+    const { updateIndex } = await import("@/lib/indexing");
+
     // Remove the document
     table.documents.splice(docIndex, 1);
+
+    // Cleanup indexes for unique columns
+    const uniqueColumns = table.schema.filter((col) => col.unique);
+    for (const col of uniqueColumns) {
+      await updateIndex(
+        databaseId,
+        tableId,
+        col.key,
+        docToDelete[col.key], // old value
+        undefined, // new value (undefined means remove)
+        docId,
+        driveService,
+        col.indexFileId
+      );
+    }
 
     const updateResult = await driveService.updateJsonContent(tableId, table);
 

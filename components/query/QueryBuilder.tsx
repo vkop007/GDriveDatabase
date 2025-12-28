@@ -2,16 +2,18 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Filter, ArrowUpDown, X, Plus, Sparkles } from "lucide-react";
-import { ColumnDefinition } from "../../types";
 import {
+  ColumnDefinition,
   QueryState,
   FilterCondition,
   SortConfig,
+  FilterOperator,
+} from "../../types";
+import {
   defaultQueryState,
   generateFilterId,
   operatorLabels,
   operatorsByType,
-  FilterOperator,
 } from "../../lib/query";
 
 interface QueryBuilderProps {

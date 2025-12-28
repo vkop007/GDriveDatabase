@@ -252,6 +252,29 @@ export default function AddColumnForm({
                     </label>
                   </div>
 
+                  {/* Unique Toggle */}
+                  <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-3 cursor-pointer group">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          name="unique"
+                          className="sr-only peer"
+                        />
+                        <div className="w-10 h-6 bg-neutral-800 rounded-full peer-checked:bg-purple-600 transition-all border border-neutral-700 peer-checked:border-purple-500" />
+                        <div className="absolute left-1 top-1 w-4 h-4 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-4 peer-checked:bg-white shadow-sm" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
+                          Unique Value
+                        </span>
+                        <span className="text-[10px] text-neutral-500">
+                          Enforces ID uniqueness via index
+                        </span>
+                      </div>
+                    </label>
+                  </div>
+
                   {/* Enum Values */}
                   <div className="space-y-2 md:col-span-3">
                     <label className="text-xs font-medium text-neutral-400">

@@ -31,9 +31,11 @@ function getValidationHint(col: ColumnDefinition): string | null {
 
 export default function AddRowForm({
   fileId,
+  databaseId,
   schema,
 }: {
   fileId: string;
+  databaseId: string;
   schema: ColumnDefinition[];
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -180,6 +182,7 @@ export default function AddRowForm({
 
             const submissionData = new FormData();
             submissionData.append("fileId", fileId);
+            submissionData.append("databaseId", databaseId);
             submissionData.append("data", JSON.stringify(data));
 
             try {

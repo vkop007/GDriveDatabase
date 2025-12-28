@@ -153,6 +153,14 @@ await schema.addColumn({
   key: "authorId",
   type: "relation",
   relationTableId: "users-table-id",
+});
+
+// Add a unique column (indexed)
+await schema.addColumn({
+  key: "username",
+  type: "string",
+  required: true,
+  unique: true, // Ensures uniqueness via manual index
 });`}
               id="schema-add"
             />
