@@ -10,12 +10,13 @@
   },
   "dependencies": {
     "@xyflow/react": "^12.10.0",
-    "gdrivekit": "file:../gdrivekit",
+    "gdrivekit": "^3.0.0",
     "lucide-react": "^0.555.0",
     "next": "16.0.6",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "sonner": "^2.0.7"
+    "sonner": "^2.0.7",
+    "zod": "^4.2.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

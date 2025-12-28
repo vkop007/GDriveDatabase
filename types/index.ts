@@ -1,3 +1,23 @@
+// Validation rules for column definitions
+export interface ValidationRules {
+  // String validations
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string; // Regex pattern
+  email?: boolean; // Email format
+  url?: boolean; // URL format
+
+  // Number validations
+  min?: number;
+  max?: number;
+
+  // Enum validation (for dropdowns)
+  enum?: string[];
+
+  // Custom error message
+  message?: string;
+}
+
 export interface ColumnDefinition {
   key: string;
   type: "string" | "integer" | "boolean" | "datetime" | "relation" | "storage";
@@ -5,6 +25,7 @@ export interface ColumnDefinition {
   default?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   array?: boolean;
   relationTableId?: string;
+  validation?: ValidationRules;
 }
 
 export interface RowData {

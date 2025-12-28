@@ -76,11 +76,34 @@ export async function PATCH(
       );
     }
 
-    // Update document fields (preserve system fields)
-    const updatedDoc: RowData = {
+    // Validate request body
+    const { validateDocument } = await import("@/lib/validation");
+    // Merge existing doc with updates for validation to ensure required fields aren't missing if they aren't in the update
+    // But for PATCH, we usually only validate fields that are present.
+    // However, validateDocument validates the whole object against the schema.
+    // So we should construct the potential new object and validate that.
+
+    const potentialNewDoc = {
       ...table.documents[docIndex],
       ...body,
-      $id: docId, // Preserve $id
+    };
+
+    const validation = validateDocument(potentialNewDoc, table.schema);
+
+    if (!validation.success) {
+      return NextResponse.json(
+        {
+          error: "Validation failed",
+          details: validation.errors,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Update document fields (preserve system fields)
+    const updatedDoc: RowData = {
+      ...validation.data, // Use validated data
+      $id: docId, // Preserve $id (just in case validation messed with it, though it shouldn't)
       $createdAt: table.documents[docIndex].$createdAt, // Preserve createdAt
       $updatedAt: new Date().toISOString(), // Update timestamp
     };

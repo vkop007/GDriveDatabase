@@ -7,8 +7,27 @@ import { listBucketFiles } from "../app/actions/bucket";
 import { ColumnDefinition } from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
-import { Loader2, Plus, X, Table2, Image as ImageIcon } from "lucide-react";
+import { Loader2, Plus, X, Table2, AlertCircle, Shield } from "lucide-react";
 import GradientButton from "./GradientButton";
+
+// Get validation hint text for a column
+function getValidationHint(col: ColumnDefinition): string | null {
+  const v = col.validation;
+  if (!v) return null;
+
+  const hints: string[] = [];
+
+  if (v.minLength !== undefined) hints.push(`min ${v.minLength} chars`);
+  if (v.maxLength !== undefined) hints.push(`max ${v.maxLength} chars`);
+  if (v.email) hints.push("email format");
+  if (v.url) hints.push("URL format");
+  if (v.pattern) hints.push(`pattern: ${v.pattern}`);
+  if (v.enum && v.enum.length > 0) hints.push(`options: ${v.enum.join(", ")}`);
+  if (v.min !== undefined) hints.push(`min: ${v.min}`);
+  if (v.max !== undefined) hints.push(`max: ${v.max}`);
+
+  return hints.length > 0 ? hints.join(" · ") : null;
+}
 
 export default function AddRowForm({
   fileId,
@@ -19,6 +38,7 @@ export default function AddRowForm({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [relationOptions, setRelationOptions] = useState<
     Record<string, { id: string; label: string }[]>
   >({});
@@ -29,6 +49,9 @@ export default function AddRowForm({
 
   useEffect(() => {
     if (isOpen) {
+      // Clear errors when opening
+      setFieldErrors({});
+
       // Fetch options for relation columns
       const relationColumns = inputColumns.filter(
         (col) => col.type === "relation" && col.relationTableId
@@ -117,6 +140,8 @@ export default function AddRowForm({
             e.preventDefault();
             if (isLoading) return;
             setIsLoading(true);
+            setFieldErrors({});
+
             const form = e.currentTarget;
             const formData = new FormData(form);
             const data: Record<string, any> = {};
@@ -158,14 +183,24 @@ export default function AddRowForm({
             submissionData.append("data", JSON.stringify(data));
 
             try {
-              const result = (await addDocument(submissionData)) as any;
+              const result = await addDocument(submissionData);
               if (result?.success) {
                 toast.success("Row added successfully");
                 setIsOpen(false);
                 form.reset();
                 router.refresh();
               } else {
-                throw new Error(result?.error || "Failed to add row");
+                // Handle validation errors
+                if (result?.errors && result.errors.length > 0) {
+                  const errors: Record<string, string> = {};
+                  result.errors.forEach((err) => {
+                    errors[err.field] = err.message;
+                  });
+                  setFieldErrors(errors);
+                  toast.error("Validation failed. Please check the form.");
+                } else {
+                  throw new Error(result?.error || "Failed to add row");
+                }
               }
             } catch (error) {
               console.error("Failed to add row", error);
@@ -192,97 +227,175 @@ export default function AddRowForm({
                 </p>
               </div>
             ) : (
-              inputColumns.map((col) => (
-                <div key={col.key} className="space-y-2">
-                  <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider flex items-center gap-2">
-                    {col.key}
-                    {col.required && <span className="text-primary">*</span>}
-                  </label>
-                  {col.array ? (
-                    <ArrayInput
-                      name={col.key}
-                      required={col.required}
-                      type={col.type as "string" | "integer"}
-                      placeholder={`Add ${col.type} value...`}
-                    />
-                  ) : col.type === "boolean" ? (
-                    <div className="flex items-center h-10">
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          name={col.key}
-                          className="sr-only peer"
-                        />
-                        <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        <span className="ml-3 text-sm font-medium text-neutral-300">
-                          {col.key}
+              inputColumns.map((col) => {
+                const hasError = !!fieldErrors[col.key];
+                const hint = getValidationHint(col);
+
+                return (
+                  <div key={col.key} className="space-y-2">
+                    <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider flex items-center gap-2">
+                      {col.key}
+                      {col.required && <span className="text-primary">*</span>}
+                      {col.validation && (
+                        <span title="Has validation rules">
+                          <Shield className="w-3 h-3 text-emerald-500" />
                         </span>
-                      </label>
-                    </div>
-                  ) : col.type === "datetime" ? (
-                    <input
-                      type="datetime-local"
-                      name={col.key}
-                      className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all scheme-dark"
-                      required={col.required}
-                    />
-                  ) : col.type === "storage" ? (
-                    <div className="relative">
+                      )}
+                    </label>
+
+                    {col.array ? (
+                      <ArrayInput
+                        name={col.key}
+                        required={col.required}
+                        type={col.type as "string" | "integer"}
+                        placeholder={`Add ${col.type} value...`}
+                      />
+                    ) : col.type === "boolean" ? (
+                      <div className="flex items-center h-10">
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            name={col.key}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                          <span className="ml-3 text-sm font-medium text-neutral-300">
+                            {col.key}
+                          </span>
+                        </label>
+                      </div>
+                    ) : col.type === "datetime" ? (
+                      <input
+                        type="datetime-local"
+                        name={col.key}
+                        className={`w-full bg-neutral-950/50 border rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 transition-all scheme-dark ${
+                          hasError
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                            : "border-neutral-700 focus:border-primary focus:ring-primary/20"
+                        }`}
+                        required={col.required}
+                      />
+                    ) : col.type === "storage" ? (
+                      <div className="relative">
+                        <select
+                          name={col.key}
+                          className={`w-full bg-neutral-950/50 border rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer ${
+                            hasError
+                              ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                              : "border-neutral-700 focus:border-primary focus:ring-primary/20"
+                          }`}
+                          required={col.required}
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
+                            Select File
+                          </option>
+                          {mediaOptions[col.key]?.map((opt) => (
+                            <option key={opt.id} value={opt.id}>
+                              {opt.name}
+                            </option>
+                          ))}
+                        </select>
+                        {mediaOptions[col.key] === undefined && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <Loader2 className="w-4 h-4 text-neutral-500 animate-spin" />
+                          </div>
+                        )}
+                      </div>
+                    ) : col.type === "relation" ? (
+                      <div className="relative">
+                        <select
+                          name={col.key}
+                          className={`w-full bg-neutral-950/50 border rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer ${
+                            hasError
+                              ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                              : "border-neutral-700 focus:border-primary focus:ring-primary/20"
+                          }`}
+                          required={col.required}
+                          defaultValue=""
+                        >
+                          <option value="" disabled>
+                            Select Item
+                          </option>
+                          {relationOptions[col.key]?.map((opt) => (
+                            <option key={opt.id} value={opt.id}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                        {relationOptions[col.key] === undefined && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <Loader2 className="w-4 h-4 text-neutral-500 animate-spin" />
+                          </div>
+                        )}
+                      </div>
+                    ) : col.validation?.enum &&
+                      col.validation.enum.length > 0 ? (
+                      // Render select for enum fields
                       <select
                         name={col.key}
-                        className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                        className={`w-full bg-neutral-950/50 border rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 transition-all appearance-none cursor-pointer ${
+                          hasError
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                            : "border-neutral-700 focus:border-primary focus:ring-primary/20"
+                        }`}
                         required={col.required}
                         defaultValue=""
                       >
                         <option value="" disabled>
-                          Select File
+                          Select {col.key}
                         </option>
-                        {mediaOptions[col.key]?.map((opt) => (
-                          <option key={opt.id} value={opt.id}>
-                            {opt.name}
+                        {col.validation.enum.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
                           </option>
                         ))}
                       </select>
-                      {mediaOptions[col.key] === undefined && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <Loader2 className="w-4 h-4 text-neutral-500 animate-spin" />
-                        </div>
-                      )}
-                    </div>
-                  ) : col.type === "relation" ? (
-                    <div className="relative">
-                      <select
+                    ) : (
+                      <input
+                        type={
+                          col.type === "integer"
+                            ? "number"
+                            : col.validation?.email
+                            ? "email"
+                            : col.validation?.url
+                            ? "url"
+                            : "text"
+                        }
                         name={col.key}
-                        className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                        placeholder={`Enter ${col.key}`}
+                        className={`w-full bg-neutral-950/50 border rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 transition-all ${
+                          hasError
+                            ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                            : "border-neutral-700 focus:border-primary focus:ring-primary/20"
+                        }`}
                         required={col.required}
-                        defaultValue=""
-                      >
-                        <option value="" disabled>
-                          Select Item
-                        </option>
-                        {relationOptions[col.key]?.map((opt) => (
-                          <option key={opt.id} value={opt.id}>
-                            {opt.label}
-                          </option>
-                        ))}
-                      </select>
-                      {relationOptions[col.key] === undefined && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <Loader2 className="w-4 h-4 text-neutral-500 animate-spin" />
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <input
-                      type={col.type === "integer" ? "number" : "text"}
-                      name={col.key}
-                      placeholder={`Enter ${col.key}`}
-                      className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-3 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                      required={col.required}
-                    />
-                  )}
-                </div>
-              ))
+                        minLength={col.validation?.minLength}
+                        maxLength={col.validation?.maxLength}
+                        min={col.validation?.min}
+                        max={col.validation?.max}
+                        pattern={col.validation?.pattern}
+                      />
+                    )}
+
+                    {/* Validation hint */}
+                    {hint && !hasError && (
+                      <p className="text-xs text-neutral-500 flex items-center gap-1">
+                        <Shield className="w-3 h-3" />
+                        {hint}
+                      </p>
+                    )}
+
+                    {/* Error message */}
+                    {hasError && (
+                      <p className="text-xs text-red-400 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        {fieldErrors[col.key]}
+                      </p>
+                    )}
+                  </div>
+                );
+              })
             )}
           </div>
 
