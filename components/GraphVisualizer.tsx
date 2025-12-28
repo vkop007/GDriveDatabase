@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -14,6 +14,8 @@ import {
   Panel,
   Handle,
   Position,
+  MarkerType,
+  ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Database, FileJson, Network, Sparkles } from "lucide-react";
@@ -143,18 +145,33 @@ function TableNode({ data }: { data: any }) {
   return (
     <div className="group relative transition-all duration-400 hover:-translate-y-1.5 cursor-pointer">
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
-      {/* Add handles for left/right connections for relationships */}
+
+      {/* Left side handles */}
       <Handle
         type="source"
-        position={Position.Right}
-        id="right"
-        style={{ opacity: 0 }}
+        position={Position.Left}
+        id="left-source"
+        style={{ opacity: 0, top: "50%" }}
       />
       <Handle
         type="target"
         position={Position.Left}
-        id="left"
-        style={{ opacity: 0 }}
+        id="left-target"
+        style={{ opacity: 0, top: "50%" }}
+      />
+
+      {/* Right side handles */}
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="right-source"
+        style={{ opacity: 0, top: "50%" }}
+      />
+      <Handle
+        type="target"
+        position={Position.Right}
+        id="right-target"
+        style={{ opacity: 0, top: "50%" }}
       />
 
       {/* Glow effect */}
@@ -234,6 +251,21 @@ const nodeTypes = {
 
 /* ---------------- MAIN ---------------- */
 
+/* ---------------- MAIN ---------------- */
+// Helper to calculate subtree width
+const getSubtreeWidth = (db: TreeData["tables"][0] | any) => {
+  // If it's a database, width is based on table count
+  if (db.tables) {
+    // Database width is max(db node width, sum of children widths)
+    // Let's approximate widths: DbNode ~ 300px, TableNode ~ 250px + gap
+    const tableWidth = 280;
+    const dbNodeWidth = 380; // Min space for db node
+    const childrenWidth = Math.max(db.tables.length * tableWidth, dbNodeWidth);
+    return childrenWidth;
+  }
+  return 280; // Table width
+};
+
 export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
   const router = useRouter();
 
@@ -241,33 +273,52 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
     const nodes: Node[] = [];
     const edges: Edge[] = [];
 
-    const width = 1400;
-    const dbSpacing = 380;
+    // Layout Configuration
     const tableSpacing = 280;
+    const verticalSpacingDb = 250;
+    const verticalSpacingTable = 550;
 
+    // 1. Calculate subtree widths for each database
+    const dbWidths = treeData.map((db) => {
+      const minWidth = 400; // Minimum width for a DB node area
+      const childrenWidth = db.tables.length * tableSpacing;
+      return Math.max(minWidth, childrenWidth);
+    });
+
+    const totalWidth = dbWidths.reduce((a, b) => a + b, 0);
+    const startX = -totalWidth / 2; // Center the whole graph
+
+    // 2. Place Root Node
     nodes.push({
       id: "root",
       type: "root",
-      position: { x: width / 2 - 150, y: 40 },
+      position: { x: 0, y: 0 }, // Center at 0,0
       data: { label: "All Databases", dbCount: treeData.length },
     });
 
+    // 3. Place Database Nodes & Tables
+    let currentX = startX;
+
     treeData.forEach((db, i) => {
-      const x =
-        width / 2 - ((treeData.length - 1) * dbSpacing) / 2 + i * dbSpacing;
+      const width = dbWidths[i];
+      // Center the DB node within its allocated width
+      const dbX = currentX + width / 2;
+      const dbY = verticalSpacingDb;
 
       const dbId = `db-${db.id}`;
 
       nodes.push({
         id: dbId,
         type: "database",
-        position: { x, y: 280 },
+        position: { x: dbX - 120, y: dbY }, // -120 to center the node visual (approx half width)
         data: {
           label: db.name,
           tableCount: db.tables.length,
           dbId: db.id,
         },
       });
+
+      // Edge from Root to DB
       edges.push({
         id: `root-${dbId}`,
         source: "root",
@@ -275,22 +326,26 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
         type: "smoothstep",
         animated: true,
         style: {
-          stroke: "url(#pink-gradient)",
+          stroke: "#ec4899",
           strokeWidth: 2.5,
           strokeDasharray: "8 4",
         },
+        zIndex: 1,
       });
 
-      db.tables.forEach((t, j) => {
-        const tx =
-          x - ((db.tables.length - 1) * tableSpacing) / 2 + j * tableSpacing;
+      // 4. Place Tables
+      const tablesStartX =
+        dbX - (db.tables.length * tableSpacing) / 2 + tableSpacing / 2;
 
+      db.tables.forEach((t, j) => {
+        const tableX = tablesStartX + j * tableSpacing;
+        const tableY = verticalSpacingTable;
         const tableId = `table-${t.id}`;
 
         nodes.push({
           id: tableId,
           type: "table",
-          position: { x: tx, y: 560 },
+          position: { x: tableX - 100, y: tableY }, // -100 to center visual
           data: {
             label: t.name,
             tableId: t.id,
@@ -299,6 +354,7 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
           },
         });
 
+        // Edge from DB to Table
         edges.push({
           id: `${dbId}-${tableId}`,
           source: dbId,
@@ -306,38 +362,80 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
           type: "smoothstep",
           animated: true,
           style: {
-            stroke: "url(#cyan-gradient)",
+            stroke: "#22d3ee",
             strokeWidth: 2,
             strokeDasharray: "6 3",
           },
+          zIndex: 1,
         });
+      });
 
-        // Add relationships
+      // Advance X cursor
+      currentX += width;
+    });
+
+    // 5. Add Relationships (Second pass to ensure all nodes exist)
+    treeData.forEach((db) => {
+      db.tables.forEach((t) => {
         if (t.schema) {
           t.schema.forEach((col) => {
             if (col.type === "relation" && col.relationTableId) {
+              const sourceId = `table-${t.id}`;
               const targetId = `table-${col.relationTableId}`;
-              // We only add edge if target exists in our graph (cross-db relations might be tricky if not loaded)
-              // But assume flat tree structure allows checking existence later or just adding edge
 
-              edges.push({
-                id: `${tableId}-${targetId}`,
-                source: tableId,
-                target: targetId,
-                sourceHandle: "right", // use side handles for relations
-                targetHandle: "left",
-                type: "default",
-                animated: true,
-                style: {
-                  stroke: "#a855f7", // purple for relations
-                  strokeWidth: 1.5,
-                },
-                label: col.key,
-                labelStyle: { fill: "#d8b4fe", fontWeight: 500, fontSize: 10 },
-                labelBgStyle: { fill: "#3b0764", fillOpacity: 0.7 },
-                labelBgPadding: [4, 2],
-                labelBgBorderRadius: 4,
-              });
+              // Check if target exists in our graph (simple check by finding in nodes array)
+              const targetNode = nodes.find((n) => n.id === targetId);
+              const sourceNode = nodes.find((n) => n.id === sourceId);
+
+              if (targetNode && sourceNode) {
+                // Smart handle detection
+                const sourceX = sourceNode.position.x;
+                const targetX = targetNode.position.x;
+
+                // Connect closest sides
+                let sourceHandle = "right-source";
+                let targetHandle = "left-target";
+
+                if (targetX < sourceX) {
+                  // Target is to the left
+                  sourceHandle = "left-source";
+                  targetHandle = "right-target";
+                }
+
+                edges.push({
+                  id: `${sourceId}-${targetId}`,
+                  source: sourceId,
+                  target: targetId,
+                  sourceHandle: sourceHandle,
+                  targetHandle: targetHandle,
+                  type: "smoothstep", // Circuit board style
+                  animated: true,
+                  style: {
+                    stroke: "#a855f7",
+                    strokeWidth: 2,
+                    zIndex: 100, // Ensure on top
+                  },
+                  label: col.key,
+                  labelStyle: {
+                    fill: "#e9d5ff",
+                    fontWeight: 600,
+                    fontSize: 11,
+                  },
+                  labelBgStyle: {
+                    fill: "#581c87",
+                    fillOpacity: 0.9,
+                    rx: 6,
+                    ry: 6,
+                  },
+                  labelBgPadding: [6, 4],
+                  markerEnd: {
+                    type: MarkerType.ArrowClosed,
+                    color: "#a855f7",
+                    width: 15,
+                    height: 15,
+                  },
+                });
+              }
             }
           });
         }
@@ -347,8 +445,14 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
     return { initialNodes: nodes, initialEdges: edges };
   }, [treeData]);
 
-  const [nodes, , onNodesChange] = useNodesState(initialNodes);
-  const [edges, , onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // Sync state with props
+  useEffect(() => {
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+  }, [initialNodes, initialEdges, setNodes, setEdges]);
 
   const onNodeClick = useCallback(
     (_: any, node: Node) => {
@@ -363,6 +467,14 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
     },
     [router]
   );
+
+  // Force edges to re-render after initialization
+  const onInit = useCallback((instance: ReactFlowInstance) => {
+    // Small delay to ensure nodes are measured
+    setTimeout(() => {
+      instance.fitView({ padding: 0.2 });
+    }, 100);
+  }, []);
 
   return (
     <div className="h-screen bg-neutral-950 relative overflow-hidden">
@@ -408,11 +520,17 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
         onEdgesChange={onEdgesChange}
         nodeTypes={nodeTypes}
         onNodeClick={onNodeClick}
+        onInit={onInit}
         fitView
+        fitViewOptions={{ padding: 0.2, duration: 0 }}
         minZoom={0.3}
         maxZoom={1.4}
         connectionMode={ConnectionMode.Loose}
         proOptions={{ hideAttribution: true }}
+        defaultEdgeOptions={{
+          animated: true,
+          style: { strokeWidth: 2 },
+        }}
       >
         <Background
           gap={32}

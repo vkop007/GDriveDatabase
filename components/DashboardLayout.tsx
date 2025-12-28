@@ -37,6 +37,12 @@ export default function DashboardLayoutWrapper({
     };
   }, []);
 
+  // Update CSS variable for sidebar width
+  useEffect(() => {
+    const offset = isCollapsed ? "5rem" : "17rem"; // 20 (5rem) vs 68 (17rem)
+    document.documentElement.style.setProperty("--sidebar-offset", offset);
+  }, [isCollapsed]);
+
   return (
     <main
       className={`flex-1 h-screen overflow-y-auto transition-all duration-300 ease-out ${
