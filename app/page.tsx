@@ -1,6 +1,7 @@
 import { authenticateWithGoogle } from "./actions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import LoginClient from "@/components/LoginClient";
 
 export default async function Home() {
   const cookieStore = await cookies();
@@ -9,85 +10,6 @@ export default async function Home() {
   if (token) {
     redirect("/dashboard");
   }
-  return (
-    <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background Gradients */}
-      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-purple-600/30 rounded-full blur-[120px]" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/30 rounded-full blur-[120px]" />
 
-      <div className="z-10 w-full max-w-md space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold tracking-tighter text-gradient-primary">
-            NoSQL Drive DB
-          </h1>
-          <p className="text-neutral-400">
-            Turn your Google Drive into a powerful NoSQL database.
-          </p>
-        </div>
-
-        <div className="card-glow p-8">
-          <form action={authenticateWithGoogle} className="space-y-6">
-            <div className="space-y-2">
-              <label
-                htmlFor="clientId"
-                className="text-sm font-medium text-neutral-300"
-              >
-                Client ID
-              </label>
-              <input
-                id="clientId"
-                name="clientId"
-                type="text"
-                required
-                placeholder="Enter your Google Client ID"
-                className="input"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label
-                htmlFor="clientSecret"
-                className="text-sm font-medium text-neutral-300"
-              >
-                Client Secret
-              </label>
-              <input
-                id="clientSecret"
-                name="clientSecret"
-                type="password"
-                required
-                placeholder="Enter your Google Client Secret"
-                className="input"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label
-                htmlFor="projectId"
-                className="text-sm font-medium text-neutral-300"
-              >
-                Project ID
-              </label>
-              <input
-                id="projectId"
-                name="projectId"
-                type="text"
-                required
-                placeholder="Enter your Google Project ID"
-                className="input"
-              />
-            </div>
-
-            <button type="submit" className="btn btn-primary w-full py-3">
-              Connect Google Drive
-            </button>
-          </form>
-        </div>
-
-        <p className="text-center text-xs text-neutral-500">
-          Your credentials are used locally to authenticate with Google.
-        </p>
-      </div>
-    </div>
-  );
+  return <LoginClient onSubmit={authenticateWithGoogle} />;
 }
