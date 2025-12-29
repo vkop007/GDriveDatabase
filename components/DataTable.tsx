@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { bulkDeleteDocuments, deleteDocument } from "../app/actions/table";
 import { TableFile, RowData } from "../types";
 import BulkActionBar from "./BulkActionBar";
@@ -8,8 +8,25 @@ import EditRowModal from "./EditRowModal";
 import { PaginationControls } from "./query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2, Database, Loader2, Shield } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Database,
+  Loader2,
+  Shield,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Search,
+  X,
+} from "lucide-react";
 import { useConfirm } from "../contexts/ConfirmContext";
+import {
+  formatRelativeTime,
+  formatFullDate,
+  compareValues,
+  filterBySearch,
+} from "../lib/utils";
 
 interface DataTableProps {
   table: TableFile;
@@ -23,6 +40,13 @@ interface DataTableProps {
   pageSize?: number;
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
+}
+
+type SortDirection = "asc" | "desc" | null;
+
+interface SortState {
+  column: string | null;
+  direction: SortDirection;
 }
 
 export default function DataTable({
@@ -44,7 +68,62 @@ export default function DataTable({
   const [editingDocument, setEditingDocument] = useState<RowData | null>(null);
   const confirm = useConfirm();
 
-  const allIds = table.documents.map((doc) => doc.$id);
+  // Sorting state
+  const [sortState, setSortState] = useState<SortState>({
+    column: null,
+    direction: null,
+  });
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Get visible columns with proper ordering: $id → user columns → $createdAt/$updatedAt
+  const visibleColumns = useMemo(
+    () =>
+      [...table.schema].sort((a, b) => {
+        if (a.key === "$id") return -1;
+        if (b.key === "$id") return 1;
+        const isATimestamp = a.key === "$createdAt" || a.key === "$updatedAt";
+        const isBTimestamp = b.key === "$createdAt" || b.key === "$updatedAt";
+        if (isATimestamp && !isBTimestamp) return 1;
+        if (!isATimestamp && isBTimestamp) return -1;
+        if (a.key === "$createdAt" && b.key === "$updatedAt") return -1;
+        if (a.key === "$updatedAt" && b.key === "$createdAt") return 1;
+        return 0;
+      }),
+    [table.schema]
+  );
+
+  // Filter and sort documents
+  const processedDocuments = useMemo(() => {
+    let docs = [...table.documents];
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      docs = filterBySearch(docs, searchQuery);
+    }
+
+    // Apply sorting
+    if (sortState.column && sortState.direction) {
+      const sortColumn = visibleColumns.find(
+        (col) => col.key === sortState.column
+      );
+      if (sortColumn) {
+        docs.sort((a, b) =>
+          compareValues(
+            a[sortState.column!],
+            b[sortState.column!],
+            sortColumn.type,
+            sortState.direction!
+          )
+        );
+      }
+    }
+
+    return docs;
+  }, [table.documents, searchQuery, sortState, visibleColumns]);
+
+  const allIds = processedDocuments.map((doc) => doc.$id);
   const allSelected =
     allIds.length > 0 && allIds.every((id) => selectedIds.has(id));
   const someSelected = allIds.some((id) => selectedIds.has(id));
@@ -70,6 +149,19 @@ export default function DataTable({
   const clearSelection = () => {
     setSelectedIds(new Set());
   };
+
+  // Handle column sort
+  const handleSort = useCallback((columnKey: string) => {
+    setSortState((prev) => {
+      if (prev.column !== columnKey) {
+        return { column: columnKey, direction: "asc" };
+      }
+      if (prev.direction === "asc") {
+        return { column: columnKey, direction: "desc" };
+      }
+      return { column: null, direction: null };
+    });
+  }, []);
 
   const handleBulkDelete = async () => {
     if (selectedIds.size === 0) return;
@@ -134,33 +226,86 @@ export default function DataTable({
     }
   };
 
-  // Get visible columns with proper ordering: $id → user columns → $createdAt/$updatedAt
-  const visibleColumns = [...table.schema].sort((a, b) => {
-    // $id always first
-    if (a.key === "$id") return -1;
-    if (b.key === "$id") return 1;
-    // $createdAt and $updatedAt always last (before Actions)
-    const isATimestamp = a.key === "$createdAt" || a.key === "$updatedAt";
-    const isBTimestamp = b.key === "$createdAt" || b.key === "$updatedAt";
-    if (isATimestamp && !isBTimestamp) return 1;
-    if (!isATimestamp && isBTimestamp) return -1;
-    // $updatedAt after $createdAt
-    if (a.key === "$createdAt" && b.key === "$updatedAt") return -1;
-    if (a.key === "$updatedAt" && b.key === "$createdAt") return 1;
-    // Keep original order for user columns
-    return 0;
-  });
+  // Render sort icon for column header
+  const renderSortIcon = (columnKey: string) => {
+    const isActive = sortState.column === columnKey;
+    const iconClass = `w-3.5 h-3.5 transition-all ${
+      isActive
+        ? "text-primary"
+        : "text-neutral-600 group-hover:text-neutral-400"
+    }`;
+
+    if (!isActive) {
+      return <ArrowUpDown className={iconClass} />;
+    }
+    if (sortState.direction === "asc") {
+      return <ArrowUp className={iconClass} />;
+    }
+    return <ArrowDown className={iconClass} />;
+  };
+
+  // Highlight search matches in text
+  const highlightText = (text: string) => {
+    if (!searchQuery.trim()) return text;
+    const query = searchQuery.toLowerCase();
+    const lowerText = text.toLowerCase();
+    const index = lowerText.indexOf(query);
+
+    if (index === -1) return text;
+
+    return (
+      <>
+        {text.slice(0, index)}
+        <mark className="bg-primary/30 text-white rounded px-0.5">
+          {text.slice(index, index + query.length)}
+        </mark>
+        {text.slice(index + query.length)}
+      </>
+    );
+  };
 
   return (
     <>
+      {/* Search Bar */}
+      <div className="mb-4">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search across all columns..."
+            className="w-full pl-10 pr-10 py-2.5 bg-neutral-900/80 border border-neutral-800 rounded-xl text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all text-sm"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-neutral-800 text-neutral-500 hover:text-white transition-colors"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+        {searchQuery && (
+          <p className="text-xs text-neutral-500 mt-2">
+            Found{" "}
+            <span className="text-primary font-medium">
+              {processedDocuments.length}
+            </span>{" "}
+            result{processedDocuments.length !== 1 ? "s" : ""} for &quot;
+            {searchQuery}&quot;
+          </p>
+        )}
+      </div>
+
       <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900/90 via-neutral-900 to-neutral-800/60 shadow-xl">
         {/* Subtle glow effect */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="border-b border-neutral-800 bg-neutral-900/80">
+            <thead className="sticky top-0 z-10">
+              <tr className="border-b border-neutral-800 bg-neutral-900/95 backdrop-blur-sm">
                 <th className="w-12 px-4 py-4">
                   <div className="flex items-center justify-center">
                     <input
@@ -179,15 +324,18 @@ export default function DataTable({
                 </th>
                 {visibleColumns.map((col) => (
                   <th key={col.key} className="px-6 py-4">
-                    <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleSort(col.key)}
+                      className="group flex items-center gap-2 hover:text-white transition-colors w-full"
+                    >
                       <span
                         className={`text-xs font-semibold uppercase tracking-wider ${
                           col.key.startsWith("$")
-                            ? "text-neutral-600"
-                            : "text-neutral-400"
+                            ? "text-neutral-600 group-hover:text-neutral-400"
+                            : "text-neutral-400 group-hover:text-white"
                         }`}
                       >
-                        {col.key}
+                        {col.key.replace(/^\$/, "")}
                       </span>
                       {!col.key.startsWith("$") && (
                         <>
@@ -206,7 +354,8 @@ export default function DataTable({
                           )}
                         </>
                       )}
-                    </div>
+                      {renderSortIcon(col.key)}
+                    </button>
                   </th>
                 ))}
                 <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">
@@ -215,7 +364,7 @@ export default function DataTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-800/50">
-              {table.documents.length === 0 ? (
+              {processedDocuments.length === 0 ? (
                 <tr>
                   <td
                     colSpan={visibleColumns.length + 2}
@@ -223,21 +372,27 @@ export default function DataTable({
                   >
                     <div className="flex flex-col items-center gap-4 py-4">
                       <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-neutral-800/80 to-neutral-800/30 flex items-center justify-center border border-neutral-700/50">
-                        <Database className="w-10 h-10 text-neutral-500" />
+                        {searchQuery ? (
+                          <Search className="w-10 h-10 text-neutral-500" />
+                        ) : (
+                          <Database className="w-10 h-10 text-neutral-500" />
+                        )}
                       </div>
                       <div className="text-center">
                         <p className="text-neutral-300 font-medium text-lg">
-                          No data yet
+                          {searchQuery ? "No results found" : "No data yet"}
                         </p>
                         <p className="text-sm text-neutral-500 mt-1 max-w-xs">
-                          Add your first row to get started with your table
+                          {searchQuery
+                            ? `No rows match "${searchQuery}"`
+                            : "Add your first row to get started with your table"}
                         </p>
                       </div>
                     </div>
                   </td>
                 </tr>
               ) : (
-                table.documents.map((doc, rowIndex) => {
+                processedDocuments.map((doc) => {
                   const isSelected = selectedIds.has(doc.$id);
                   return (
                     <tr
@@ -265,21 +420,55 @@ export default function DataTable({
                             ? JSON.stringify(value)
                             : String(value ?? "");
 
-                        // Style system fields differently
                         const isSystemField = col.key.startsWith("$");
                         const isId = col.key === "$id";
+                        const isTimestamp =
+                          col.key === "$createdAt" || col.key === "$updatedAt";
                         const isDate = col.type === "datetime";
                         const isRelation = col.type === "relation";
+                        const isBoolean = col.type === "boolean";
 
                         return (
                           <td key={col.key} className="px-6 py-4">
                             {isId ? (
-                              <code className="text-xs font-mono px-2 py-1 rounded bg-neutral-800/50 text-neutral-400 border border-neutral-700/50">
+                              <code
+                                onClick={() => {
+                                  navigator.clipboard.writeText(displayValue);
+                                  toast.success("ID copied to clipboard");
+                                }}
+                                className="text-xs font-mono px-2 py-1 rounded bg-neutral-800/50 text-neutral-400 border border-neutral-700/50 cursor-pointer hover:bg-neutral-700/50 hover:text-white transition-colors"
+                                title="Click to copy"
+                              >
                                 {displayValue.slice(0, 8)}...
                               </code>
+                            ) : isTimestamp ? (
+                              <span
+                                className="text-neutral-400 text-sm cursor-help"
+                                title={formatFullDate(displayValue)}
+                              >
+                                {formatRelativeTime(displayValue)}
+                              </span>
+                            ) : isBoolean ? (
+                              <span
+                                className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
+                                  value
+                                    ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                    : "bg-neutral-700/30 text-neutral-400 border border-neutral-600/20"
+                                }`}
+                              >
+                                <span
+                                  className={`w-1.5 h-1.5 rounded-full ${
+                                    value ? "bg-emerald-400" : "bg-neutral-500"
+                                  }`}
+                                />
+                                {value ? "true" : "false"}
+                              </span>
                             ) : isDate ? (
-                              <span className="text-neutral-400 text-sm">
-                                {new Date(displayValue).toLocaleString()}
+                              <span
+                                className="text-neutral-400 text-sm cursor-help"
+                                title={formatFullDate(displayValue)}
+                              >
+                                {formatRelativeTime(displayValue)}
                               </span>
                             ) : isRelation ? (
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
@@ -295,8 +484,6 @@ export default function DataTable({
                                   className="inline-flex items-center gap-2 text-primary hover:underline"
                                 >
                                   <div className="w-8 h-8 rounded bg-neutral-800 border border-neutral-700 flex items-center justify-center overflow-hidden">
-                                    {/* Try to show image thumbnail if possible, otherwise generic file icon */}
-                                    {/* Since we only store the link, we can't be sure it's an image without metadata, but we can try */}
                                     <img
                                       src={`/api/resources?id=${displayValue}`}
                                       alt="File"
@@ -349,7 +536,9 @@ export default function DataTable({
                                 } truncate block max-w-[200px]`}
                                 title={displayValue}
                               >
-                                {displayValue || (
+                                {displayValue ? (
+                                  highlightText(displayValue)
+                                ) : (
                                   <span className="text-neutral-600">—</span>
                                 )}
                               </span>
@@ -398,14 +587,19 @@ export default function DataTable({
             onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}
           />
-        ) : table.documents.length > 0 ? (
+        ) : processedDocuments.length > 0 ? (
           <div className="px-6 py-3 border-t border-neutral-800/50 bg-neutral-900/50">
             <p className="text-xs text-neutral-500">
               Showing{" "}
               <span className="text-neutral-400 font-medium">
-                {table.documents.length}
+                {processedDocuments.length}
               </span>{" "}
-              row{table.documents.length !== 1 ? "s" : ""}
+              row{processedDocuments.length !== 1 ? "s" : ""}
+              {searchQuery && (
+                <span className="text-primary ml-1">
+                  (filtered from {table.documents.length})
+                </span>
+              )}
               {selectedIds.size > 0 && (
                 <span className="ml-2 text-primary">
                   • {selectedIds.size} selected
