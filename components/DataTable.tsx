@@ -134,8 +134,22 @@ export default function DataTable({
     }
   };
 
-  // Get visible columns (non-system for better display)
-  const visibleColumns = table.schema;
+  // Get visible columns with proper ordering: $id → user columns → $createdAt/$updatedAt
+  const visibleColumns = [...table.schema].sort((a, b) => {
+    // $id always first
+    if (a.key === "$id") return -1;
+    if (b.key === "$id") return 1;
+    // $createdAt and $updatedAt always last (before Actions)
+    const isATimestamp = a.key === "$createdAt" || a.key === "$updatedAt";
+    const isBTimestamp = b.key === "$createdAt" || b.key === "$updatedAt";
+    if (isATimestamp && !isBTimestamp) return 1;
+    if (!isATimestamp && isBTimestamp) return -1;
+    // $updatedAt after $createdAt
+    if (a.key === "$createdAt" && b.key === "$updatedAt") return -1;
+    if (a.key === "$updatedAt" && b.key === "$createdAt") return 1;
+    // Keep original order for user columns
+    return 0;
+  });
 
   return (
     <>
