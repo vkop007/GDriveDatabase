@@ -90,13 +90,42 @@ export async function generateApiKey() {
 }
 
 export async function getApiKey() {
+  // First, try reading from local file
   try {
     const data = await fs.readFile(SECRETS_FILE, "utf-8");
     const secrets = JSON.parse(data);
-    return secrets.apiKey as string;
-  } catch (error) {
-    return null;
+    if (secrets.apiKey) {
+      return secrets.apiKey as string;
+    }
+  } catch {
+    // Local file doesn't exist or is invalid, continue to check Drive
   }
+
+  // If local file doesn't have apiKey, try to restore from Google Drive
+  try {
+    const { driveService } = await getAuth();
+    const systemFolderId = await getOrCreateSystemFolder();
+    const files = await operations.listOperations.listFilesInFolder(
+      systemFolderId
+    );
+    const configFile = files.data?.files?.find(
+      (f: any) => f.name === API_CONFIG_FILE && !f.trashed
+    );
+
+    if (configFile) {
+      const content = await driveService.selectJsonContent(configFile.id);
+      if (content?.apiKey) {
+        // Restore to local file for future reads
+        await fs.writeFile(SECRETS_FILE, JSON.stringify(content, null, 2));
+        console.log("[getApiKey] Restored API key from Google Drive");
+        return content.apiKey as string;
+      }
+    }
+  } catch (error) {
+    console.error("[getApiKey] Failed to fetch from Drive:", error);
+  }
+
+  return null;
 }
 
 export async function deleteApiKey() {
