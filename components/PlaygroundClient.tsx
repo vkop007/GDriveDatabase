@@ -23,15 +23,13 @@ const Editor = dynamic(() => import("@monaco-editor/react"), { ssr: false });
 const DEFAULT_CODE = `// GDatabase SDK Playground
 // The 'db' instance is already initialized for you!
 
-(async () => {
-  // Example: List all items from a table
-  const items = await db.database("YOUR_DATABASE_ID").table("YOUR_TABLE_ID").list();
-  console.log("Items:", items);
+// Example: List all items from a table
+const items = await db.database("YOUR_DATABASE_ID").table("YOUR_TABLE_ID").list();
+console.log("Items:", items);
 
-  // Example: Get table schema
-  // const schema = await db.database("YOUR_DATABASE_ID").table("YOUR_TABLE_ID").schema().get();
-  // console.log("Schema:", schema);
-})();
+// Example: Get table schema
+// const schema = await db.database("YOUR_DATABASE_ID").table("YOUR_TABLE_ID").schema().get();
+// console.log("Schema:", schema);
 `;
 
 // JSON syntax highlighting function
@@ -192,12 +190,20 @@ function highlightJSONString(json: string, startKey: number): React.ReactNode {
   return <>{parts}</>;
 }
 
+interface DatabaseTreeItem {
+  id: string;
+  name: string;
+  tables: { id: string; name: string; schema: any[] }[];
+}
+
 interface PlaygroundClientProps {
   initialApiKey: string;
+  databaseTree: DatabaseTreeItem[];
 }
 
 export default function PlaygroundClient({
   initialApiKey,
+  databaseTree,
 }: PlaygroundClientProps) {
   const [code, setCode] = useState(DEFAULT_CODE);
   const [apiKey, setApiKey] = useState(initialApiKey);
@@ -380,44 +386,181 @@ export default function PlaygroundClient({
                   }
                 );
 
+                // Generate dynamic type hints for databases and tables
+                const databaseHints =
+                  databaseTree
+                    .map((db) => `/** Database: ${db.name} */ "${db.id}"`)
+                    .join(" | ") || "string";
+
+                const tableHints =
+                  databaseTree
+                    .flatMap((db) =>
+                      db.tables.map(
+                        (t) =>
+                          `/** Table: ${t.name} (in ${db.name}) */ "${t.id}"`
+                      )
+                    )
+                    .join(" | ") || "string";
+
                 // Add type definitions for the playground environment
                 monaco.languages.typescript.typescriptDefaults.addExtraLib(
                   `
+                  /** Available Database IDs */
+                  type DatabaseId = ${databaseHints};
+                  
+                  /** Available Table IDs */
+                  type TableId = ${tableHints};
+
                   interface TableClient {
+                    /**
+                     * List all documents in the table
+                     * @returns Promise resolving to array of documents
+                     * @example
+                     * const items = await db.database("...").table("...").list();
+                     */
                     list(): Promise<any[]>;
+                    
+                    /**
+                     * Get a single document by ID
+                     * @param id - The document ID (e.g., "abc123...")
+                     * @returns Promise resolving to the document
+                     * @example
+                     * const item = await db.database("...").table("...").get("doc-id");
+                     */
                     get(id: string): Promise<any>;
+                    
+                    /**
+                     * Create a new document
+                     * @param data - Object containing field values
+                     * @returns Promise resolving to the created document
+                     * @example
+                     * const newItem = await db.database("...").table("...").create({ name: "John", age: 30 });
+                     */
                     create(data: Record<string, any>): Promise<any>;
+                    
+                    /**
+                     * Update an existing document
+                     * @param id - The document ID to update
+                     * @param data - Object containing fields to update
+                     * @returns Promise resolving to the updated document
+                     * @example
+                     * const updated = await db.database("...").table("...").update("doc-id", { name: "Jane" });
+                     */
                     update(id: string, data: Record<string, any>): Promise<any>;
+                    
+                    /**
+                     * Delete a document
+                     * @param id - The document ID to delete
+                     * @example
+                     * await db.database("...").table("...").delete("doc-id");
+                     */
                     delete(id: string): Promise<void>;
+                    
+                    /**
+                     * Access schema operations for this table
+                     * @returns SchemaClient for schema operations
+                     */
                     schema(): SchemaClient;
                   }
                   
                   interface SchemaClient {
+                    /**
+                     * Get the current table schema
+                     * @returns Promise resolving to schema definition
+                     * @example
+                     * const schema = await db.database("...").table("...").schema().get();
+                     */
                     get(): Promise<any>;
+                    
+                    /**
+                     * Update the table schema
+                     * @param schema - New schema definition
+                     * @returns Promise resolving to updated schema
+                     */
                     update(schema: any): Promise<any>;
                   }
                   
                   interface DatabaseClient {
-                    table(tableId: string): TableClient;
+                    /**
+                     * Access a table within this database
+                     * @param tableId - The table ID
+                     * @returns TableClient for table operations
+                     * @example
+                     * const table = db.database("db-id").table("table-id");
+                     */
+                    table(tableId: TableId): TableClient;
                   }
                   
                   interface BucketClient {
-                    upload(file: File): Promise<any>;
-                    list(): Promise<any[]>;
+                    /**
+                     * Upload a file to the bucket
+                     * @param file - File object to upload
+                     * @returns Promise resolving to upload result with file ID
+                     * @example
+                     * const result = await db.bucket().upload(file);
+                     */
+                    upload(file: File): Promise<{ id: string; name: string; url: string }>;
+                    
+                    /**
+                     * List all files in the bucket
+                     * @returns Promise resolving to array of file metadata
+                     * @example
+                     * const files = await db.bucket().list();
+                     */
+                    list(): Promise<Array<{ id: string; name: string; size: number }>>;
+                    
+                    /**
+                     * Delete a file from the bucket
+                     * @param fileId - The file ID to delete
+                     * @example
+                     * await db.bucket().delete("file-id");
+                     */
                     delete(fileId: string): Promise<void>;
                   }
                   
                   interface FunctionsClient {
+                    /**
+                     * Run a cloud function
+                     * @param functionId - The function ID to execute
+                     * @param params - Optional parameters to pass to the function
+                     * @returns Promise resolving to function result
+                     * @example
+                     * const result = await db.functions().run("my-function", { param1: "value" });
+                     */
                     run(functionId: string, params?: Record<string, any>): Promise<any>;
                   }
                   
                   interface GDatabase {
-                    database(databaseId: string): DatabaseClient;
+                    /**
+                     * Access a database by ID
+                     * @param databaseId - The database ID
+                     * @returns DatabaseClient for database operations
+                     * @example
+                     * const database = db.database("your-database-id");
+                     */
+                    database(databaseId: DatabaseId): DatabaseClient;
+                    
+                    /**
+                     * Access bucket storage operations
+                     * @returns BucketClient for file operations
+                     * @example
+                     * const bucket = db.bucket();
+                     */
                     bucket(): BucketClient;
+                    
+                    /**
+                     * Access cloud functions
+                     * @returns FunctionsClient for function operations
+                     * @example
+                     * const functions = db.functions();
+                     */
                     functions(): FunctionsClient;
                   }
                   
+                  /** The GDatabase SDK instance - already initialized with your API key */
                   declare const db: GDatabase;
+                  
+                  /** Console for logging output */
                   declare const console: Console;
                 `,
                   "ts:playground-globals.d.ts"
