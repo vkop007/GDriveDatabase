@@ -176,8 +176,33 @@ export async function getApiAuth(apiKey: string) {
     const { resetDriveService } = await import("gdrivekit");
     resetDriveService();
 
+    // Try to get fresh tokens from the user's active session (cookies)
+    // This ensures the API key works even after the original tokens expire
+    let tokensToUse = secrets.tokens;
+    try {
+      const cookieStore = await cookies();
+      const cookieTokensStr = cookieStore.get("gdrive_tokens")?.value;
+      if (cookieTokensStr) {
+        const cookieTokens = JSON.parse(cookieTokensStr);
+        // Update secrets with fresh tokens from cookies
+        if (cookieTokens.access_token) {
+          tokensToUse = cookieTokens;
+          // Sync the fresh tokens back to api-secrets.json
+          const updatedSecrets = { ...secrets, tokens: cookieTokens };
+          await fs.writeFile(
+            SECRETS_FILE,
+            JSON.stringify(updatedSecrets, null, 2)
+          );
+          console.log("[getApiAuth] Synced fresh tokens from session");
+        }
+      }
+    } catch (cookieError) {
+      // If we can't get cookies (e.g., external API call), use stored tokens
+      console.log("[getApiAuth] Using stored tokens (no active session)");
+    }
+
     // Check if tokens are present
-    if (!secrets.tokens) {
+    if (!tokensToUse) {
       console.error("[getApiAuth] No tokens in secrets");
       throw new Error("No tokens available");
     }
@@ -189,10 +214,10 @@ export async function getApiAuth(apiKey: string) {
         project_id: secrets.projectId,
         redirect_uris: ["http://localhost:3000/oauth2callback"],
       },
-      secrets.tokens
+      tokensToUse
     );
 
-    return { ...secrets, driveService };
+    return { ...secrets, tokens: tokensToUse, driveService };
   } catch (error) {
     console.error("[getApiAuth] Authentication failed with error:", error);
     throw new Error("API Authentication failed");
