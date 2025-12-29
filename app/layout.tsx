@@ -30,7 +30,23 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ConfirmProvider>{children}</ConfirmProvider>
-        <Toaster />
+        <Toaster
+          theme="dark"
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: "rgb(10 10 10)",
+              border: "1px solid transparent",
+              backgroundImage:
+                "linear-gradient(rgb(10 10 10), rgb(10 10 10)), linear-gradient(135deg, rgb(168 85 247), rgb(236 72 153))",
+              backgroundOrigin: "border-box",
+              backgroundClip: "padding-box, border-box",
+              color: "rgb(245 245 245)",
+              borderRadius: "12px",
+              fontSize: "13px",
+            },
+          }}
+        />
       </body>
     </html>
   );
