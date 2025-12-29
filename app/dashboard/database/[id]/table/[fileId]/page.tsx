@@ -5,7 +5,7 @@ import ColumnsView from "./columns";
 import DataView from "./data";
 import ApiAccess from "../../../../../../components/ApiAccess";
 import Link from "next/link";
-import { Database, ChevronRight, Table2, Layers, Settings } from "lucide-react";
+import { Database, ChevronRight, Table2, Layers } from "lucide-react";
 
 // Force dynamic rendering to ensure fresh data after edits
 // Force dynamic rendering removed to enable caching
@@ -148,17 +148,6 @@ export default async function TablePage({
             <Layers className="w-3.5 h-3.5" />
             Columns
           </Link>
-          <Link
-            href={`${tableUrl}?tab=settings`}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-              tab === "settings"
-                ? "bg-primary/10 text-primary border border-primary/20"
-                : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
-            }`}
-          >
-            <Settings className="w-3.5 h-3.5" />
-            Settings
-          </Link>
         </div>
 
         {/* Content */}
@@ -177,11 +166,6 @@ export default async function TablePage({
               fileId={fileId}
               databaseId={databaseId}
             />
-          )}
-          {tab === "settings" && (
-            <div className="p-8 text-center text-neutral-500 bg-neutral-900/50 rounded-xl border border-neutral-800">
-              Settings coming soon...
-            </div>
           )}
         </div>
       </div>

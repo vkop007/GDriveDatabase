@@ -131,7 +131,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
         }}
       >
         {/* Subtle gradient overlay */}
-        <div className="absolute inset-0 bg-linear-to-br from-primary/[0.02] via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-br from-primary/2 via-transparent to-transparent pointer-events-none" />
 
         {/* Header */}
         <div
