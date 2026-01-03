@@ -57,7 +57,7 @@ export async function saveUserProfile(tokens: any) {
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
@@ -111,7 +111,7 @@ async function _getUserProfile(auth: any) {
         client_id: auth.clientId,
         client_secret: auth.clientSecret,
         project_id: auth.projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       auth.tokens
     );

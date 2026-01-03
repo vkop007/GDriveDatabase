@@ -37,7 +37,7 @@ export default async function EditDocument({
       client_id: clientId,
       client_secret: clientSecret,
       project_id: projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
     tokens
   );

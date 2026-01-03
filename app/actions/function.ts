@@ -60,7 +60,7 @@ async function getOrCreateRegistry(): Promise<{
       client_id: clientId,
       client_secret: clientSecret,
       project_id: projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
     tokens
   );
@@ -87,7 +87,7 @@ async function saveRegistry(registryId: string, registry: FunctionsRegistry) {
       client_id: clientId,
       client_secret: clientSecret,
       project_id: projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
     tokens
   );
@@ -105,7 +105,7 @@ export async function listFunctions(): Promise<FunctionInfo[]> {
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
@@ -160,7 +160,7 @@ export async function createFunction(
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
@@ -468,7 +468,7 @@ export async function getFunction(id: string): Promise<FunctionInfo | null> {
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
@@ -495,7 +495,7 @@ export async function updateFunction(
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
@@ -736,7 +736,7 @@ export async function updateSchedule(
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
@@ -791,7 +791,7 @@ export async function enableAutoRun(id: string): Promise<{
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
@@ -900,7 +900,7 @@ export async function deleteFunction(
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
@@ -959,7 +959,7 @@ export async function runFunction(
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
@@ -1045,7 +1045,7 @@ export async function getFunctionLogs(
         client_id: clientId,
         client_secret: clientSecret,
         project_id: projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokens
     );
