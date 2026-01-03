@@ -16,7 +16,7 @@ async function _listBucketFiles(auth: any) {
         client_id: auth.clientId,
         client_secret: auth.clientSecret,
         project_id: auth.projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       auth.tokens
     );

@@ -35,7 +35,7 @@ export async function getAuth() {
       client_id: clientId,
       client_secret: clientSecret,
       project_id: projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
     tokens
   );
@@ -212,7 +212,7 @@ export async function getApiAuth(apiKey: string) {
         client_id: secrets.clientId,
         client_secret: secrets.clientSecret,
         project_id: secrets.projectId,
-        redirect_uris: ["http://localhost:3000/oauth2callback"],
+        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
       },
       tokensToUse
     );
@@ -247,7 +247,7 @@ export async function authenticateWithGoogle(formData: FormData) {
       "email",
       "profile",
     ];
-    const redirectUri = "http://localhost:3000/oauth2callback";
+    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`;
 
     const params = new URLSearchParams({
       client_id: clientId,
@@ -304,7 +304,7 @@ async function _listDatabases(auth: any) {
       client_id: auth.clientId,
       client_secret: auth.clientSecret,
       project_id: auth.projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
     auth.tokens
   );
@@ -381,7 +381,7 @@ async function _listCollections(databaseId: string, auth: any) {
       client_id: auth.clientId,
       client_secret: auth.clientSecret,
       project_id: auth.projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
     auth.tokens
   );
@@ -418,7 +418,7 @@ export const getDatabaseTree = async () => {
       client_id: auth.clientId,
       client_secret: auth.clientSecret,
       project_id: auth.projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
     auth.tokens
   );
@@ -560,7 +560,7 @@ export async function saveDocument(formData: FormData) {
       client_id: clientId,
       client_secret: clientSecret,
       project_id: projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
     tokens
   );

@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
         code,
         client_id: clientId,
         client_secret: clientSecret,
-        redirect_uri: "http://localhost:3000/oauth2callback",
+        redirect_uri: `${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`,
         grant_type: "authorization_code",
       }),
     });

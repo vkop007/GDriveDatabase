@@ -20,7 +20,7 @@ export async function getAuth() {
       client_id: clientId,
       client_secret: clientSecret,
       project_id: projectId,
-      redirect_uris: ["http://localhost:3000/oauth2callback"],
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
     tokens
   );
@@ -42,7 +42,7 @@ export async function authenticateWithGoogle(formData: FormData) {
     // Construct Auth URL manually to avoid gdrivekit's CLI-centric behavior
     const scope =
       "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/script.projects email profile";
-    const redirectUri = "http://localhost:3000/oauth2callback";
+    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`;
 
     const params = new URLSearchParams({
       client_id: clientId,
