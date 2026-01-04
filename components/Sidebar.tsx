@@ -18,6 +18,7 @@ import {
   Gamepad2,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import RenameModal from "./RenameModal";
@@ -142,12 +143,14 @@ export default function Sidebar({ treeData }: SidebarProps) {
           {/* Header glow */}
           <div className="absolute top-0 left-0 right-0 h-24 bg-linear-to-b from-primary/5 to-transparent pointer-events-none" />
 
-          <div className="relative group">
-            <div className="absolute -inset-1 bg-linear-to-br from-primary-from to-primary-to rounded-xl blur-lg opacity-40 group-hover:opacity-60 transition-opacity duration-300" />
-            <div className="relative w-10 h-10 rounded-xl bg-linear-to-br from-primary-from via-primary to-primary-to flex items-center justify-center shadow-lg shadow-primary/20">
-              <div className="absolute inset-0 rounded-xl bg-linear-to-t from-black/20 to-transparent" />
-              <Database className="relative w-4.5 h-4.5 text-white drop-shadow-sm" />
-            </div>
+          <div className="relative">
+            <Image
+              src="/logo.png"
+              alt="GDrive DB Logo"
+              width={40}
+              height={40}
+              className="rounded-xl"
+            />
           </div>
           {!isCollapsed && (
             <h1 className="relative text-lg font-bold text-white tracking-tight">

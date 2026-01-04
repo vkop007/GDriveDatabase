@@ -7,7 +7,6 @@ import {
   KeyRound,
   ExternalLink,
   ArrowRight,
-  Database,
   CheckCircle2,
   AlertCircle,
   Cloud,
@@ -15,6 +14,7 @@ import {
   Shield,
   Download,
 } from "lucide-react";
+import Image from "next/image";
 
 interface LoginClientProps {
   onSubmit: (formData: FormData) => void;
@@ -164,9 +164,13 @@ export default function LoginClient({ onSubmit }: LoginClientProps) {
           {/* Header */}
           <div className="mb-16">
             <div className="flex items-center gap-4 mb-8">
-              <div className="p-3.5 rounded-2xl bg-linear-to-br from-primary/30 to-purple-600/30 border border-primary/40 shadow-lg shadow-primary/20">
-                <Database className="w-9 h-9 text-primary" />
-              </div>
+              <Image
+                src="/logo.png"
+                alt="GDrive DB Logo"
+                width={56}
+                height={56}
+                className="rounded-2xl"
+              />
               <h1 className="text-4xl xl:text-5xl font-bold bg-linear-to-r from-white via-white to-neutral-400 bg-clip-text text-transparent">
                 GDrive DB
               </h1>
@@ -234,9 +238,13 @@ export default function LoginClient({ onSubmit }: LoginClientProps) {
           {/* Mobile Header */}
           <div className="lg:hidden text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="p-3 rounded-2xl bg-linear-to-br from-primary/30 to-purple-600/30 border border-primary/40">
-                <Database className="w-7 h-7 text-primary" />
-              </div>
+              <Image
+                src="/logo.png"
+                alt="GDrive DB Logo"
+                width={44}
+                height={44}
+                className="rounded-2xl"
+              />
               <h1 className="text-3xl font-bold">GDrive DB</h1>
             </div>
             <p className="text-neutral-400">
