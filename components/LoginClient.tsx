@@ -239,7 +239,7 @@ export default function LoginClient({ onSubmit }: LoginClientProps) {
           <div className="lg:hidden text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-6">
               <Image
-                src="/logo.png"
+                src="/logowhite.png"
                 alt="GDrive DB Logo"
                 width={44}
                 height={44}
