@@ -80,7 +80,11 @@ export default function ResourceCard({
           <span
             className={`text-[10px] font-medium text-neutral-500 bg-neutral-900/50 border border-white/5 px-2 py-1 rounded-full ${theme.badgeBorderHover} transition-colors`}
           >
-            {new Date(createdTime).toLocaleDateString()}
+            {new Date(createdTime).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "numeric",
+            })}
           </span>
         </div>
 
