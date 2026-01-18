@@ -7,8 +7,8 @@
       "dependencies": {
         "@monaco-editor/react": "^4.7.0",
         "@xyflow/react": "^12.10.0",
-        "gdatabase": "^1.1.5",
-        "gdrivekit": "^3.0.0",
+        "gdatabase": "^2.1.0",
+        "gdrivekit": "^3.2.0",
         "lucide-react": "^0.555.0",
         "next": "16.0.6",
         "react": "19.2.0",
@@ -595,9 +595,9 @@
 
     "functions-have-names": ["functions-have-names@1.2.3", "", {}, ""],
 
-    "gdatabase": ["gdatabase@1.1.5", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-KUEpMfcXpJ4GPqlMHv9DtaEmHLwI216GKZLgyop24r18627ca+WymM2k2Y/kTC0rDW4MEJwfS8aLjRckqt3moA=="],
+    "gdatabase": ["gdatabase@2.1.0", "", { "peerDependencies": { "typescript": "^5.0.0" } }, "sha512-bbGNurb0mqNO1K1S3ssyBOjuSSFNS9ARyb2VS/zMxXlQPZMiUt0vH85/m5Mil/GgxxuOCGJMe0Zwq06ggQOItQ=="],
 
-    "gdrivekit": ["gdrivekit@3.0.0", "", { "dependencies": { "archiver": "^7.0.1", "archiver-zip-encrypted": "^2.0.0", "core-util-is": "^1.0.3", "crypto": "^1.0.1", "update-notifier": "^7.3.1" } }, "sha512-gjA6ZzzTYUuMZoN73aqfH2aiGKjpLk4DR2yB8v9fw2+I1hDicCALYUjmfiNu9cXrbKsIxBu78ETQ10oAYKzaaw=="],
+    "gdrivekit": ["gdrivekit@3.2.0", "", { "dependencies": { "archiver": "^7.0.1", "archiver-zip-encrypted": "^2.0.0", "core-util-is": "^1.0.3", "crypto": "^1.0.1", "update-notifier": "^7.3.1" } }, "sha512-1IdVBSy5WXFPOE6i4R9rPE7xxYxGwftlxFEP+acv7rnL3f064bwUS26SsnIN8HsKzCnUbL+1PG/sl2cghX+VaQ=="],
 
     "generator-function": ["generator-function@2.0.1", "", {}, ""],
 
