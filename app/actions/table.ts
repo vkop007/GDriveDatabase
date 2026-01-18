@@ -13,20 +13,16 @@ import {
   ValidationError,
 } from "../../types";
 
-// Re-export ColumnDefinition for backward compatibility
-export type { ColumnDefinition };
-
 export async function listCollections(databaseId: string) {
   try {
     await getAuth();
     console.log(`Listing collections in ${databaseId}...`);
-    const response = await operations.listOperations.listFilesInFolder(
-      databaseId
-    );
+    const response =
+      await operations.listOperations.listFilesInFolder(databaseId);
     console.log("List response count:", response.data?.files?.length);
     // Filter for JSON files just in case, though listFilesInFolder might return all types
     return (response.data?.files || []).filter(
-      (f: any) => f.mimeType === "application/json"
+      (f: any) => f.mimeType === "application/json",
     );
   } catch (error) {
     console.error("Error listing collections:", error);
@@ -38,12 +34,12 @@ export async function listCollections(databaseId: string) {
 async function getFreshTableData(fileId: string): Promise<TableFile> {
   const response = await fetchWithAuth(
     `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-    { cache: "no-store", next: { revalidate: 0 } }
+    { cache: "no-store", next: { revalidate: 0 } },
   );
 
   if (!response.ok) {
     throw new Error(
-      `Failed to fetch table data: ${response.status} ${response.statusText}`
+      `Failed to fetch table data: ${response.status} ${response.statusText}`,
     );
   }
 
@@ -100,13 +96,13 @@ export async function createTable(formData: FormData) {
 export async function getTableData(fileId: string) {
   const response = await fetchWithAuth(
     `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`,
-    { next: { tags: [`table-data-${fileId}`] } }
+    { next: { tags: [`table-data-${fileId}`] } },
   );
 
   if (!response.ok) {
     if (response.status === 404) return null;
     throw new Error(
-      `Failed to fetch table data: ${response.status} ${response.statusText}`
+      `Failed to fetch table data: ${response.status} ${response.statusText}`,
     );
   }
 
@@ -242,7 +238,7 @@ export async function updateTableSchema(formData: FormData) {
         databaseId,
         fileId,
         key,
-        table.documents
+        table.documents,
       );
 
       // Update schema with the new indexFileId
@@ -297,7 +293,7 @@ export async function deleteColumn(formData: FormData) {
         fileId,
         columnKey,
         undefined,
-        column?.indexFileId
+        column?.indexFileId,
       );
     }
   } catch (e) {
@@ -363,7 +359,7 @@ export async function addDocument(formData: FormData): Promise<{
         val,
         undefined,
         undefined,
-        col.indexFileId
+        col.indexFileId,
       );
       if (!check.safe) {
         return {
@@ -398,7 +394,7 @@ export async function addDocument(formData: FormData): Promise<{
           val, // new value
           newDoc.$id,
           undefined,
-          col.indexFileId
+          col.indexFileId,
         );
 
         if (newIndexFileId && newIndexFileId !== col.indexFileId) {
@@ -447,7 +443,7 @@ export async function updateDocument(formData: FormData): Promise<{
     console.log(
       "[updateDocument] Got table with",
       table.documents.length,
-      "documents"
+      "documents",
     );
 
     // Find document index FIRST
@@ -492,7 +488,7 @@ export async function updateDocument(formData: FormData): Promise<{
             val,
             docId, // Exclude self
             undefined,
-            col.indexFileId
+            col.indexFileId,
           );
           if (!check.safe) {
             return {
@@ -543,7 +539,7 @@ export async function updateDocument(formData: FormData): Promise<{
             newVal,
             docId,
             undefined,
-            col.indexFileId
+            col.indexFileId,
           );
           if (newIndexFileId && newIndexFileId !== col.indexFileId) {
             col.indexFileId = newIndexFileId;
@@ -621,7 +617,7 @@ async function saveTableContent(fileId: string, content: TableFile) {
       project_id: projectId,
       redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
-    tokens
+    tokens,
   );
 
   const result = await driveService.updateJsonContent(fileId, content);
@@ -673,16 +669,16 @@ export async function getParentId(fileId: string) {
   // gdrivekit doesn't seem to expose a direct "getFileAttributes" or "getParents" helper easily accessible here.
   // Falling back to fetchWithAuth which works reliably.
   const response = await fetchWithAuth(
-    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`
+    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=parents`,
   );
 
   if (!response.ok) {
     const errorText = await response.text();
     console.error(
-      `Failed to fetch file parents. Status: ${response.status}, Text: ${errorText}`
+      `Failed to fetch file parents. Status: ${response.status}, Text: ${errorText}`,
     );
     throw new Error(
-      `Failed to fetch file parents: ${response.status} ${response.statusText}`
+      `Failed to fetch file parents: ${response.status} ${response.statusText}`,
     );
   }
 
@@ -691,7 +687,7 @@ export async function getParentId(fileId: string) {
 }
 
 export async function getParentInfo(
-  fileId: string
+  fileId: string,
 ): Promise<{ id: string; name: string } | null> {
   try {
     // First get the parent ID
@@ -700,7 +696,7 @@ export async function getParentInfo(
 
     // Then get the parent folder's name
     const response = await fetchWithAuth(
-      `https://www.googleapis.com/drive/v3/files/${parentId}?fields=id,name`
+      `https://www.googleapis.com/drive/v3/files/${parentId}?fields=id,name`,
     );
 
     if (!response.ok) {
@@ -731,7 +727,7 @@ export async function getSimpleTableData(tableId: string) {
     const labelField =
       table.schema.find(
         (c) =>
-          c.type === "string" && !c.key.startsWith("$") && c.key !== "password"
+          c.type === "string" && !c.key.startsWith("$") && c.key !== "password",
       )?.key || "$id";
 
     console.log("Using label field:", labelField);
