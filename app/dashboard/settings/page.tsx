@@ -1,5 +1,7 @@
 import { getApiKey } from "../../actions";
 import { getUserProfile } from "../../actions/user";
+
+export const dynamic = "force-dynamic";
 import ApiSettings from "../../../components/settings/ApiSettings";
 import UserProfile from "../../../components/settings/UserProfile";
 import BackupSettings from "../../../components/settings/BackupSettings";
