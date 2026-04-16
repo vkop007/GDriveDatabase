@@ -8,7 +8,11 @@ import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import GradientButton from "./GradientButton";
 
-export default function CreateDatabaseModal() {
+export default function CreateDatabaseModal({
+  triggerClassName,
+}: {
+  triggerClassName?: string;
+} = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -46,6 +50,7 @@ export default function CreateDatabaseModal() {
       <GradientButton
         onClick={() => setIsOpen(true)}
         icon={<Plus className="w-4 h-4" />}
+        className={triggerClassName}
       >
         Create Database
       </GradientButton>

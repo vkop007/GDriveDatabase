@@ -16,12 +16,14 @@ import {
   Network,
   FunctionSquare,
   Gamepad2,
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import RenameModal from "./RenameModal";
+import CreateDatabaseModal from "./CreateDatabaseModal";
 
 interface SidebarProps {
   treeData: {
@@ -165,7 +167,7 @@ export default function Sidebar({ treeData }: SidebarProps) {
             isCollapsed ? "p-2" : "p-3"
           } space-y-1 scrollbar-thin scrollbar-thumb-neutral-700/50 scrollbar-track-transparent`}
         >
-          {/* Home */}
+          {/* NAVIGATION SECTION */}
           <Link
             href="/dashboard"
             className={`group flex items-center ${
@@ -186,6 +188,195 @@ export default function Sidebar({ treeData }: SidebarProps) {
             />
             {!isCollapsed && "Home"}
           </Link>
+
+          {/* DATA MANAGEMENT SECTION */}
+          {!isCollapsed && (
+            <div className="pt-4 pb-3 px-1 flex items-center justify-between">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="h-px flex-1 bg-linear-to-r from-neutral-700/60 via-neutral-600/30 to-transparent" />
+                <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-[0.15em] whitespace-nowrap px-1">
+                  Databases
+                </span>
+                <div className="h-px flex-1 bg-linear-to-l from-neutral-700/60 via-neutral-600/30 to-transparent" />
+              </div>
+              {treeData.length > 0 && (
+                <span className="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-semibold ml-1">
+                  {treeData.length}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Database Tree */}
+          <div className="space-y-0.5">
+            {treeData.length === 0 ? (
+              // Empty State
+              !isCollapsed && (
+                <div className="py-6 px-4 text-center">
+                  <div className="flex justify-center mb-3">
+                    <Folder className="w-8 h-8 text-neutral-600" />
+                  </div>
+                  <p className="text-xs text-neutral-500">
+                    No databases yet
+                  </p>
+                </div>
+              )
+            ) : (
+              treeData.map((db) => {
+                const isExpanded = expandedDbs.has(db.id);
+                const isExactDb = pathname === `/dashboard/database/${db.id}`;
+
+                if (isCollapsed) {
+                  return (
+                    <button
+                      key={db.id}
+                      onClick={() => handleDatabaseClick(db.id)}
+                      className={`w-full flex items-center justify-center p-2.5 rounded-xl text-sm transition-all duration-200 ${
+                        isExactDb
+                          ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25"
+                          : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
+                      }`}
+                      title={db.name}
+                    >
+                      <Folder className="w-4 h-4" />
+                    </button>
+                  );
+                }
+
+                return (
+                  <div key={db.id} className="select-none">
+                    <div
+                      className={`group flex items-center gap-1 px-2 py-2 rounded-xl text-sm transition-all duration-200 cursor-pointer ${
+                        isExactDb
+                          ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-white border border-primary/25 shadow-lg shadow-primary/10"
+                          : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
+                      }`}
+                      onClick={() => handleDatabaseClick(db.id)}
+                    >
+                      <button
+                        onClick={(e) => toggleDb(e, db.id)}
+                        className="p-1 rounded-lg hover:bg-white/10 text-neutral-500 hover:text-white transition-all duration-150"
+                      >
+                        {isExpanded ? (
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        ) : (
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        {isExpanded ? (
+                          <FolderOpen
+                            className={`w-4 h-4 transition-all duration-200 ${
+                              isExactDb
+                                ? "text-primary"
+                                : "text-neutral-500 group-hover:text-primary"
+                            }`}
+                          />
+                        ) : (
+                          <Folder
+                            className={`w-4 h-4 transition-all duration-200 ${
+                              isExactDb
+                                ? "text-primary"
+                                : "text-neutral-500 group-hover:text-primary"
+                            }`}
+                          />
+                        )}
+                        <span className="truncate font-medium">{db.name}</span>
+                      </div>
+
+                      <button
+                        onClick={(e) =>
+                          handleRename(e, {
+                            id: db.id,
+                            name: db.name,
+                            type: "database",
+                          })
+                        }
+                        className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-neutral-500 hover:text-white hover:bg-white/10 transition-all duration-150"
+                        title="Rename Database"
+                      >
+                        <Pencil className="w-3 h-3" />
+                      </button>
+                    </div>
+
+                    {/* Animated tables container using CSS Grid for smooth animation */}
+                    <div
+                      className="grid transition-[grid-template-rows] duration-300 ease-out"
+                      style={{
+                        gridTemplateRows:
+                          isExpanded && !isCollapsed ? "1fr" : "0fr",
+                      }}
+                    >
+                      <div className="overflow-hidden">
+                        {db.tables.length > 0 && (
+                          <div className="ml-4 pl-3 border-l border-neutral-700/40 mt-1 space-y-0.5">
+                            {db.tables.map((table) => {
+                              const isTableActive =
+                                pathname ===
+                                `/dashboard/database/${db.id}/table/${table.id}`;
+                              return (
+                                <Link
+                                  key={table.id}
+                                  href={`/dashboard/database/${db.id}/table/${table.id}`}
+                                  className={`group flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all duration-200 ${
+                                    isTableActive
+                                      ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25"
+                                      : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
+                                  }`}
+                                >
+                                  <FileJson
+                                    className={`w-3.5 h-3.5 transition-all duration-200 ${
+                                      isTableActive
+                                        ? "text-primary"
+                                        : "text-neutral-500 group-hover:text-primary"
+                                    }`}
+                                  />
+                                  <span className="truncate flex-1">
+                                    {table.name}
+                                  </span>
+                                  <button
+                                    onClick={(e) =>
+                                      handleRename(e, {
+                                        id: table.id,
+                                        name: table.name,
+                                        type: "collection",
+                                        parentId: db.id,
+                                      })
+                                    }
+                                    className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-white transition-all duration-150"
+                                    title="Rename Collection"
+                                  >
+                                    <Pencil className="w-3 h-3" />
+                                  </button>
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+            {!isCollapsed && treeData.length > 0 && (
+              <CreateDatabaseModal triggerClassName="mt-2 w-full justify-center bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white border border-neutral-700/40 hover:border-neutral-600/60" />
+            )}
+          </div>
+
+          {/* TOOLS SECTION */}
+          {!isCollapsed && (
+            <div className="pt-4 pb-2 px-1">
+              <div className="flex items-center gap-3">
+                <div className="h-px flex-1 bg-linear-to-r from-neutral-700/60 via-neutral-600/30 to-transparent" />
+                <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-[0.15em]">
+                  Tools
+                </span>
+                <div className="h-px flex-1 bg-linear-to-l from-neutral-700/60 via-neutral-600/30 to-transparent" />
+              </div>
+            </div>
+          )}
 
           {/* API Docs */}
           <Link
@@ -274,162 +465,10 @@ export default function Sidebar({ treeData }: SidebarProps) {
             />
             {!isCollapsed && "Playground"}
           </Link>
+
+          {/* STORAGE SECTION */}
           {!isCollapsed && (
-            <div className="pt-6 pb-2 px-1">
-              <div className="flex items-center gap-3">
-                <div className="h-px flex-1 bg-linear-to-r from-neutral-700/60 via-neutral-600/30 to-transparent" />
-                <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-[0.15em]">
-                  Explorer
-                </span>
-                <div className="h-px flex-1 bg-linear-to-l from-neutral-700/60 via-neutral-600/30 to-transparent" />
-              </div>
-            </div>
-          )}
-
-          {/* Database Tree */}
-          <div className="space-y-0.5">
-            {treeData.map((db) => {
-              const isExpanded = expandedDbs.has(db.id);
-              const isExactDb = pathname === `/dashboard/database/${db.id}`;
-
-              if (isCollapsed) {
-                return (
-                  <button
-                    key={db.id}
-                    onClick={() => handleDatabaseClick(db.id)}
-                    className={`w-full flex items-center justify-center p-2.5 rounded-xl text-sm transition-all duration-200 ${
-                      isExactDb
-                        ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25"
-                        : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
-                    }`}
-                    title={db.name}
-                  >
-                    <Folder className="w-4 h-4" />
-                  </button>
-                );
-              }
-
-              return (
-                <div key={db.id} className="select-none">
-                  <div
-                    className={`group flex items-center gap-1 px-2 py-2 rounded-xl text-sm transition-all duration-200 cursor-pointer ${
-                      isExactDb
-                        ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-white border border-primary/25 shadow-lg shadow-primary/10"
-                        : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
-                    }`}
-                    onClick={() => handleDatabaseClick(db.id)}
-                  >
-                    <button
-                      onClick={(e) => toggleDb(e, db.id)}
-                      className="p-1 rounded-lg hover:bg-white/10 text-neutral-500 hover:text-white transition-all duration-150"
-                    >
-                      {isExpanded ? (
-                        <ChevronDown className="w-3.5 h-3.5" />
-                      ) : (
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-
-                    <div className="flex items-center gap-2 min-w-0 flex-1">
-                      {isExpanded ? (
-                        <FolderOpen
-                          className={`w-4 h-4 transition-all duration-200 ${
-                            isExactDb
-                              ? "text-primary"
-                              : "text-neutral-500 group-hover:text-primary"
-                          }`}
-                        />
-                      ) : (
-                        <Folder
-                          className={`w-4 h-4 transition-all duration-200 ${
-                            isExactDb
-                              ? "text-primary"
-                              : "text-neutral-500 group-hover:text-primary"
-                          }`}
-                        />
-                      )}
-                      <span className="truncate font-medium">{db.name}</span>
-                    </div>
-
-                    <button
-                      onClick={(e) =>
-                        handleRename(e, {
-                          id: db.id,
-                          name: db.name,
-                          type: "database",
-                        })
-                      }
-                      className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-neutral-500 hover:text-white hover:bg-white/10 transition-all duration-150"
-                      title="Rename Database"
-                    >
-                      <Pencil className="w-3 h-3" />
-                    </button>
-                  </div>
-
-                  {/* Animated tables container using CSS Grid for smooth animation */}
-                  <div
-                    className="grid transition-[grid-template-rows] duration-300 ease-out"
-                    style={{
-                      gridTemplateRows:
-                        isExpanded && !isCollapsed ? "1fr" : "0fr",
-                    }}
-                  >
-                    <div className="overflow-hidden">
-                      {db.tables.length > 0 && (
-                        <div className="ml-4 pl-3 border-l border-neutral-700/40 mt-1 space-y-0.5">
-                          {db.tables.map((table) => {
-                            const isTableActive =
-                              pathname ===
-                              `/dashboard/database/${db.id}/table/${table.id}`;
-                            return (
-                              <Link
-                                key={table.id}
-                                href={`/dashboard/database/${db.id}/table/${table.id}`}
-                                className={`group flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all duration-200 ${
-                                  isTableActive
-                                    ? "bg-linear-to-r from-primary-from/15 to-primary-to/10 text-primary border border-primary/25"
-                                    : "text-neutral-400 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5"
-                                }`}
-                              >
-                                <FileJson
-                                  className={`w-3.5 h-3.5 transition-all duration-200 ${
-                                    isTableActive
-                                      ? "text-primary"
-                                      : "text-neutral-500 group-hover:text-primary"
-                                  }`}
-                                />
-                                <span className="truncate flex-1">
-                                  {table.name}
-                                </span>
-                                <button
-                                  onClick={(e) =>
-                                    handleRename(e, {
-                                      id: table.id,
-                                      name: table.name,
-                                      type: "collection",
-                                      parentId: db.id,
-                                    })
-                                  }
-                                  className="opacity-0 group-hover:opacity-100 p-1 text-neutral-500 hover:text-white transition-all duration-150"
-                                  title="Rename Collection"
-                                >
-                                  <Pencil className="w-3 h-3" />
-                                </button>
-                              </Link>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Storage Section */}
-          {!isCollapsed && (
-            <div className="pt-6 pb-2 px-1">
+            <div className="pt-4 pb-3 px-1">
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-linear-to-r from-neutral-700/60 via-neutral-600/30 to-transparent" />
                 <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-[0.15em]">
@@ -460,9 +499,9 @@ export default function Sidebar({ treeData }: SidebarProps) {
             {!isCollapsed && "Bucket"}
           </Link>
 
-          {/* System Section */}
+          {/* SYSTEM SECTION */}
           {!isCollapsed && (
-            <div className="pt-6 pb-2 px-1">
+            <div className="pt-4 pb-3 px-1">
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-linear-to-r from-neutral-700/60 via-neutral-600/30 to-transparent" />
                 <span className="text-[10px] font-semibold text-neutral-500 uppercase tracking-[0.15em]">
@@ -558,16 +597,42 @@ export default function Sidebar({ treeData }: SidebarProps) {
         </div>
 
         {/* Collapse Toggle Button - Centered on right edge */}
+        <style>{`
+          .sidebar-toggle-icon {
+            transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+          }
+          .sidebar-toggle-icon.rotate {
+            transform: rotate(180deg);
+          }
+        `}</style>
         <button
           onClick={toggleCollapse}
-          className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 w-7 h-14 items-center justify-center bg-neutral-900/95 backdrop-blur-md border border-neutral-700/50 rounded-r-xl hover:bg-neutral-800 hover:border-primary/40 transition-all duration-200 group shadow-xl shadow-black/30 z-50"
+          className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 w-8 h-16 items-center justify-center backdrop-blur-xl rounded-r-2xl transition-all duration-300 group z-50 hover:scale-125 active:scale-95"
           title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {isCollapsed ? (
-            <PanelLeft className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors duration-200" />
-          ) : (
-            <PanelLeftClose className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors duration-200" />
-          )}
+          <div className="relative flex items-center justify-center">
+            {/* Multiple glow layers */}
+            <div className="absolute inset-0 bg-primary rounded-lg blur-xl opacity-0 group-hover:opacity-30 transition-all duration-300" />
+            <div className="absolute inset-1 bg-primary-from rounded-lg blur-md opacity-0 group-hover:opacity-20 transition-all duration-300" />
+            
+            {/* Icon with enhanced effects */}
+            <div
+              className={`sidebar-toggle-icon relative text-neutral-400 group-hover:text-primary transition-all duration-400 drop-shadow-[0_0_8px_rgba(236,72,153,0)] group-hover:drop-shadow-[0_0_16px_rgba(236,72,153,0.8)] ${
+                !isCollapsed ? "rotate" : ""
+              }`}
+            >
+              {isCollapsed ? (
+                <PanelLeft className="w-4 h-4" />
+              ) : (
+                <PanelLeftClose className="w-4 h-4" />
+              )}
+            </div>
+
+            {/* Active state indicator */}
+            {!isCollapsed && (
+              <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            )}
+          </div>
         </button>
       </aside>
 
