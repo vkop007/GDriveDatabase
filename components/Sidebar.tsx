@@ -23,7 +23,6 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import RenameModal from "./RenameModal";
-import CreateDatabaseModal from "./CreateDatabaseModal";
 
 interface SidebarProps {
   treeData: {
@@ -359,9 +358,6 @@ export default function Sidebar({ treeData }: SidebarProps) {
                   </div>
                 );
               })
-            )}
-            {!isCollapsed && treeData.length > 0 && (
-              <CreateDatabaseModal triggerClassName="mt-2 w-full justify-center bg-white/5 text-neutral-400 hover:bg-white/10 hover:text-white border border-neutral-700/40 hover:border-neutral-600/60" />
             )}
           </div>
 

@@ -340,6 +340,19 @@ export const listDatabases = async () => {
 
 export async function createDatabase(formData: FormData) {
   const name = formData.get("name") as string;
+  
+  // Initialize drive service first
+  const auth = await getAuth();
+  initDriveService(
+    {
+      client_id: auth.clientId,
+      client_secret: auth.clientSecret,
+      project_id: auth.projectId,
+      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
+    },
+    auth.tokens
+  );
+
   const checkExists = await operations.listOperations.listFoldersByName(name);
 
   if (checkExists.data?.files?.length > 0) {
@@ -351,7 +364,7 @@ export async function createDatabase(formData: FormData) {
   }
 
   try {
-    const rootId = await getOrCreateRootFolder();
+    const rootId = await getOrCreateRootFolder(auth);
     await operations.folderOperations.createFolder(name, rootId);
   } catch (error) {
     console.error("Error creating database:", error);
