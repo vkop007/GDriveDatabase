@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { bulkDeleteDocuments, deleteDocument, updateDocument } from "../app/actions/table";
 import { TableFile, RowData } from "../types";
 import BulkActionBar from "./BulkActionBar";
@@ -20,6 +20,9 @@ import {
   ArrowDown,
   Search,
   X,
+  Eye,
+  EyeOff,
+  Settings,
 } from "lucide-react";
 import { useConfirm } from "../contexts/ConfirmContext";
 import {
@@ -73,7 +76,57 @@ export default function DataTable({
   const [deletingRowId, setDeletingRowId] = useState<string | null>(null);
   const [editingDocument, setEditingDocument] = useState<RowData | null>(null);
   const [inlineEdit, setInlineEdit] = useState<InlineEditState | null>(null);
+  const [showColumnMenu, setShowColumnMenu] = useState(false);
+  const [columnVisibility, setColumnVisibility] = useState<Record<string, boolean>>({});
   const confirm = useConfirm();
+
+  // Initialize and persist column visibility
+  useEffect(() => {
+    const storageKey = `table-columns-${fileId}`;
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      setColumnVisibility(JSON.parse(saved));
+    } else {
+      // Initialize all columns as visible
+      const initial = table.schema.reduce(
+        (acc, col) => ({
+          ...acc,
+          [col.key]: true,
+        }),
+        {}
+      );
+      setColumnVisibility(initial);
+    }
+  }, [fileId, table.schema]);
+
+  // Close column menu on escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showColumnMenu) {
+        setShowColumnMenu(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [showColumnMenu]);
+
+  // Save visibility to localStorage
+  const toggleColumnVisibility = useCallback(
+    (columnKey: string) => {
+      setColumnVisibility((prev) => {
+        const updated = {
+          ...prev,
+          [columnKey]: !prev[columnKey],
+        };
+        localStorage.setItem(
+          `table-columns-${fileId}`,
+          JSON.stringify(updated)
+        );
+        return updated;
+      });
+    },
+    [fileId]
+  );
 
   // Sorting state
   const [sortState, setSortState] = useState<SortState>({
@@ -87,18 +140,20 @@ export default function DataTable({
   // Get visible columns with proper ordering: $id → user columns → $createdAt/$updatedAt
   const visibleColumns = useMemo(
     () =>
-      [...table.schema].sort((a, b) => {
-        if (a.key === "$id") return -1;
-        if (b.key === "$id") return 1;
-        const isATimestamp = a.key === "$createdAt" || a.key === "$updatedAt";
-        const isBTimestamp = b.key === "$createdAt" || b.key === "$updatedAt";
-        if (isATimestamp && !isBTimestamp) return 1;
-        if (!isATimestamp && isBTimestamp) return -1;
-        if (a.key === "$createdAt" && b.key === "$updatedAt") return -1;
-        if (a.key === "$updatedAt" && b.key === "$createdAt") return 1;
-        return 0;
-      }),
-    [table.schema]
+      [...table.schema]
+        .sort((a, b) => {
+          if (a.key === "$id") return -1;
+          if (b.key === "$id") return 1;
+          const isATimestamp = a.key === "$createdAt" || a.key === "$updatedAt";
+          const isBTimestamp = b.key === "$createdAt" || b.key === "$updatedAt";
+          if (isATimestamp && !isBTimestamp) return 1;
+          if (!isATimestamp && isBTimestamp) return -1;
+          if (a.key === "$createdAt" && b.key === "$updatedAt") return -1;
+          if (a.key === "$updatedAt" && b.key === "$createdAt") return 1;
+          return 0;
+        })
+        .filter((col) => columnVisibility[col.key] !== false),
+    [table.schema, columnVisibility]
   );
 
   // Filter and sort documents
@@ -389,9 +444,9 @@ export default function DataTable({
 
   return (
     <>
-      {/* Search Bar */}
-      <div className="mb-4">
-        <div className="relative max-w-md">
+      {/* Search Bar & Column Visibility */}
+      <div className="mb-4 flex items-start gap-3">
+        <div className="relative max-w-md flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
           <input
             type="text"
@@ -409,17 +464,79 @@ export default function DataTable({
             </button>
           )}
         </div>
-        {searchQuery && (
-          <p className="text-xs text-neutral-500 mt-2">
-            Found{" "}
-            <span className="text-primary font-medium">
-              {processedDocuments.length}
-            </span>{" "}
-            result{processedDocuments.length !== 1 ? "s" : ""} for &quot;
-            {searchQuery}&quot;
-          </p>
-        )}
+
+        {/* Column Visibility Toggle */}
+        <div className="relative">
+          <button
+            onClick={() => setShowColumnMenu(!showColumnMenu)}
+            className="flex items-center gap-2 px-3 py-2.5 bg-neutral-900/80 border border-neutral-800 rounded-xl text-neutral-400 hover:text-white hover:border-neutral-700 transition-all text-sm font-medium"
+            title="Toggle column visibility"
+          >
+            <Settings className="w-4 h-4" />
+            <span className="hidden sm:inline">Columns</span>
+            {Object.values(columnVisibility).filter((v) => !v).length > 0 && (
+              <span className="ml-1 text-xs bg-primary/20 text-primary px-1.5 py-0.5 rounded">
+                {Object.values(columnVisibility).filter((v) => !v).length} hidden
+              </span>
+            )}
+          </button>
+
+          {/* Column Visibility Menu */}
+          {showColumnMenu && (
+            <div className="absolute right-0 mt-2 w-56 bg-neutral-900 border border-neutral-800 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+              <div className="p-3 border-b border-neutral-800">
+                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+                  Show/Hide Columns
+                </p>
+              </div>
+              <div className="max-h-96 overflow-y-auto">
+                {table.schema.map((col) => (
+                  <button
+                    key={col.key}
+                    onClick={() => toggleColumnVisibility(col.key)}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-800/50 transition-colors text-sm text-left"
+                  >
+                    <div className="shrink-0 w-4">
+                      {columnVisibility[col.key] !== false ? (
+                        <Eye className="w-4 h-4 text-primary" />
+                      ) : (
+                        <EyeOff className="w-4 h-4 text-neutral-600" />
+                      )}
+                    </div>
+                    <span
+                      className={`flex-1 ${
+                        columnVisibility[col.key] !== false
+                          ? "text-white"
+                          : "text-neutral-500"
+                      }`}
+                    >
+                      {col.key.replace(/^\$/, "")}
+                    </span>
+                    {col.key.startsWith("$") && (
+                      <span className="text-xs text-neutral-600">System</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+              <div className="px-4 py-2 border-t border-neutral-800 bg-neutral-900/50 text-xs text-neutral-500">
+                {Object.values(columnVisibility).filter((v) => v).length} of{" "}
+                {table.schema.length} visible
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+
+      {searchQuery && (
+        <p className="text-xs text-neutral-500 mt-2">
+          Found{" "}
+          <span className="text-primary font-medium">
+            {processedDocuments.length}
+          </span>{" "}
+          result{processedDocuments.length !== 1 ? "s" : ""} for &quot;
+          {searchQuery}&quot;
+        </p>
+      )}
 
       <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900/90 via-neutral-900 to-neutral-800/60 shadow-xl">
         {/* Subtle glow effect */}
