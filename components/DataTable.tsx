@@ -5,6 +5,7 @@ import { bulkDeleteDocuments, deleteDocument, updateDocument } from "../app/acti
 import { TableFile, RowData } from "../types";
 import BulkActionBar from "./BulkActionBar";
 import EditRowModal from "./EditRowModal";
+import InlineEditableCell from "./InlineEditableCell";
 import { PaginationControls } from "./query";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -19,8 +20,6 @@ import {
   ArrowDown,
   Search,
   X,
-  Check,
-  Edit2,
 } from "lucide-react";
 import { useConfirm } from "../contexts/ConfirmContext";
 import {
@@ -74,8 +73,6 @@ export default function DataTable({
   const [deletingRowId, setDeletingRowId] = useState<string | null>(null);
   const [editingDocument, setEditingDocument] = useState<RowData | null>(null);
   const [inlineEdit, setInlineEdit] = useState<InlineEditState | null>(null);
-  const [inlineEditValue, setInlineEditValue] = useState<string>("");
-  const [isSavingInline, setIsSavingInline] = useState(false);
   const confirm = useConfirm();
 
   // Sorting state
@@ -161,33 +158,20 @@ export default function DataTable({
   };
 
   // Inline edit handlers
-  const startInlineEdit = (rowId: string, columnKey: string, currentValue: any) => {
-    // Don't allow editing system fields
-    if (columnKey.startsWith("$")) return;
-    
-    setInlineEdit({ rowId, columnKey });
-    setInlineEditValue(String(currentValue ?? ""));
-  };
-
-  const cancelInlineEdit = () => {
-    setInlineEdit(null);
-    setInlineEditValue("");
-  };
-
-  const saveInlineEdit = async (rowId: string, columnKey: string) => {
-    if (!inlineEdit) return;
-
-    setIsSavingInline(true);
+  const handleInlineEditSave = async (
+    rowId: string,
+    columnKey: string,
+    newValue: any
+  ): Promise<boolean> => {
     try {
       const doc = table.documents.find((d) => d.$id === rowId);
       if (!doc) throw new Error("Document not found");
 
       const updatedDoc = {
         ...doc,
-        [columnKey]: inlineEditValue,
+        [columnKey]: newValue,
       };
 
-      // Call the update action
       const formData = new FormData();
       formData.append("fileId", fileId);
       formData.append("docId", rowId);
@@ -195,27 +179,99 @@ export default function DataTable({
       formData.append("databaseId", databaseId);
 
       const result = await updateDocument(formData);
-      
+
       if (!result.success) {
         if (result.errors) {
           toast.error(`Validation error: ${result.errors[0].message}`);
         } else {
           toast.error(result.error || "Failed to update row");
         }
-        return;
+        return false;
       }
 
-      toast.success("Row updated successfully");
       router.refresh();
       setInlineEdit(null);
-      setInlineEditValue("");
+      return true;
     } catch (error) {
       toast.error("Failed to update row");
       console.error(error);
-    } finally {
-      setIsSavingInline(false);
+      return false;
     }
   };
+
+  // Keyboard navigation between cells
+  const handleCellNavigation = useCallback(
+    (direction: "next" | "prev") => {
+      if (!inlineEdit) return;
+
+      const currentRowIndex = processedDocuments.findIndex(
+        (d) => d.$id === inlineEdit.rowId
+      );
+      const currentColIndex = visibleColumns.findIndex(
+        (c) => c.key === inlineEdit.columnKey
+      );
+
+      let newRowIndex = currentRowIndex;
+      let newColIndex = currentColIndex;
+
+      switch (direction) {
+        case "next":
+          // Tab to next column, or first column of next row
+          newColIndex++;
+          if (newColIndex >= visibleColumns.length) {
+            newColIndex = 0;
+            newRowIndex++;
+          }
+          break;
+        case "prev":
+          // Shift+Tab to previous column, or last column of previous row
+          newColIndex--;
+          if (newColIndex < 0) {
+            newColIndex = visibleColumns.length - 1;
+            newRowIndex--;
+          }
+          break;
+      }
+
+      // Bounds checking
+      if (newRowIndex < 0 || newRowIndex >= processedDocuments.length) {
+        return;
+      }
+
+      // Skip system fields when navigating
+      while (visibleColumns[newColIndex]?.key.startsWith("$")) {
+        if (direction === "next") {
+          newColIndex++;
+        } else {
+          newColIndex--;
+        }
+
+        if (newColIndex < 0 || newColIndex >= visibleColumns.length) {
+          if (direction === "next") {
+            newRowIndex++;
+            newColIndex = 0;
+          } else {
+            newRowIndex--;
+            newColIndex = visibleColumns.length - 1;
+          }
+          break;
+        }
+      }
+
+      // Final bounds check
+      if (newRowIndex < 0 || newRowIndex >= processedDocuments.length) {
+        return;
+      }
+
+      const newDoc = processedDocuments[newRowIndex];
+      const newCol = visibleColumns[newColIndex];
+
+      if (newDoc && newCol && !newCol.key.startsWith("$")) {
+        setInlineEdit({ rowId: newDoc.$id, columnKey: newCol.key });
+      }
+    },
+    [inlineEdit, processedDocuments, visibleColumns]
+  );
 
   // Handle column sort
   const handleSort = useCallback((columnKey: string) => {
@@ -512,6 +568,7 @@ export default function DataTable({
                               <span
                                 className="text-neutral-400 text-sm cursor-help"
                                 title={formatFullDate(displayValue)}
+                                suppressHydrationWarning
                               >
                                 {formatRelativeTime(displayValue)}
                               </span>
@@ -534,6 +591,7 @@ export default function DataTable({
                               <span
                                 className="text-neutral-400 text-sm cursor-help"
                                 title={formatFullDate(displayValue)}
+                                suppressHydrationWarning
                               >
                                 {formatRelativeTime(displayValue)}
                               </span>
@@ -595,73 +653,32 @@ export default function DataTable({
                                 )}
                               </div>
                             ) : (
-                              <div className="relative group/cell">
-                                {inlineEdit?.rowId === doc.$id &&
-                                inlineEdit?.columnKey === col.key ? (
-                                  // Inline edit mode
-                                  <div className="flex items-center gap-2">
-                                    <input
-                                      autoFocus
-                                      type="text"
-                                      value={inlineEditValue}
-                                      onChange={(e) =>
-                                        setInlineEditValue(e.target.value)
-                                      }
-                                      onKeyDown={(e) => {
-                                        if (e.key === "Enter") {
-                                          saveInlineEdit(doc.$id, col.key);
-                                        } else if (e.key === "Escape") {
-                                          cancelInlineEdit();
-                                        }
-                                      }}
-                                      onBlur={() => cancelInlineEdit()}
-                                      className="flex-1 px-3 py-1 rounded bg-neutral-800 border border-primary/50 text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30"
-                                      disabled={isSavingInline}
-                                    />
-                                    <div className="flex items-center gap-1">
-                                      <button
-                                        onClick={() =>
-                                          saveInlineEdit(doc.$id, col.key)
-                                        }
-                                        disabled={isSavingInline}
-                                        className="p-1 rounded hover:bg-neutral-700/50 text-emerald-400 hover:text-emerald-300 disabled:opacity-50 transition-colors"
-                                        title="Save (Enter)"
-                                      >
-                                        <Check className="w-4 h-4" />
-                                      </button>
-                                      <button
-                                        onClick={() => cancelInlineEdit()}
-                                        disabled={isSavingInline}
-                                        className="p-1 rounded hover:bg-neutral-700/50 text-red-400 hover:text-red-300 disabled:opacity-50 transition-colors"
-                                        title="Cancel (Escape)"
-                                      >
-                                        <X className="w-4 h-4" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  // Display mode
-                                  <div
-                                    onClick={() =>
-                                      startInlineEdit(doc.$id, col.key, value)
-                                    }
-                                    className="cursor-pointer hover:text-primary transition-colors text-white rounded pl-2 pr-6 py-1 relative group/text hover:bg-neutral-700/20 flex items-center"
-                                    title={displayValue}
-                                  >
-                                    <span className="truncate block max-w-[160px]">
-                                      {displayValue ? (
-                                        highlightText(displayValue)
-                                      ) : (
-                                        <span className="text-neutral-600">—</span>
-                                      )}
-                                    </span>
-                                    <Edit2
-                                      className="absolute right-1.5 w-3 h-3 text-neutral-500 opacity-0 group-hover/text:opacity-100 transition-opacity flex-shrink-0"
-                                      strokeWidth={2.5}
-                                    />
-                                  </div>
-                                )}
-                              </div>
+                              <InlineEditableCell
+                                value={value}
+                                displayValue={displayValue}
+                                columnType={
+                                  col.type as
+                                    | "text"
+                                    | "number"
+                                    | "email"
+                                    | "date"
+                                    | "datetime"
+                                    | "boolean"
+                                }
+                                isEditing={
+                                  inlineEdit?.rowId === doc.$id &&
+                                  inlineEdit?.columnKey === col.key
+                                }
+                                onEditStart={() =>
+                                  setInlineEdit({ rowId: doc.$id, columnKey: col.key })
+                                }
+                                onCancel={() => setInlineEdit(null)}
+                                onSave={(newValue) =>
+                                  handleInlineEditSave(doc.$id, col.key, newValue)
+                                }
+                                onNavigate={handleCellNavigation}
+                                highlightText={highlightText}
+                              />
                             )}
                           </td>
                         );
