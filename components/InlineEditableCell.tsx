@@ -96,7 +96,7 @@ export default function InlineEditableCell({
 
   if (isEditing) {
     return (
-      <div className="flex items-center gap-2 w-full">
+      <div className="flex items-center gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
         <input
           ref={inputRef}
           type={getInputType()}
@@ -104,15 +104,15 @@ export default function InlineEditableCell({
           onChange={(e) => setEditValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleCancel}
-          className="flex-1 px-3 py-1 rounded bg-neutral-800 border border-primary/50 text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 min-w-0"
+          className="flex-1 px-3 py-1 rounded bg-neutral-800 border border-primary/50 text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 min-w-0 transition-all duration-200"
           disabled={isSaving}
           step={columnType === "number" ? "any" : undefined}
         />
-        <div className="flex items-center gap-1 shrink-0">
+        <div className="flex items-center gap-1 shrink-0 animate-in fade-in slide-in-from-left-2 duration-300">
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="p-1 rounded hover:bg-neutral-700/50 text-emerald-400 hover:text-emerald-300 disabled:opacity-50 transition-colors"
+            className="p-1 rounded hover:bg-neutral-700/50 text-emerald-400 hover:text-emerald-300 disabled:opacity-50 transition-all duration-200 hover:scale-110"
             title="Save (Enter)"
           >
             <Check className="w-4 h-4" />
@@ -120,7 +120,7 @@ export default function InlineEditableCell({
           <button
             onClick={handleCancel}
             disabled={isSaving}
-            className="p-1 rounded hover:bg-neutral-700/50 text-red-400 hover:text-red-300 disabled:opacity-50 transition-colors"
+            className="p-1 rounded hover:bg-neutral-700/50 text-red-400 hover:text-red-300 disabled:opacity-50 transition-all duration-200 hover:scale-110"
             title="Cancel (Escape)"
           >
             <X className="w-4 h-4" />
@@ -133,7 +133,7 @@ export default function InlineEditableCell({
   return (
     <div
       onClick={onEditStart}
-      className={`cursor-pointer hover:text-primary transition-colors text-white rounded pl-2 pr-6 py-1 relative group/text hover:bg-neutral-700/20 flex items-center ${maxWidth}`}
+      className={`cursor-pointer hover:text-primary transition-all duration-200 text-white rounded pl-2 pr-6 py-1 relative group/text hover:bg-neutral-700/20 flex items-center ${maxWidth}`}
       title={displayValue}
     >
       <span className={`truncate block ${maxWidth}`}>
@@ -144,7 +144,7 @@ export default function InlineEditableCell({
         )}
       </span>
       <Edit2
-        className="absolute right-1.5 w-3 h-3 text-neutral-500 opacity-0 group-hover/text:opacity-100 transition-opacity shrink-0"
+        className="absolute right-1.5 w-3 h-3 text-neutral-500 opacity-0 group-hover/text:opacity-100 transition-all duration-200 shrink-0 group-hover/text:scale-110"
         strokeWidth={2.5}
       />
     </div>
