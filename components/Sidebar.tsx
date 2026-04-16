@@ -597,16 +597,42 @@ export default function Sidebar({ treeData }: SidebarProps) {
         </div>
 
         {/* Collapse Toggle Button - Centered on right edge */}
+        <style>{`
+          .sidebar-toggle-icon {
+            transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+          }
+          .sidebar-toggle-icon.rotate {
+            transform: rotate(180deg);
+          }
+        `}</style>
         <button
           onClick={toggleCollapse}
-          className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 w-7 h-14 items-center justify-center bg-neutral-900/95 backdrop-blur-md border border-neutral-700/50 rounded-r-xl hover:bg-neutral-800 hover:border-primary/40 transition-all duration-200 group shadow-xl shadow-black/30 z-50"
+          className="hidden md:flex absolute top-1/2 -right-4 transform -translate-y-1/2 w-8 h-16 items-center justify-center backdrop-blur-xl rounded-r-2xl transition-all duration-300 group z-50 hover:scale-125 active:scale-95"
           title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
-          {isCollapsed ? (
-            <PanelLeft className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors duration-200" />
-          ) : (
-            <PanelLeftClose className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors duration-200" />
-          )}
+          <div className="relative flex items-center justify-center">
+            {/* Multiple glow layers */}
+            <div className="absolute inset-0 bg-primary rounded-lg blur-xl opacity-0 group-hover:opacity-30 transition-all duration-300" />
+            <div className="absolute inset-1 bg-primary-from rounded-lg blur-md opacity-0 group-hover:opacity-20 transition-all duration-300" />
+            
+            {/* Icon with enhanced effects */}
+            <div
+              className={`sidebar-toggle-icon relative text-neutral-400 group-hover:text-primary transition-all duration-400 drop-shadow-[0_0_8px_rgba(236,72,153,0)] group-hover:drop-shadow-[0_0_16px_rgba(236,72,153,0.8)] ${
+                !isCollapsed ? "rotate" : ""
+              }`}
+            >
+              {isCollapsed ? (
+                <PanelLeft className="w-4 h-4" />
+              ) : (
+                <PanelLeftClose className="w-4 h-4" />
+              )}
+            </div>
+
+            {/* Active state indicator */}
+            {!isCollapsed && (
+              <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            )}
+          </div>
         </button>
       </aside>
 
