@@ -199,6 +199,80 @@ export default function DataTable({
     }
   };
 
+  // Keyboard navigation between cells
+  const handleCellNavigation = useCallback(
+    (direction: "next" | "prev") => {
+      if (!inlineEdit) return;
+
+      const currentRowIndex = processedDocuments.findIndex(
+        (d) => d.$id === inlineEdit.rowId
+      );
+      const currentColIndex = visibleColumns.findIndex(
+        (c) => c.key === inlineEdit.columnKey
+      );
+
+      let newRowIndex = currentRowIndex;
+      let newColIndex = currentColIndex;
+
+      switch (direction) {
+        case "next":
+          // Tab to next column, or first column of next row
+          newColIndex++;
+          if (newColIndex >= visibleColumns.length) {
+            newColIndex = 0;
+            newRowIndex++;
+          }
+          break;
+        case "prev":
+          // Shift+Tab to previous column, or last column of previous row
+          newColIndex--;
+          if (newColIndex < 0) {
+            newColIndex = visibleColumns.length - 1;
+            newRowIndex--;
+          }
+          break;
+      }
+
+      // Bounds checking
+      if (newRowIndex < 0 || newRowIndex >= processedDocuments.length) {
+        return;
+      }
+
+      // Skip system fields when navigating
+      while (visibleColumns[newColIndex]?.key.startsWith("$")) {
+        if (direction === "next") {
+          newColIndex++;
+        } else {
+          newColIndex--;
+        }
+
+        if (newColIndex < 0 || newColIndex >= visibleColumns.length) {
+          if (direction === "next") {
+            newRowIndex++;
+            newColIndex = 0;
+          } else {
+            newRowIndex--;
+            newColIndex = visibleColumns.length - 1;
+          }
+          break;
+        }
+      }
+
+      // Final bounds check
+      if (newRowIndex < 0 || newRowIndex >= processedDocuments.length) {
+        return;
+      }
+
+      const newDoc = processedDocuments[newRowIndex];
+      const newCol = visibleColumns[newColIndex];
+
+      if (newDoc && newCol && !newCol.key.startsWith("$")) {
+        setInlineEdit({ rowId: newDoc.$id, columnKey: newCol.key });
+      }
+    },
+    [inlineEdit, processedDocuments, visibleColumns]
+  );
+
   // Handle column sort
   const handleSort = useCallback((columnKey: string) => {
     setSortState((prev) => {
@@ -494,6 +568,7 @@ export default function DataTable({
                               <span
                                 className="text-neutral-400 text-sm cursor-help"
                                 title={formatFullDate(displayValue)}
+                                suppressHydrationWarning
                               >
                                 {formatRelativeTime(displayValue)}
                               </span>
@@ -516,6 +591,7 @@ export default function DataTable({
                               <span
                                 className="text-neutral-400 text-sm cursor-help"
                                 title={formatFullDate(displayValue)}
+                                suppressHydrationWarning
                               >
                                 {formatRelativeTime(displayValue)}
                               </span>
@@ -600,6 +676,7 @@ export default function DataTable({
                                 onSave={(newValue) =>
                                   handleInlineEditSave(doc.$id, col.key, newValue)
                                 }
+                                onNavigate={handleCellNavigation}
                                 highlightText={highlightText}
                               />
                             )}
