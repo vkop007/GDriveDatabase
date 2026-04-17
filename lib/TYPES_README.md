@@ -83,12 +83,12 @@ interface SortConfig {
 
 ## Error Handling (Issue #74)
 
-The SDK provides a Result patternn for consistent error handling:
+The SDK provides a Result pattern for consistent error handling:
 
 ```typescript
 import { Result, GDatabaseError } from 'gdatabase';
 
-// Using Result patternn
+// Using Result pattern
 const result = await db.database('my-db').table<User>('users').get('id');
 
 if (!result.success) {
