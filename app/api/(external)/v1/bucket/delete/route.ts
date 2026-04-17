@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse }
+import { checkRateLimit } from "@/lib/rate-limit"; from "next/server";
 import { getApiAuth } from "@/app/actions";
 
 export async function DELETE(request: NextRequest) {

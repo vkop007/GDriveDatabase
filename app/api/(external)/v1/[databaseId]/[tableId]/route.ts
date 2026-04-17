@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getApiAuth } from "@/app/actions";
 import { TableFile, RowData } from "@/types";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ databaseId: string; tableId: string }> }
 ) {
+  // Apply rate limiting
+  const { success: rateOk, remaining, resetIn } = checkRateLimit(req);
+  if (!rateOk) {
+    const response = NextResponse.json(
+      { error: "RATE_LIMITED", message: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+    response.headers.set("X-RateLimit-Remaining", "0");
+    response.headers.set("Retry-After", String(Math.ceil(resetIn / 1000)));
+    return response;
+  }
+
   const apiKey =
     req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
   if (!apiKey) {
@@ -16,22 +29,18 @@ export async function GET(
     const { driveService } = await getApiAuth(apiKey);
     const { tableId } = await params;
 
-    // Fetch table content
-    // We use selectJsonContent which returns the parsed JSON
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
 
     if (!table) {
-      return NextResponse.json(
-        { error: "Table not found or empty" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Table not found or empty" }, { status: 404 });
     }
 
-    return NextResponse.json(table.documents || []);
+    const response = NextResponse.json(table.documents || []);
+    response.headers.set("X-RateLimit-Remaining", String(remaining));
+    return response;
   } catch (error) {
     console.error("API Error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
@@ -40,6 +49,18 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ databaseId: string; tableId: string }> }
 ) {
+  // Apply rate limiting
+  const { success: rateOk, remaining, resetIn } = checkRateLimit(req);
+  if (!rateOk) {
+    const response = NextResponse.json(
+      { error: "RATE_LIMITED", message: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+    response.headers.set("X-RateLimit-Remaining", "0");
+    response.headers.set("Retry-After", String(Math.ceil(resetIn / 1000)));
+    return response;
+  }
+
   const apiKey =
     req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
   if (!apiKey) {
@@ -59,41 +80,24 @@ export async function POST(
 
     if (!validation.success) {
       return NextResponse.json(
-        {
-          error: "Validation failed",
-          details: validation.errors,
-        },
+        { error: "Validation failed", details: validation.errors },
         { status: 400 }
       );
     }
 
     // Check Unique Constraints
-    const { checkUniqueConstraint, updateIndex } = await import(
-      "@/lib/indexing"
-    );
+    const { checkUniqueConstraint, updateIndex } = await import("@/lib/indexing");
     const { databaseId } = await params;
 
-    // Check if passed explicitly or infer logic (API might need databaseId)
-    // Actually we have databaseId in params!
-
-    // Check Unique Constraints (Optimized with indexFileId)
     const uniqueColumns = table.schema.filter((col) => col.unique);
     for (const col of uniqueColumns) {
       const val = validation.data[col.key];
       const check = await checkUniqueConstraint(
-        databaseId,
-        tableId,
-        col.key,
-        val,
-        undefined, // excludeDocId
-        driveService, // Pass driveService
-        col.indexFileId // Pass indexFileId
+        databaseId, tableId, col.key, val, undefined, driveService, col.indexFileId
       );
       if (!check.safe) {
         return NextResponse.json(
-          {
-            error: `Unique constraint failed for field '${col.key}': ${check.error}`,
-          },
+          { error: `Unique constraint failed for field '${col.key}': ${check.error}` },
           { status: 409 }
         );
       }
@@ -103,11 +107,10 @@ export async function POST(
       $id: crypto.randomUUID(),
       $createdAt: new Date().toISOString(),
       $updatedAt: new Date().toISOString(),
-      ...validation.data, // Use validated (and coerced) data
+      ...validation.data,
     };
 
     table.documents.push(newDoc);
-
     await driveService.updateJsonContent(tableId, table);
 
     // Update Indexes
@@ -115,16 +118,8 @@ export async function POST(
     for (const col of uniqueColumns) {
       const val = newDoc[col.key];
       const newIndexFileId = await updateIndex(
-        databaseId,
-        tableId,
-        col.key,
-        undefined, // old value
-        val, // new value
-        newDoc.$id,
-        driveService, // Pass driveService
-        col.indexFileId // Pass indexFileId
+        databaseId, tableId, col.key, undefined, val, newDoc.$id, driveService, col.indexFileId
       );
-
       if (newIndexFileId && newIndexFileId !== col.indexFileId) {
         col.indexFileId = newIndexFileId;
         schemaUpdated = true;
@@ -132,18 +127,16 @@ export async function POST(
     }
 
     if (schemaUpdated) {
-      console.log("Schema updated with new index file IDs during POST");
       await driveService.updateJsonContent(tableId, table);
     }
 
-    return NextResponse.json(newDoc, { status: 201 });
+    const response = NextResponse.json(newDoc, { status: 201 });
+    response.headers.set("X-RateLimit-Remaining", String(remaining));
+    return response;
   } catch (error) {
     console.error("API Error:", error);
     return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal Server Error",
-        details: error instanceof Error ? error.stack : undefined,
-      },
+      { error: error instanceof Error ? error.message : "Internal Server Error" },
       { status: 500 }
     );
   }
