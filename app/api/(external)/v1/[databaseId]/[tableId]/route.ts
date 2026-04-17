@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getApiAuth } from "@/app/actions";
-import { TableFile, RowData } from "@/types";
+import { TableFile } from "@/types";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { processQuery } from "@/lib/query-processor";
 
 export async function GET(
   req: NextRequest,
@@ -10,17 +11,13 @@ export async function GET(
   // Apply rate limiting
   const { success: rateOk, remaining, resetIn } = checkRateLimit(req);
   if (!rateOk) {
-    const response = NextResponse.json(
-      { error: "RATE_LIMITED", message: "Too many requests. Please try again later." },
+    return NextResponse.json(
+      { error: "RATE_LIMITED", message: "Too many requests" },
       { status: 429 }
     );
-    response.headers.set("X-RateLimit-Remaining", "0");
-    response.headers.set("Retry-After", String(Math.ceil(resetIn / 1000)));
-    return response;
   }
 
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
+  const apiKey = req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
   if (!apiKey) {
     return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
   }
@@ -29,19 +26,46 @@ export async function GET(
     const { driveService } = await getApiAuth(apiKey);
     const { tableId } = await params;
 
+    // Parse query parameters for server-side filtering
+    const searchParams = req.nextUrl.searchParams;
+    const queryParams = {
+      filters: searchParams.get('filter') || undefined,
+      sort: searchParams.get('sort') || undefined,
+      limit: searchParams.get('limit') || undefined,
+      offset: searchParams.get('offset') || undefined,
+    };
+
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
 
     if (!table) {
       return NextResponse.json({ error: "Table not found or empty" }, { status: 404 });
     }
 
-    const response = NextResponse.json(table.documents || []);
+    // Apply server-side query processing (filter, sort, pagination)
+    const { data, total, hasMore } = processQuery(
+      table.documents || [],
+      queryParams
+    );
+
+    const response = NextResponse.json({
+      data,
+      pagination: {
+        total,
+        limit: parseInt(queryParams.limit || '50'),
+        offset: parseInt(queryParams.offset || '0'),
+        hasMore
+      }
+    });
+
     response.headers.set("X-RateLimit-Remaining", String(remaining));
+    response.headers.set("X-Total-Count", String(total));
     return response;
   } catch (error) {
     console.error("API Error:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -49,20 +73,16 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ databaseId: string; tableId: string }> }
 ) {
-  // Apply rate limiting
+  // Rate limiting check
   const { success: rateOk, remaining, resetIn } = checkRateLimit(req);
   if (!rateOk) {
-    const response = NextResponse.json(
-      { error: "RATE_LIMITED", message: "Too many requests. Please try again later." },
+    return NextResponse.json(
+      { error: "RATE_LIMITED", message: "Too many requests" },
       { status: 429 }
     );
-    response.headers.set("X-RateLimit-Remaining", "0");
-    response.headers.set("Retry-After", String(Math.ceil(resetIn / 1000)));
-    return response;
   }
 
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
+  const apiKey = req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
   if (!apiKey) {
     return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
   }
@@ -85,11 +105,11 @@ export async function POST(
       );
     }
 
-    // Check Unique Constraints
+    // Check unique constraints
     const { checkUniqueConstraint, updateIndex } = await import("@/lib/indexing");
     const { databaseId } = await params;
-
     const uniqueColumns = table.schema.filter((col) => col.unique);
+
     for (const col of uniqueColumns) {
       const val = validation.data[col.key];
       const check = await checkUniqueConstraint(
@@ -97,13 +117,13 @@ export async function POST(
       );
       if (!check.safe) {
         return NextResponse.json(
-          { error: `Unique constraint failed for field '${col.key}': ${check.error}` },
+          { error: `Unique constraint failed for '${col.key}': ${check.error}` },
           { status: 409 }
         );
       }
     }
 
-    const newDoc: RowData = {
+    const newDoc = {
       $id: crypto.randomUUID(),
       $createdAt: new Date().toISOString(),
       $updatedAt: new Date().toISOString(),
@@ -113,12 +133,11 @@ export async function POST(
     table.documents.push(newDoc);
     await driveService.updateJsonContent(tableId, table);
 
-    // Update Indexes
+    // Update indexes
     let schemaUpdated = false;
     for (const col of uniqueColumns) {
-      const val = newDoc[col.key];
       const newIndexFileId = await updateIndex(
-        databaseId, tableId, col.key, undefined, val, newDoc.$id, driveService, col.indexFileId
+        databaseId, tableId, col.key, undefined, newDoc[col.key], newDoc.$id, driveService, col.indexFileId
       );
       if (newIndexFileId && newIndexFileId !== col.indexFileId) {
         col.indexFileId = newIndexFileId;
