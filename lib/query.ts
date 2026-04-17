@@ -5,9 +5,21 @@ import {
   FilterCondition,
   FilterOperator,
   SortConfig,
-  QueryState,
-  QueryResult,
-} from "../types";
+} from "./gdatabase-types";
+
+// Legacy types for backward compatibility
+export type QueryState = {
+  filters: FilterCondition[];
+  sort: SortConfig[];
+  page: number;
+  pageSize: number;
+};
+
+export type QueryResult = {
+  data: RowData[];
+  total: number;
+  totalPages: number;
+};
 
 // Operator labels for UI
 export const operatorLabels: Record<FilterOperator, string> = {
