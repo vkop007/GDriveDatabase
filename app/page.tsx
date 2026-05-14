@@ -2,14 +2,23 @@ import { authenticateWithGoogle } from "./actions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import LoginClient from "@/components/LoginClient";
+import {
+  APP_SESSION_COOKIE,
+  isGoogleOAuthConfigured,
+} from "@/lib/gdrive/google-oauth";
 
 export default async function Home() {
   const cookieStore = await cookies();
-  const token = cookieStore.get("gdrive_tokens")?.value;
+  const session = cookieStore.get(APP_SESSION_COOKIE)?.value;
 
-  if (token) {
+  if (session) {
     redirect("/dashboard");
   }
 
-  return <LoginClient onSubmit={authenticateWithGoogle} />;
+  return (
+    <LoginClient
+      onSubmit={authenticateWithGoogle}
+      isGoogleLoginConfigured={isGoogleOAuthConfigured()}
+    />
+  );
 }

@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import {
+  APP_SESSION_COOKIE,
+  getSessionCookieOptions,
+  GOOGLE_TOKEN_COOKIE,
+} from "@/lib/gdrive/google-oauth";
 
 // Helper to decode JWT and check expiry (without verification)
 function isTokenExpired(accessToken: string, bufferSeconds = 300): boolean {
@@ -51,29 +56,31 @@ async function refreshAccessToken(
 }
 
 export async function proxy(request: NextRequest) {
-  const tokensStr = request.cookies.get("gdrive_tokens")?.value;
+  const appSession = request.cookies.get(APP_SESSION_COOKIE)?.value;
+  const tokensStr = request.cookies.get(GOOGLE_TOKEN_COOKIE)?.value;
   const clientId = request.cookies.get("gdrive_client_id")?.value;
   const clientSecret = request.cookies.get("gdrive_client_secret")?.value;
   const { pathname } = request.nextUrl;
 
-  // If user has tokens and is on the root page, redirect to dashboard
-  if (tokensStr && pathname === "/") {
+  // If user is signed in to the app and is on the root page, redirect to dashboard
+  if (appSession && pathname === "/") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // If user does not have tokens and is NOT on the root page, redirect to root
-  if (!tokensStr && pathname !== "/") {
+  // If user is not signed into the app, protect dashboard routes.
+  if (!appSession && pathname.startsWith("/dashboard")) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
   // For dashboard routes, proactively refresh expired tokens
-  if (
-    pathname.startsWith("/dashboard") &&
-    tokensStr &&
-    clientId &&
-    clientSecret
-  ) {
+  if (pathname.startsWith("/dashboard") && tokensStr) {
     try {
+      if (!clientId || !clientSecret) {
+        const response = NextResponse.next();
+        response.cookies.delete(GOOGLE_TOKEN_COOKIE);
+        return response;
+      }
+
       const tokens = JSON.parse(tokensStr);
 
       // Check if access token is expired or about to expire
@@ -82,7 +89,9 @@ export async function proxy(request: NextRequest) {
 
         if (!tokens.refresh_token) {
           console.error("No refresh token available");
-          return NextResponse.redirect(new URL("/", request.url));
+          const response = NextResponse.next();
+          response.cookies.delete(GOOGLE_TOKEN_COOKIE);
+          return response;
         }
 
         const newTokenData = await refreshAccessToken(
@@ -93,7 +102,9 @@ export async function proxy(request: NextRequest) {
 
         if (!newTokenData) {
           console.error("Failed to refresh token, redirecting to login");
-          return NextResponse.redirect(new URL("/", request.url));
+          const response = NextResponse.next();
+          response.cookies.delete(GOOGLE_TOKEN_COOKIE);
+          return response;
         }
 
         // Update tokens with new access token
@@ -106,16 +117,19 @@ export async function proxy(request: NextRequest) {
 
         // Create response and set updated cookie
         const response = NextResponse.next();
-        response.cookies.set("gdrive_tokens", JSON.stringify(updatedTokens), {
-          secure: process.env.NODE_ENV === "production",
-          httpOnly: true,
-        });
+        response.cookies.set(
+          GOOGLE_TOKEN_COOKIE,
+          JSON.stringify(updatedTokens),
+          getSessionCookieOptions()
+        );
 
         return response;
       }
     } catch (error) {
       console.error("Proxy auth error:", error);
-      return NextResponse.redirect(new URL("/", request.url));
+      const response = NextResponse.next();
+      response.cookies.delete(GOOGLE_TOKEN_COOKIE);
+      return response;
     }
   }
 
@@ -132,6 +146,6 @@ export const config = {
      * - favicon.ico (favicon file)
      * - Static files (images, etc.)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|.well-known|oauth2callback|.*\\.png$|.*\\.svg$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.ico$|.*\\.webp$).*)",
+    "/((?!api|auth|_next/static|_next/image|favicon.ico|.well-known|oauth2callback|.*\\.png$|.*\\.svg$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.ico$|.*\\.webp$).*)",
   ],
 };

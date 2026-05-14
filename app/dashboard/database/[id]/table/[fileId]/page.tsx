@@ -6,6 +6,7 @@ import DataView from "./data";
 import ApiAccess from "../../../../../../components/ApiAccess";
 import Link from "next/link";
 import { Database, ChevronRight, Table2, Layers } from "lucide-react";
+import { GOOGLE_TOKEN_COOKIE } from "@/lib/gdrive/google-oauth";
 
 // Force dynamic rendering to ensure fresh data after edits
 // Force dynamic rendering removed to enable caching
@@ -22,10 +23,10 @@ export default async function TablePage({
   const { tab = "data" } = await searchParams;
 
   const cookieStore = await cookies();
-  const tokensStr = cookieStore.get("gdrive_tokens")?.value;
+  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
 
   if (!tokensStr) {
-    redirect("/");
+    redirect("/dashboard");
   }
 
   const table = await getTableData(fileId);

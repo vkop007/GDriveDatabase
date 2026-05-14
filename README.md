@@ -42,6 +42,21 @@ npm install gdatabase
 bun add gdatabase
 ```
 
+## Dashboard Google Login
+
+The dashboard uses the app's Google OAuth client only for signing users into
+the product. Create a Google OAuth web client, add
+`http://localhost:3000/api/auth/callback/google` as an authorized redirect URI for
+local development, then copy `.env.example` to `.env.local` and fill in:
+
+```bash
+GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-oauth-client-secret
+```
+
+After sign-in, users connect their own Google Drive from inside the dashboard by
+pasting their Google Cloud OAuth credentials JSON.
+
 ## Usage
 
 ### Initialize

@@ -1,7 +1,6 @@
-import { saveDocument } from "../../../actions";
-import { cookies } from "next/headers";
+import { getAuth } from "../../../actions";
 import { redirect } from "next/navigation";
-import { initDriveService, operations } from "gdrivekit";
+import { operations } from "gdrivekit";
 import JsonTableEditor from "./editor";
 
 export default async function EditDocument({
@@ -20,27 +19,11 @@ export default async function EditDocument({
 
   const decodedFilename = decodeURIComponent(filename);
 
-  const cookieStore = await cookies();
-  const tokensStr = cookieStore.get("gdrive_tokens")?.value;
-  const clientId = cookieStore.get("gdrive_client_id")?.value;
-  const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
-  const projectId = cookieStore.get("gdrive_project_id")?.value;
-
-  if (!tokensStr || !clientId || !clientSecret || !projectId) {
-    redirect("/");
+  try {
+    await getAuth();
+  } catch {
+    redirect("/dashboard");
   }
-
-  const tokens = JSON.parse(tokensStr);
-
-  initDriveService(
-    {
-      client_id: clientId,
-      client_secret: clientSecret,
-      project_id: projectId,
-      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
-    },
-    tokens
-  );
 
   let content = "{}";
   try {

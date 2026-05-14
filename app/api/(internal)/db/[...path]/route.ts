@@ -1,23 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { initDriveService, operations } from "gdrivekit";
 import { cookies } from "next/headers";
+import {
+  getDriveClientConfig,
+  GOOGLE_TOKEN_COOKIE,
+} from "@/lib/gdrive/google-oauth";
 
 // Helper to initialize drive service from cookies or headers
 async function initService(req: NextRequest) {
   const cookieStore = await cookies();
 
-  // Try cookies first
-  let clientId = cookieStore.get("gdrive_client_id")?.value;
-  let clientSecret = cookieStore.get("gdrive_client_secret")?.value;
-  let projectId = cookieStore.get("gdrive_project_id")?.value;
-  let tokensStr = cookieStore.get("gdrive_tokens")?.value;
-
-  // If not in cookies, check headers
-  if (!clientId) clientId = req.headers.get("x-gdrive-client-id") || undefined;
-  if (!clientSecret)
-    clientSecret = req.headers.get("x-gdrive-client-secret") || undefined;
-  if (!projectId)
-    projectId = req.headers.get("x-gdrive-project-id") || undefined;
+  const clientId =
+    req.headers.get("x-gdrive-client-id") ||
+    cookieStore.get("gdrive_client_id")?.value;
+  const clientSecret =
+    req.headers.get("x-gdrive-client-secret") ||
+    cookieStore.get("gdrive_client_secret")?.value;
+  const projectId =
+    req.headers.get("x-gdrive-project-id") ||
+    cookieStore.get("gdrive_project_id")?.value;
+  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
 
   let tokens;
   if (tokensStr) {
@@ -44,12 +46,7 @@ async function initService(req: NextRequest) {
   }
 
   initDriveService(
-    {
-      client_id: clientId,
-      client_secret: clientSecret,
-      project_id: projectId,
-      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
-    },
+    getDriveClientConfig({ clientId, clientSecret, projectId }),
     tokens
   );
 }
