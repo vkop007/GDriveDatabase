@@ -2,10 +2,21 @@
 
 import { operations, initDriveService } from "gdrivekit";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { unstable_cache, revalidateTag } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
+import {
+  buildGoogleOAuthUrl,
+  buildDriveOAuthUrl,
+  createOAuthState,
+  getBaseUrlFromHeaders,
+  getDriveClientConfig,
+  getSessionCookieOptions,
+  APP_LOGIN_STATE_COOKIE,
+  DRIVE_OAUTH_STATE_COOKIE,
+  GOOGLE_TOKEN_COOKIE,
+} from "@/lib/gdrive/google-oauth";
 
 import { createTable } from "./actions/table";
 import {
@@ -19,7 +30,7 @@ const SECRETS_FILE = path.join(process.cwd(), "api-secrets.json");
 
 export async function getAuth() {
   const cookieStore = await cookies();
-  const tokensStr = cookieStore.get("gdrive_tokens")?.value;
+  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
   const clientId = cookieStore.get("gdrive_client_id")?.value;
   const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
   const projectId = cookieStore.get("gdrive_project_id")?.value;
@@ -31,12 +42,7 @@ export async function getAuth() {
   const tokens = JSON.parse(tokensStr);
 
   const driveService = initDriveService(
-    {
-      client_id: clientId,
-      client_secret: clientSecret,
-      project_id: projectId,
-      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
-    },
+    getDriveClientConfig({ clientId, clientSecret, projectId }),
     tokens
   );
 
@@ -181,7 +187,7 @@ export async function getApiAuth(apiKey: string) {
     let tokensToUse = secrets.tokens;
     try {
       const cookieStore = await cookies();
-      const cookieTokensStr = cookieStore.get("gdrive_tokens")?.value;
+      const cookieTokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
       if (cookieTokensStr) {
         const cookieTokens = JSON.parse(cookieTokensStr);
         // Update secrets with fresh tokens from cookies
@@ -224,68 +230,61 @@ export async function getApiAuth(apiKey: string) {
   }
 }
 
-export async function authenticateWithGoogle(formData: FormData) {
+export async function authenticateWithGoogle() {
+  let authUrl = "";
+
+  try {
+    const state = createOAuthState();
+    const cookieStore = await cookies();
+    const headerStore = await headers();
+    cookieStore.set(
+      APP_LOGIN_STATE_COOKIE,
+      state,
+      getSessionCookieOptions(10 * 60)
+    );
+
+    authUrl = buildGoogleOAuthUrl(state, getBaseUrlFromHeaders(headerStore));
+  } catch (error) {
+    console.error("Error generating Google auth URL:", error);
+    throw error;
+  }
+
+  redirect(authUrl);
+}
+
+export async function connectDriveWithGoogle(formData: FormData) {
   const clientId = formData.get("clientId") as string;
   const clientSecret = formData.get("clientSecret") as string;
   const projectId = formData.get("projectId") as string;
 
   if (!clientId || !clientSecret || !projectId) {
-    throw new Error("Missing credentials");
+    throw new Error("Missing Google Drive credentials");
   }
 
-  let authUrl;
+  let authUrl = "";
+
   try {
-    // Construct Auth URL manually to avoid gdrivekit's CLI-centric behavior
-    const SCOPES = [
-      "https://www.googleapis.com/auth/drive",
-      "https://www.googleapis.com/auth/drive.file",
-      "https://www.googleapis.com/auth/script.projects",
-      "https://www.googleapis.com/auth/script.deployments",
-      "https://www.googleapis.com/auth/script.processes",
-      "https://www.googleapis.com/auth/script.metrics",
-      "https://www.googleapis.com/auth/script.scriptapp",
-      "email",
-      "profile",
-    ];
-    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`;
-
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      response_type: "code",
-      scope: SCOPES.join(" "),
-      access_type: "offline",
-      prompt: "consent",
-    });
-
-    authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-
-    // Store credentials in cookies for the callback
+    const state = createOAuthState();
     const cookieStore = await cookies();
-    const isProduction = process.env.NODE_ENV === "production";
+    const headerStore = await headers();
+    const cookieOptions = getSessionCookieOptions(10 * 60);
 
-    cookieStore.set("gdrive_client_id", clientId, {
-      secure: isProduction,
-      httpOnly: true,
-    });
-    cookieStore.set("gdrive_client_secret", clientSecret, {
-      secure: isProduction,
-      httpOnly: true,
-    });
-    cookieStore.set("gdrive_project_id", projectId, {
-      secure: isProduction,
-      httpOnly: true,
-    });
+    cookieStore.set("gdrive_client_id", clientId, cookieOptions);
+    cookieStore.set("gdrive_client_secret", clientSecret, cookieOptions);
+    cookieStore.set("gdrive_project_id", projectId, cookieOptions);
+    cookieStore.set(DRIVE_OAUTH_STATE_COOKIE, state, cookieOptions);
 
-    console.log("Auth URL generated:", authUrl);
+    authUrl = buildDriveOAuthUrl(
+      { clientId },
+      state,
+      getBaseUrlFromHeaders(headerStore)
+    );
   } catch (error) {
-    console.error("Error generating credentials:", error);
+    console.error("Error generating Google Drive auth URL:", error);
     throw error;
   }
 
-  if (authUrl) {
-    redirect(authUrl);
-  }
+  redirect(authUrl);
 }
 
 // System folder/file names to hide from user

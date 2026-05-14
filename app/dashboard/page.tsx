@@ -1,17 +1,32 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { listDatabases } from "../actions";
+import { connectDriveWithGoogle, listDatabases } from "../actions";
 import DashboardView from "../../components/DashboardView";
+import {
+  APP_SESSION_COOKIE,
+  GOOGLE_TOKEN_COOKIE,
+} from "@/lib/gdrive/google-oauth";
 
 export default async function Dashboard() {
   const cookieStore = await cookies();
-  const tokensStr = cookieStore.get("gdrive_tokens")?.value;
-  const clientId = cookieStore.get("gdrive_client_id")?.value;
-  const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
-  const projectId = cookieStore.get("gdrive_project_id")?.value;
+  const appSession = cookieStore.get(APP_SESSION_COOKIE)?.value;
+  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
+  const driveClientId = cookieStore.get("gdrive_client_id")?.value;
+  const driveClientSecret = cookieStore.get("gdrive_client_secret")?.value;
+  const driveProjectId = cookieStore.get("gdrive_project_id")?.value;
 
-  if (!tokensStr || !clientId || !clientSecret || !projectId) {
+  if (!appSession) {
     redirect("/");
+  }
+
+  if (!tokensStr || !driveClientId || !driveClientSecret || !driveProjectId) {
+    return (
+      <DashboardView
+        initialDatabases={[]}
+        needsDriveConnection
+        driveSetupAction={connectDriveWithGoogle}
+      />
+    );
   }
 
   // ✅ Now returns cached data (after first call)

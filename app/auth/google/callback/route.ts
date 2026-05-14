@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { saveUserProfile } from "../actions/user";
 import {
-  getGoogleRedirectUri,
+  APP_LOGIN_STATE_COOKIE,
+  APP_SESSION_COOKIE,
+  AppSession,
+  getAppLoginRedirectUri,
+  getGoogleOAuthConfig,
   getSessionCookieOptions,
-  DRIVE_OAUTH_STATE_COOKIE,
-  GOOGLE_TOKEN_COOKIE,
 } from "@/lib/gdrive/google-oauth";
 
 export async function GET(request: NextRequest) {
@@ -23,9 +24,7 @@ export async function GET(request: NextRequest) {
   }
 
   const cookieStore = await cookies();
-  const expectedState = cookieStore.get(DRIVE_OAUTH_STATE_COOKIE)?.value;
-  const clientId = cookieStore.get("gdrive_client_id")?.value;
-  const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
+  const expectedState = cookieStore.get(APP_LOGIN_STATE_COOKIE)?.value;
 
   if (!state || !expectedState || state !== expectedState) {
     return NextResponse.json(
@@ -34,24 +33,16 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!clientId || !clientSecret) {
-    return NextResponse.json(
-      { error: "Missing Google Drive credentials. Please connect Drive again." },
-      { status: 400 }
-    );
-  }
-
   try {
+    const { clientId, clientSecret } = getGoogleOAuthConfig();
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({
         code,
         client_id: clientId,
         client_secret: clientSecret,
-        redirect_uri: getGoogleRedirectUri(request.nextUrl.origin),
+        redirect_uri: getAppLoginRedirectUri(request.nextUrl.origin),
         grant_type: "authorization_code",
       }),
     });
@@ -59,26 +50,47 @@ export async function GET(request: NextRequest) {
     const tokens = await tokenResponse.json();
 
     if (!tokenResponse.ok) {
-      console.error("Token exchange failed:", tokens);
+      console.error("Google login token exchange failed:", tokens);
       return NextResponse.json(
         { error: tokens.error_description || "Failed to exchange tokens" },
         { status: 400 }
       );
     }
 
-    cookieStore.delete(DRIVE_OAUTH_STATE_COOKIE);
-    cookieStore.set(
-      GOOGLE_TOKEN_COOKIE,
-      JSON.stringify(tokens),
-      getSessionCookieOptions()
+    const profileResponse = await fetch(
+      "https://www.googleapis.com/oauth2/v3/userinfo",
+      {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`,
+        },
+      }
     );
 
-    // Save user profile to Drive
-    await saveUserProfile(tokens);
+    if (!profileResponse.ok) {
+      return NextResponse.json(
+        { error: "Failed to fetch Google profile" },
+        { status: 400 }
+      );
+    }
+
+    const profile = await profileResponse.json();
+    const session: AppSession = {
+      email: profile.email,
+      name: profile.name,
+      picture: profile.picture,
+      sub: profile.sub,
+    };
+
+    cookieStore.delete(APP_LOGIN_STATE_COOKIE);
+    cookieStore.set(
+      APP_SESSION_COOKIE,
+      JSON.stringify(session),
+      getSessionCookieOptions(60 * 60 * 24 * 30)
+    );
 
     return NextResponse.redirect(new URL("/dashboard", request.url));
   } catch (error: any) {
-    console.error("OAuth error:", error);
+    console.error("Google login error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

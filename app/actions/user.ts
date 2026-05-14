@@ -6,6 +6,13 @@ import { unstable_cache, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { moveFile, getOrCreateSystemFolder } from "../../lib/gdrive/operations";
+import {
+  APP_LOGIN_STATE_COOKIE,
+  APP_SESSION_COOKIE,
+  DRIVE_OAUTH_STATE_COOKIE,
+  getDriveClientConfig,
+  GOOGLE_TOKEN_COOKIE,
+} from "@/lib/gdrive/google-oauth";
 
 const USER_PROFILE_FILE = "user-profile.json";
 
@@ -22,7 +29,7 @@ export async function saveUserProfile(tokens: any) {
   const projectId = cookieStore.get("gdrive_project_id")?.value;
 
   if (!clientId || !clientSecret || !projectId) {
-    console.error("Missing credentials for saving user profile");
+    console.error("Missing Drive credentials for saving user profile");
     return;
   }
 
@@ -53,12 +60,7 @@ export async function saveUserProfile(tokens: any) {
 
     // 2. Save to Drive in _SystemData folder
     const driveService = initDriveService(
-      {
-        client_id: clientId,
-        client_secret: clientSecret,
-        project_id: projectId,
-        redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
-      },
+      getDriveClientConfig({ clientId, clientSecret, projectId }),
       tokens
     );
 
@@ -139,7 +141,10 @@ export const getUserProfile = async () => {
 
 export async function logout() {
   const cookieStore = await cookies();
-  cookieStore.delete("gdrive_tokens");
+  cookieStore.delete(APP_SESSION_COOKIE);
+  cookieStore.delete(APP_LOGIN_STATE_COOKIE);
+  cookieStore.delete(GOOGLE_TOKEN_COOKIE);
+  cookieStore.delete(DRIVE_OAUTH_STATE_COOKIE);
   cookieStore.delete("gdrive_client_id");
   cookieStore.delete("gdrive_client_secret");
   cookieStore.delete("gdrive_project_id");

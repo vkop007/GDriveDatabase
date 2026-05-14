@@ -2,25 +2,29 @@
 
 import { useState } from "react";
 import ApiAccess from "./ApiAccess";
-import CopyButton from "./CopyButton";
 import CreateDatabaseModal from "./CreateDatabaseModal";
 import RenameModal from "./RenameModal";
 import ItemSettingsModal from "./ItemSettingsModal";
 import SearchInput from "./SearchInput";
-import { deleteDatabase } from "../app/actions";
-import Link from "next/link";
-import { Database } from "lucide-react";
+import { Database, Link2 } from "lucide-react";
 import ResourceCard from "./ResourceCard";
+import DriveSetupClient from "./DriveSetupClient";
 
 interface DashboardViewProps {
   initialDatabases: any[];
+  needsDriveConnection?: boolean;
+  driveSetupAction?: (formData: FormData) => void;
 }
 
 export default function DashboardView({
   initialDatabases,
+  needsDriveConnection = false,
+  driveSetupAction,
 }: DashboardViewProps) {
   const [renamingDatabase, setRenamingDatabase] = useState<any>(null);
   const [settingsDatabase, setSettingsDatabase] = useState<any>(null);
+  const [isDriveSetupOpen, setIsDriveSetupOpen] =
+    useState(needsDriveConnection);
   const [searchQuery, setSearchQuery] = useState("");
 
   const files = searchQuery
@@ -39,18 +43,56 @@ export default function DashboardView({
             </h1>
             <div className="flex flex-wrap items-center gap-4 mt-2">
               <p className="text-neutral-400">Manage your NoSQL Databases</p>
-              <ApiAccess />
+              {!needsDriveConnection && <ApiAccess />}
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <SearchInput
-              placeholder="Search databases..."
-              value={searchQuery}
-              onChange={setSearchQuery}
-            />
-            <CreateDatabaseModal />
+            {!needsDriveConnection && (
+              <>
+                <SearchInput
+                  placeholder="Search databases..."
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                />
+                <CreateDatabaseModal />
+              </>
+            )}
+            {needsDriveConnection && (
+              <button
+                type="button"
+                onClick={() => setIsDriveSetupOpen(true)}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary/90"
+              >
+                <Link2 className="h-4 w-4" />
+                Connect Drive
+              </button>
+            )}
           </div>
         </header>
+
+        {needsDriveConnection && (
+          <div className="rounded-2xl border border-primary/25 bg-primary/10 p-5">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="font-semibold text-white">
+                  Google Drive is not connected
+                </h2>
+                <p className="mt-1 text-sm text-neutral-400">
+                  Connect your Drive credentials to load databases, create
+                  collections, and enable storage.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsDriveSetupOpen(true)}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-neutral-950 px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/10"
+              >
+                <Link2 className="h-4 w-4" />
+                Connect Google Drive
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {files.length === 0 ? (
@@ -59,6 +101,8 @@ export default function DashboardView({
               <p className="text-neutral-400">
                 {searchQuery
                   ? `No databases found matching "${searchQuery}"`
+                  : needsDriveConnection
+                  ? "Connect Google Drive to load databases and create your first one."
                   : "No databases found. Create a new database to get started."}
               </p>
             </div>
@@ -98,6 +142,14 @@ export default function DashboardView({
             setRenamingDatabase(settingsDatabase);
             setSettingsDatabase(null);
           }}
+        />
+      )}
+
+      {needsDriveConnection && driveSetupAction && (
+        <DriveSetupClient
+          isOpen={isDriveSetupOpen}
+          onClose={() => setIsDriveSetupOpen(false)}
+          onSubmit={driveSetupAction}
         />
       )}
     </div>

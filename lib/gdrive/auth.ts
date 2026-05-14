@@ -1,10 +1,14 @@
 import { initDriveService } from "gdrivekit";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import {
+  getDriveClientConfig,
+  getSessionCookieOptions,
+  GOOGLE_TOKEN_COOKIE,
+} from "./google-oauth";
 
 export async function getAuth() {
   const cookieStore = await cookies();
-  const tokensStr = cookieStore.get("gdrive_tokens")?.value;
+  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
   const clientId = cookieStore.get("gdrive_client_id")?.value;
   const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
   const projectId = cookieStore.get("gdrive_project_id")?.value;
@@ -16,75 +20,15 @@ export async function getAuth() {
   const tokens = JSON.parse(tokensStr);
 
   initDriveService(
-    {
-      client_id: clientId,
-      client_secret: clientSecret,
-      project_id: projectId,
-      redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
-    },
+    getDriveClientConfig({ clientId, clientSecret, projectId }),
     tokens
   );
 
   return { tokens, clientId, clientSecret, projectId };
 }
 
-export async function authenticateWithGoogle(formData: FormData) {
-  const clientId = formData.get("clientId") as string;
-  const clientSecret = formData.get("clientSecret") as string;
-  const projectId = formData.get("projectId") as string;
-
-  if (!clientId || !clientSecret || !projectId) {
-    throw new Error("Missing credentials");
-  }
-
-  let authUrl;
-  try {
-    // Construct Auth URL manually to avoid gdrivekit's CLI-centric behavior
-    const scope =
-      "https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/script.projects email profile";
-    const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`;
-
-    const params = new URLSearchParams({
-      client_id: clientId,
-      redirect_uri: redirectUri,
-      response_type: "code",
-      scope: scope,
-      access_type: "offline",
-      prompt: "consent",
-    });
-
-    authUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-
-    // Store credentials in cookies for the callback
-    const cookieStore = await cookies();
-    const isProduction = process.env.NODE_ENV === "production";
-
-    cookieStore.set("gdrive_client_id", clientId, {
-      secure: isProduction,
-      httpOnly: true,
-    });
-    cookieStore.set("gdrive_client_secret", clientSecret, {
-      secure: isProduction,
-      httpOnly: true,
-    });
-    cookieStore.set("gdrive_project_id", projectId, {
-      secure: isProduction,
-      httpOnly: true,
-    });
-
-    console.log("Auth URL generated:", authUrl);
-  } catch (error) {
-    console.error("Error generating credentials:", error);
-    throw error;
-  }
-
-  if (authUrl) {
-    redirect(authUrl);
-  }
-}
-
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  let { tokens, clientId, clientSecret } = await getAuth();
+  const { tokens, clientId, clientSecret } = await getAuth();
 
   const makeRequest = async (accessToken: string) => {
     const headers = {
@@ -134,10 +78,11 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
     // Middleware will handle persistent token updates
     try {
       const cookieStore = await cookies();
-      cookieStore.set("gdrive_tokens", JSON.stringify(updatedTokens), {
-        secure: process.env.NODE_ENV === "production",
-        httpOnly: true,
-      });
+      cookieStore.set(
+        GOOGLE_TOKEN_COOKIE,
+        JSON.stringify(updatedTokens),
+        getSessionCookieOptions()
+      );
     } catch {
       // Expected in Server Components - middleware handles this
     }

@@ -1,466 +1,200 @@
 "use client";
 
-import { useState, useRef } from "react";
-import {
-  Upload,
-  FileJson,
-  KeyRound,
-  ExternalLink,
-  ArrowRight,
-  CheckCircle2,
-  AlertCircle,
-  Cloud,
-  Zap,
-  Shield,
-  Download,
-} from "lucide-react";
+import { useFormStatus } from "react-dom";
 import Image from "next/image";
+import {
+  ArrowRight,
+  Cloud,
+  Database,
+  KeyRound,
+  LockKeyhole,
+  Sparkles,
+  Table2,
+  Workflow,
+} from "lucide-react";
 
 interface LoginClientProps {
   onSubmit: (formData: FormData) => void;
+  isGoogleLoginConfigured: boolean;
 }
 
-const STEPS = [
-  {
-    number: 1,
-    title: "Create Project",
-    description: "Go to Google Cloud Console and create a new project",
-    icon: Cloud,
-  },
-  {
-    number: 2,
-    title: "Enable APIs",
-    description: "Enable Google Drive API and Apps Script API",
-    icon: Zap,
-  },
-  {
-    number: 3,
-    title: "OAuth Consent",
-    description: "Configure the consent screen with your app details",
-    icon: Shield,
-  },
-  {
-    number: 4,
-    title: "Create Credentials",
-    description: "Create OAuth 2.0 Client ID (Desktop app type)",
-    icon: KeyRound,
-  },
-  {
-    number: 5,
-    title: "Download JSON",
-    description: "Download the credentials JSON file",
-    icon: Download,
-  },
+const previewStats = [
+  { label: "Collections", value: "12", icon: Database },
+  { label: "Rows synced", value: "8.4k", icon: Table2 },
+  { label: "Automations", value: "6", icon: Workflow },
 ];
 
-export default function LoginClient({ onSubmit }: LoginClientProps) {
-  const [mode, setMode] = useState<"manual" | "json">("json");
-  const [dragActive, setDragActive] = useState(false);
-  const [jsonData, setJsonData] = useState<{
-    clientId: string;
-    clientSecret: string;
-    projectId: string;
-  } | null>(null);
-  const [jsonError, setJsonError] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+function GoogleMark() {
+  return (
+    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white text-sm font-bold text-neutral-950">
+      G
+    </span>
+  );
+}
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const parseCredentialsJson = (content: string, name: string) => {
-    try {
-      const json = JSON.parse(content);
-      const creds = json.installed || json.web || json;
-
-      if (!creds.client_id || !creds.client_secret || !creds.project_id) {
-        throw new Error("Missing required fields");
-      }
-
-      setJsonData({
-        clientId: creds.client_id,
-        clientSecret: creds.client_secret,
-        projectId: creds.project_id,
-      });
-      setFileName(name);
-      setJsonError(null);
-    } catch {
-      setJsonError("Invalid credentials JSON format");
-      setJsonData(null);
-      setFileName(null);
-    }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type === "application/json") {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        parseCredentialsJson(event.target?.result as string, file.name);
-      };
-      reader.readAsText(file);
-    } else {
-      setJsonError("Please upload a JSON file");
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        parseCredentialsJson(event.target?.result as string, file.name);
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    if (mode === "json" && jsonData) {
-      formData.set("clientId", jsonData.clientId);
-      formData.set("clientSecret", jsonData.clientSecret);
-      formData.set("projectId", jsonData.projectId);
-    }
-
-    onSubmit(formData);
-  };
+function GoogleSignInButton({
+  disabled,
+}: {
+  disabled: boolean;
+}) {
+  const { pending } = useFormStatus();
+  const isDisabled = disabled || pending;
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white flex">
-      {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 xl:w-[55%] relative overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-linear-to-br from-primary/10 via-transparent to-purple-600/10" />
-        <div className="absolute top-1/3 -left-32 w-[500px] h-[500px] bg-primary/30 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/3 right-0 w-[400px] h-[400px] bg-purple-600/25 rounded-full blur-[120px]" />
+    <button
+      type="submit"
+      disabled={isDisabled}
+      className="group flex h-12 w-full items-center justify-center gap-3 rounded-xl bg-white px-5 text-sm font-semibold text-neutral-950 shadow-xl shadow-black/30 transition-all duration-200 hover:-translate-y-0.5 hover:bg-neutral-100 disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-neutral-700 disabled:text-neutral-400"
+    >
+      <GoogleMark />
+      <span>{pending ? "Opening Google..." : "Continue with Google"}</span>
+      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+    </button>
+  );
+}
 
-        {/* Right Edge Blend */}
-        <div className="absolute inset-y-0 right-0 w-48 bg-linear-to-l from-neutral-950 via-neutral-950/80 to-transparent z-20" />
-
-        {/* Grid Pattern */}
-        <div
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: "80px 80px",
-          }}
-        />
-
-        <div className="relative z-10 flex flex-col justify-center p-16 xl:p-24">
-          {/* Header */}
-          <div className="mb-16">
-            <div className="flex items-center gap-4 mb-8">
+export default function LoginClient({
+  onSubmit,
+  isGoogleLoginConfigured,
+}: LoginClientProps) {
+  return (
+    <main className="min-h-screen bg-neutral-950 text-white">
+      <div className="grid min-h-screen lg:grid-cols-[1.08fr_0.92fr]">
+        <section className="relative flex min-h-[46rem] flex-col justify-between overflow-hidden border-b border-neutral-800 bg-[radial-gradient(circle_at_15%_10%,rgba(235,0,129,0.14),transparent_32%),linear-gradient(135deg,#050505_0%,#121212_55%,#080808_100%)] p-6 sm:p-10 lg:border-b-0 lg:border-r lg:p-14">
+          <header className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
               <Image
                 src="/logo.png"
-                alt="GDrive DB Logo"
-                width={56}
-                height={56}
-                className="rounded-2xl"
-              />
-              <h1 className="text-4xl xl:text-5xl font-bold bg-linear-to-r from-white via-white to-neutral-400 bg-clip-text text-transparent">
-                GDrive DB
-              </h1>
-            </div>
-            <p className="text-neutral-400 text-xl leading-relaxed max-w-lg">
-              Transform your Google Drive into a powerful NoSQL database.
-              <span className="text-neutral-500 block mt-2">
-                Zero infrastructure. Infinite possibilities.
-              </span>
-            </p>
-          </div>
-
-          {/* Steps Guide */}
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xs font-semibold text-neutral-500 uppercase tracking-widest">
-                How to get credentials
-              </h2>
-              {/* CTA Button - inline with header */}
-              <a
-                href="https://console.cloud.google.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-neutral-900/60 border border-neutral-800 hover:border-primary/50 hover:bg-primary/10 text-xs text-neutral-400 hover:text-white transition-all duration-300 group"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span className="font-medium">Open Console</span>
-                <ArrowRight className="w-3 h-3 opacity-0 -ml-1 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
-              </a>
-            </div>
-            <div className="space-y-0">
-              {STEPS.map((step, index) => (
-                <div key={step.number} className="flex gap-4 group">
-                  {/* Step indicator with line */}
-                  <div className="flex flex-col items-center">
-                    <div className="w-10 h-10 rounded-xl bg-neutral-900/80 border border-neutral-800 flex items-center justify-center group-hover:border-primary/50 group-hover:bg-primary/10 transition-all duration-300 relative">
-                      <step.icon className="w-4 h-4 text-neutral-400 group-hover:text-primary transition-colors" />
-                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary/20 border border-primary/40 flex items-center justify-center text-[10px] font-bold text-primary">
-                        {step.number}
-                      </span>
-                    </div>
-                    {index < STEPS.length - 1 && (
-                      <div className="w-px h-6 bg-neutral-800/60 my-1" />
-                    )}
-                  </div>
-                  {/* Step content */}
-                  <div className="pt-2 pb-4">
-                    <h3 className="text-white font-medium text-sm">
-                      {step.title}
-                    </h3>
-                    <p className="text-neutral-500 text-xs mt-0.5 leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Right Panel - Login Form */}
-      <div className="w-full lg:w-1/2 xl:w-[45%] flex items-center justify-center p-8 lg:p-16">
-        <div className="w-full max-w-md">
-          {/* Mobile Header */}
-          <div className="lg:hidden text-center mb-12">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <Image
-                src="/logowhite.png"
-                alt="GDrive DB Logo"
+                alt="GDrive Database"
                 width={44}
                 height={44}
-                className="rounded-2xl"
+                className="rounded-xl"
               />
-              <h1 className="text-3xl font-bold">GDrive DB</h1>
+              <span className="text-lg font-semibold tracking-tight">
+                GDrive Database
+              </span>
             </div>
-            <p className="text-neutral-400">
-              Connect your Google Drive to get started
-            </p>
-          </div>
+            <div className="hidden items-center gap-2 rounded-full border border-neutral-800 bg-neutral-900/60 px-3 py-1.5 text-xs text-neutral-400 sm:flex">
+              <LockKeyhole className="h-3.5 w-3.5 text-emerald-400" />
+              Google secured
+            </div>
+          </header>
 
-          {/* Login Card */}
-          <div className="bg-neutral-900/40 backdrop-blur-2xl border border-neutral-800/80 rounded-3xl p-10 shadow-2xl shadow-black/60">
-            <div className="mb-8">
-              <h2 className="text-2xl font-semibold text-white">Get Started</h2>
-              <p className="text-neutral-500 mt-2">
-                Connect your Google credentials
+          <div className="mx-auto flex w-full max-w-5xl flex-1 items-center py-14 lg:py-20">
+            <div className="grid w-full gap-10 xl:grid-cols-[0.9fr_1.1fr] xl:items-center">
+              <div className="max-w-xl">
+                <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Drive-native database workspace
+                </div>
+                <h1 className="text-5xl font-semibold leading-[1.02] tracking-tight text-white sm:text-6xl">
+                  Your Google Drive, shaped into a database.
+                </h1>
+                <p className="mt-6 max-w-lg text-lg leading-8 text-neutral-400">
+                  Sign in once, then manage tables, files, functions, and API
+                  access from the dashboard.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-neutral-800 bg-neutral-900/70 p-4 shadow-2xl shadow-black/40 backdrop-blur">
+                <div className="mb-4 flex items-center justify-between border-b border-neutral-800 pb-4">
+                  <div>
+                    <p className="text-sm font-medium text-neutral-300">
+                      Production workspace
+                    </p>
+                    <p className="text-xs text-neutral-500">
+                      Synced with Google Drive
+                    </p>
+                  </div>
+                  <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300 ring-1 ring-emerald-500/20">
+                    Live
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-3">
+                  {previewStats.map((stat) => (
+                    <div
+                      key={stat.label}
+                      className="rounded-xl border border-neutral-800 bg-neutral-900/80 p-4"
+                    >
+                      <stat.icon className="mb-4 h-4 w-4 text-primary" />
+                      <p className="text-2xl font-semibold">{stat.value}</p>
+                      <p className="mt-1 text-xs text-neutral-500">
+                        {stat.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-xl border border-neutral-800 bg-neutral-900/80 p-4">
+                  <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Cloud className="h-4 w-4 text-sky-300" />
+                      <span className="text-sm font-medium">
+                        Drive resources
+                      </span>
+                    </div>
+                    <span className="text-xs text-neutral-500">Updated now</span>
+                  </div>
+                  <div className="space-y-3">
+                    {["Customers", "Orders", "Inventory"].map((item, index) => (
+                      <div
+                        key={item}
+                        className="flex items-center justify-between rounded-lg bg-neutral-950/70 px-3 py-2.5"
+                      >
+                        <span className="text-sm text-neutral-300">{item}</span>
+                        <span className="text-xs text-neutral-500">
+                          {index + 2} tables
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="flex items-center justify-center bg-neutral-950 px-6 py-12 sm:px-10">
+          <div className="w-full max-w-md">
+            <div className="mb-9">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-neutral-800 bg-neutral-900">
+                <KeyRound className="h-5 w-5 text-primary" />
+              </div>
+              <h2 className="text-3xl font-semibold tracking-tight">
+                Sign in to continue
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-neutral-500">
+                Use your Google account to connect the dashboard to Drive.
               </p>
             </div>
 
-            {/* Mode Toggle */}
-            <div className="flex p-1.5 bg-neutral-800/40 rounded-2xl mb-8">
-              <button
-                type="button"
-                onClick={() => setMode("json")}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
-                  mode === "json"
-                    ? "bg-linear-to-r from-primary to-purple-600 text-white shadow-lg shadow-primary/30"
-                    : "text-neutral-400 hover:text-white"
-                }`}
-              >
-                <Upload className="w-4 h-4" />
-                Upload JSON
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode("manual")}
-                className={`flex-1 flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
-                  mode === "manual"
-                    ? "bg-linear-to-r from-primary to-purple-600 text-white shadow-lg shadow-primary/30"
-                    : "text-neutral-400 hover:text-white"
-                }`}
-              >
-                <KeyRound className="w-4 h-4" />
-                Manual
-              </button>
-            </div>
+            <form action={onSubmit} className="space-y-4">
+              <GoogleSignInButton disabled={!isGoogleLoginConfigured} />
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {mode === "json" ? (
-                <div className="space-y-4">
-                  {/* Drag & Drop Zone */}
-                  <div
-                    onDragEnter={handleDrag}
-                    onDragLeave={handleDrag}
-                    onDragOver={handleDrag}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`relative border-2 border-dashed rounded-2xl p-10 text-center cursor-pointer transition-all duration-300 ${
-                      dragActive
-                        ? "border-primary bg-primary/10 scale-[1.02]"
-                        : jsonData
-                        ? "border-emerald-500/50 bg-emerald-500/5"
-                        : jsonError
-                        ? "border-red-500/50 bg-red-500/5"
-                        : "border-neutral-700/80 hover:border-neutral-600 hover:bg-neutral-800/20"
-                    }`}
-                  >
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".json,application/json"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-
-                    {jsonData ? (
-                      <div className="space-y-3">
-                        <div className="w-14 h-14 mx-auto rounded-2xl bg-emerald-500/20 flex items-center justify-center">
-                          <CheckCircle2 className="w-7 h-7 text-emerald-400" />
-                        </div>
-                        <p className="text-emerald-400 font-medium text-lg">
-                          {fileName}
-                        </p>
-                        <p className="text-neutral-500 text-sm">
-                          Credentials loaded • Click to change
-                        </p>
-                      </div>
-                    ) : jsonError ? (
-                      <div className="space-y-3">
-                        <div className="w-14 h-14 mx-auto rounded-2xl bg-red-500/20 flex items-center justify-center">
-                          <AlertCircle className="w-7 h-7 text-red-400" />
-                        </div>
-                        <p className="text-red-400 font-medium">{jsonError}</p>
-                        <p className="text-neutral-500 text-sm">
-                          Click or drop to try again
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="w-16 h-16 mx-auto rounded-2xl bg-neutral-800/80 flex items-center justify-center border border-neutral-700/50">
-                          <FileJson className="w-8 h-8 text-neutral-400" />
-                        </div>
-                        <div>
-                          <p className="text-white font-medium text-lg">
-                            Drop credentials JSON
-                          </p>
-                          <p className="text-neutral-500 text-sm mt-1.5">
-                            or click to browse files
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Hidden inputs for form submission */}
-                  {jsonData && (
-                    <>
-                      <input
-                        type="hidden"
-                        name="clientId"
-                        value={jsonData.clientId}
-                      />
-                      <input
-                        type="hidden"
-                        name="clientSecret"
-                        value={jsonData.clientSecret}
-                      />
-                      <input
-                        type="hidden"
-                        name="projectId"
-                        value={jsonData.projectId}
-                      />
-                    </>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-5">
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="clientId"
-                      className="text-sm font-medium text-neutral-300"
-                    >
-                      Client ID
-                    </label>
-                    <input
-                      id="clientId"
-                      name="clientId"
-                      type="text"
-                      required={mode === "manual"}
-                      placeholder="Your Google Client ID"
-                      className="w-full px-4 py-3.5 bg-neutral-800/40 border border-neutral-700/80 rounded-xl text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="clientSecret"
-                      className="text-sm font-medium text-neutral-300"
-                    >
-                      Client Secret
-                    </label>
-                    <input
-                      id="clientSecret"
-                      name="clientSecret"
-                      type="password"
-                      required={mode === "manual"}
-                      placeholder="Your Google Client Secret"
-                      className="w-full px-4 py-3.5 bg-neutral-800/40 border border-neutral-700/80 rounded-xl text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="projectId"
-                      className="text-sm font-medium text-neutral-300"
-                    >
-                      Project ID
-                    </label>
-                    <input
-                      id="projectId"
-                      name="projectId"
-                      type="text"
-                      required={mode === "manual"}
-                      placeholder="Your Google Project ID"
-                      className="w-full px-4 py-3.5 bg-neutral-800/40 border border-neutral-700/80 rounded-xl text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
-                    />
-                  </div>
+              {!isGoogleLoginConfigured && (
+                <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 p-4 text-sm leading-6 text-amber-200">
+                  Google login needs server env vars:
+                  <span className="mt-1 block font-mono text-xs text-amber-100/90">
+                    GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+                  </span>
                 </div>
               )}
-
-              <button
-                type="submit"
-                disabled={mode === "json" && !jsonData}
-                className="w-full py-4 bg-linear-to-r from-primary to-purple-600 text-white font-semibold rounded-xl hover:opacity-90 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl shadow-primary/30 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Connect Google Drive
-              </button>
             </form>
 
-            <p className="text-center text-xs text-neutral-500 mt-8 leading-relaxed">
-              Your credentials are stored locally and never sent to any external
-              server.
-            </p>
+            <div className="mt-8 grid gap-3 text-sm text-neutral-500">
+              <div className="flex items-center gap-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                OAuth credentials stay on the server
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-sky-400" />
+                No manual JSON upload required
+              </div>
+            </div>
           </div>
-
-          {/* Mobile Instructions Link */}
-          <div className="lg:hidden mt-8 text-center">
-            <a
-              href="https://console.cloud.google.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Get credentials from Google Cloud Console
-            </a>
-          </div>
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
