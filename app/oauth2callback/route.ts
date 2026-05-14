@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
     cookieStore.set(
       GOOGLE_TOKEN_COOKIE,
       JSON.stringify(tokens),
-      getSessionCookieOptions()
+      getSessionCookieOptions(60 * 60 * 24 * 30)
     );
 
     // Save user profile to Drive

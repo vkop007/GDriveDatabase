@@ -1,9 +1,11 @@
 import { getDatabaseTree } from "../actions";
+import { logout } from "../actions/user";
 import Sidebar from "../../components/Sidebar";
 import DashboardLayoutWrapper from "../../components/DashboardLayout";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
+  type AppSession,
   APP_SESSION_COOKIE,
   GOOGLE_TOKEN_COOKIE,
 } from "@/lib/gdrive/google-oauth";
@@ -24,6 +26,13 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
+  let user: AppSession = { email: "Google account" };
+  try {
+    user = JSON.parse(appSession) as AppSession;
+  } catch {
+    user = { email: "Google account" };
+  }
+
   const hasDriveConnection =
     driveTokens && driveClientId && driveClientSecret && driveProjectId;
   const treeData = hasDriveConnection ? await getDatabaseTree() : [];
@@ -31,7 +40,9 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-screen bg-neutral-950">
       <Sidebar treeData={treeData} />
-      <DashboardLayoutWrapper>{children}</DashboardLayoutWrapper>
+      <DashboardLayoutWrapper user={user} logoutAction={logout}>
+        {children}
+      </DashboardLayoutWrapper>
     </div>
   );
 }

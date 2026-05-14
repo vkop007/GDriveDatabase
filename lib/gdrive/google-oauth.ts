@@ -120,6 +120,7 @@ export function buildGoogleOAuthUrl(state: string, baseUrl?: string) {
     scope: APP_LOGIN_SCOPES.join(" "),
     access_type: "offline",
     include_granted_scopes: "true",
+    prompt: "select_account",
     state,
   });
 

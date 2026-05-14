@@ -267,12 +267,17 @@ export async function connectDriveWithGoogle(formData: FormData) {
     const state = createOAuthState();
     const cookieStore = await cookies();
     const headerStore = await headers();
-    const cookieOptions = getSessionCookieOptions(10 * 60);
+    const stateCookieOptions = getSessionCookieOptions(10 * 60);
+    const credentialCookieOptions = getSessionCookieOptions(60 * 60 * 24 * 30);
 
-    cookieStore.set("gdrive_client_id", clientId, cookieOptions);
-    cookieStore.set("gdrive_client_secret", clientSecret, cookieOptions);
-    cookieStore.set("gdrive_project_id", projectId, cookieOptions);
-    cookieStore.set(DRIVE_OAUTH_STATE_COOKIE, state, cookieOptions);
+    cookieStore.set("gdrive_client_id", clientId, credentialCookieOptions);
+    cookieStore.set(
+      "gdrive_client_secret",
+      clientSecret,
+      credentialCookieOptions
+    );
+    cookieStore.set("gdrive_project_id", projectId, credentialCookieOptions);
+    cookieStore.set(DRIVE_OAUTH_STATE_COOKIE, state, stateCookieOptions);
 
     authUrl = buildDriveOAuthUrl(
       { clientId },
