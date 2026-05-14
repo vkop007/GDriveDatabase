@@ -120,7 +120,7 @@ export async function proxy(request: NextRequest) {
         response.cookies.set(
           GOOGLE_TOKEN_COOKIE,
           JSON.stringify(updatedTokens),
-          getSessionCookieOptions()
+          getSessionCookieOptions(60 * 60 * 24 * 30)
         );
 
         return response;

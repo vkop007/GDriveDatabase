@@ -2,7 +2,7 @@
 
 import { getAuth } from "../actions";
 import { operations, initDriveService } from "gdrivekit";
-import { unstable_cache, revalidateTag } from "next/cache";
+import { unstable_cache, revalidatePath, revalidateTag } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { moveFile, getOrCreateSystemFolder } from "../../lib/gdrive/operations";
@@ -149,4 +149,17 @@ export async function logout() {
   cookieStore.delete("gdrive_client_secret");
   cookieStore.delete("gdrive_project_id");
   redirect("/");
+}
+
+export async function disconnectDrive() {
+  const cookieStore = await cookies();
+  cookieStore.delete(GOOGLE_TOKEN_COOKIE);
+  cookieStore.delete(DRIVE_OAUTH_STATE_COOKIE);
+  cookieStore.delete("gdrive_client_id");
+  cookieStore.delete("gdrive_client_secret");
+  cookieStore.delete("gdrive_project_id");
+
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/settings");
+  redirect("/dashboard/settings");
 }
