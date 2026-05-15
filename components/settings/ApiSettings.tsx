@@ -54,10 +54,7 @@ export default function ApiSettings({ initialApiKey }: ApiSettingsProps) {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
-      {/* Glow effect */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
       <div className="relative">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
@@ -65,15 +62,17 @@ export default function ApiSettings({ initialApiKey }: ApiSettingsProps) {
             <Key className="w-5 h-5 text-blue-400" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-white">API Access</h2>
-            <p className="text-neutral-400 text-sm">
+            <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
+              API Access
+            </h2>
+            <p className="text-slate-500 text-sm dark:text-neutral-400">
               Manage your API Key for programmatic access
             </p>
           </div>
         </div>
 
         {loading ? (
-          <div className="flex items-center gap-3 text-neutral-400 py-8">
+          <div className="flex items-center gap-3 text-slate-500 py-8 dark:text-neutral-400">
             <Loader2 className="w-5 h-5 animate-spin" />
             <span>Loading...</span>
           </div>
@@ -82,21 +81,21 @@ export default function ApiSettings({ initialApiKey }: ApiSettingsProps) {
             {apiKey ? (
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-medium text-neutral-500 uppercase block mb-2">
+                  <label className="text-xs font-medium text-slate-500 uppercase block mb-2 dark:text-neutral-500">
                     Current API Key
                   </label>
                   <div className="flex items-center gap-2">
-                    <div className="flex-1 bg-neutral-950/50 border border-neutral-700 rounded-xl p-4 font-mono text-sm text-green-400 break-all">
+                    <div className="flex-1 rounded-xl border border-slate-200 bg-slate-50 p-4 font-mono text-sm text-green-700 break-all dark:border-neutral-700 dark:bg-neutral-950/50 dark:text-green-400">
                       {apiKey}
                     </div>
                     <CopyButton text={apiKey} label="API Key" />
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-3 pt-4 border-t border-neutral-800">
+                <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-200 dark:border-neutral-800">
                   <button
                     onClick={handleGenerate}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl text-sm font-medium transition-all border border-neutral-700 hover:border-neutral-600"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-sm font-medium transition-all border border-slate-200 hover:border-slate-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 dark:text-white dark:border-neutral-700 dark:hover:border-neutral-600"
                   >
                     <RefreshCw className="w-4 h-4" />
                     Regenerate Key
@@ -114,7 +113,7 @@ export default function ApiSettings({ initialApiKey }: ApiSettingsProps) {
               <div>
                 <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 mb-6 flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-                  <p className="text-amber-200 text-sm">
+                  <p className="text-amber-700 text-sm dark:text-amber-200">
                     You don&apos;t have an active API Key. Generate one to start
                     using the API.
                   </p>

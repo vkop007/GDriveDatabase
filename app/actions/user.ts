@@ -9,10 +9,15 @@ import { moveFile, getOrCreateSystemFolder } from "../../lib/gdrive/operations";
 import {
   APP_LOGIN_STATE_COOKIE,
   APP_SESSION_COOKIE,
+  type DriveOAuthConfig,
   DRIVE_OAUTH_STATE_COOKIE,
   getDriveClientConfig,
   GOOGLE_TOKEN_COOKIE,
 } from "@/lib/gdrive/google-oauth";
+import {
+  deleteCurrentDriveConnection,
+  type OAuthTokens,
+} from "@/lib/gdrive/drive-connection-store";
 
 const USER_PROFILE_FILE = "user-profile.json";
 
@@ -22,11 +27,17 @@ export interface UserProfile {
   picture: string;
 }
 
-export async function saveUserProfile(tokens: any) {
+export async function saveUserProfile(
+  tokens: OAuthTokens,
+  driveConfig?: DriveOAuthConfig
+) {
   const cookieStore = await cookies();
-  const clientId = cookieStore.get("gdrive_client_id")?.value;
-  const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
-  const projectId = cookieStore.get("gdrive_project_id")?.value;
+  const clientId =
+    driveConfig?.clientId || cookieStore.get("gdrive_client_id")?.value;
+  const clientSecret =
+    driveConfig?.clientSecret || cookieStore.get("gdrive_client_secret")?.value;
+  const projectId =
+    driveConfig?.projectId || cookieStore.get("gdrive_project_id")?.value;
 
   if (!clientId || !clientSecret || !projectId) {
     console.error("Missing Drive credentials for saving user profile");
@@ -152,12 +163,7 @@ export async function logout() {
 }
 
 export async function disconnectDrive() {
-  const cookieStore = await cookies();
-  cookieStore.delete(GOOGLE_TOKEN_COOKIE);
-  cookieStore.delete(DRIVE_OAUTH_STATE_COOKIE);
-  cookieStore.delete("gdrive_client_id");
-  cookieStore.delete("gdrive_client_secret");
-  cookieStore.delete("gdrive_project_id");
+  await deleteCurrentDriveConnection();
 
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/settings");

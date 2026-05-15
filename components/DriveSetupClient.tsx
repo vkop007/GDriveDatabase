@@ -71,14 +71,14 @@ export default function DriveSetupClient({
       title="Connect Google Drive"
       maxWidth="max-w-5xl"
     >
-      <div className="space-y-5 text-white">
-        <p className="max-w-2xl text-sm leading-6 text-neutral-400">
+      <div className="space-y-5 text-slate-950 dark:text-white">
+        <p className="max-w-2xl text-sm leading-6 text-slate-600 dark:text-neutral-400">
           Add your Google Cloud OAuth credentials so GDrive Database can create
           and manage files in your Drive.
         </p>
 
         <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr]">
-          <section className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-5">
+          <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950/70 dark:shadow-none">
             <div className="mb-4 flex items-center gap-3">
               <Upload className="h-4 w-4 text-primary" />
               <h3 className="text-base font-semibold">Paste credentials JSON</h3>
@@ -88,27 +88,27 @@ export default function DriveSetupClient({
               onChange={(event) => parseCredentials(event.target.value)}
               spellCheck={false}
               placeholder='{"web":{"client_id":"...","client_secret":"...","project_id":"..."}}'
-              className="min-h-72 w-full resize-y rounded-xl border border-neutral-800 bg-neutral-950 p-4 font-mono text-xs leading-5 text-neutral-200 outline-none transition placeholder:text-neutral-600 focus:border-primary/70"
+              className="min-h-72 w-full resize-y rounded-xl border border-slate-200 bg-slate-50 p-4 font-mono text-xs leading-5 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-primary/70 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200 dark:placeholder:text-neutral-600"
             />
             {jsonStatus === "valid" && (
-              <div className="mt-3 flex items-center gap-2 text-sm text-emerald-300">
+              <div className="mt-3 flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-300">
                 <CheckCircle2 className="h-4 w-4" />
                 Credentials loaded into the form.
               </div>
             )}
             {jsonStatus === "invalid" && (
-              <p className="mt-3 text-sm text-amber-300">
+              <p className="mt-3 text-sm text-amber-600 dark:text-amber-300">
                 Paste a Google OAuth JSON file with client_id, client_secret,
                 and project_id.
               </p>
             )}
           </section>
 
-          <section className="rounded-xl border border-neutral-800 bg-neutral-950/70 p-5">
+          <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950/70 dark:shadow-none">
             <h3 className="mb-4 text-base font-semibold">Review and connect</h3>
             <form action={onSubmit} className="space-y-4">
               <label className="block">
-                <span className="mb-2 block text-sm text-neutral-300">
+                <span className="mb-2 block text-sm text-slate-600 dark:text-neutral-300">
                   Client ID
                 </span>
                 <input
@@ -116,11 +116,11 @@ export default function DriveSetupClient({
                   value={clientId}
                   onChange={(event) => setClientId(event.target.value)}
                   required
-                  className="h-11 w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3 text-sm text-white outline-none transition focus:border-primary/70"
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-950 outline-none transition focus:border-primary/70 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
                 />
               </label>
               <label className="block">
-                <span className="mb-2 block text-sm text-neutral-300">
+                <span className="mb-2 block text-sm text-slate-600 dark:text-neutral-300">
                   Client Secret
                 </span>
                 <input
@@ -129,11 +129,11 @@ export default function DriveSetupClient({
                   onChange={(event) => setClientSecret(event.target.value)}
                   required
                   type="password"
-                  className="h-11 w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3 text-sm text-white outline-none transition focus:border-primary/70"
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-950 outline-none transition focus:border-primary/70 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
                 />
               </label>
               <label className="block">
-                <span className="mb-2 block text-sm text-neutral-300">
+                <span className="mb-2 block text-sm text-slate-600 dark:text-neutral-300">
                   Project ID
                 </span>
                 <input
@@ -141,7 +141,7 @@ export default function DriveSetupClient({
                   value={projectId}
                   onChange={(event) => setProjectId(event.target.value)}
                   required
-                  className="h-11 w-full rounded-xl border border-neutral-800 bg-neutral-950 px-3 text-sm text-white outline-none transition focus:border-primary/70"
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-950 outline-none transition focus:border-primary/70 dark:border-neutral-800 dark:bg-neutral-950 dark:text-white"
                 />
               </label>
               <ConnectButton />

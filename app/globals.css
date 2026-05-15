@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ============================================
    GDrive Database - Design System
@@ -12,25 +13,32 @@
   --sidebar-width: 16rem;
 
   /* Colors - Light Mode */
-  --background: #ffffff;
-  --foreground: #171717;
-  --sidebar-bg: #ffffff;
-  --sidebar-border: #e5e5e5;
-  --sidebar-foreground: #171717;
-  --sidebar-accent: #f5f5f5;
-  --sidebar-accent-foreground: #171717;
+  --background: #f6f8fb;
+  --foreground: #101828;
+  --muted-foreground: #667085;
+  --surface-panel: #ffffff;
+  --surface-muted: #f1f5f9;
+  --surface-border: #e2e8f0;
+  --surface-border-strong: #cbd5e1;
+  --panel-shadow: 0 18px 55px rgba(15, 23, 42, 0.08);
+  --sidebar-shadow: 4px 0 28px rgba(15, 23, 42, 0.06);
+  --sidebar-bg: rgba(255, 255, 255, 0.94);
+  --sidebar-border: #e2e8f0;
+  --sidebar-foreground: #334155;
+  --sidebar-accent: #f1f5f9;
+  --sidebar-accent-foreground: #0f172a;
 
   /* Brand Colors */
-  --primary: #eb0081; /* Fuchsia-400 (Lighter & More Vibrant) */
-  --text--primary: #ffffff; /* Fuchsia-400 (Lighter & More Vibrant) */
+  --primary: #db2777;
+  --text--primary: #ffffff;
   --primary-foreground: #ffffff;
-  --primary-gradient-from: #eb00c0; /* Purple-400 */
-  --primary-gradient-to: #d61545; /* Fuchsia-400 */
-  --secondary: #d61545;
-  --accent: #3b82f6;
-  --success: #22c55e;
-  --warning: #eab308;
-  --danger: #ef4444;
+  --primary-gradient-from: #db2777;
+  --primary-gradient-to: #9333ea;
+  --secondary: #7c3aed;
+  --accent: #2563eb;
+  --success: #16a34a;
+  --warning: #ca8a04;
+  --danger: #dc2626;
 }
 
 @theme inline {
@@ -45,23 +53,34 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* Dark Mode (Default for this app) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --sidebar-bg: #0a0a0a;
-    --sidebar-border: #262626;
-    --sidebar-foreground: #a3a3a3;
-    --sidebar-accent: #262626;
-    --sidebar-accent-foreground: #ffffff;
-  }
+:root.dark {
+  --background: #07080a;
+  --foreground: #f8fafc;
+  --muted-foreground: #a1a1aa;
+  --surface-panel: #0f1117;
+  --surface-muted: #171923;
+  --surface-border: rgba(63, 63, 70, 0.72);
+  --surface-border-strong: rgba(82, 82, 91, 0.82);
+  --panel-shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  --sidebar-shadow: 4px 0 32px rgba(0, 0, 0, 0.4);
+  --sidebar-bg: rgba(10, 10, 10, 0.96);
+  --sidebar-border: rgba(38, 38, 38, 0.8);
+  --sidebar-foreground: #a3a3a3;
+  --sidebar-accent: #262626;
+  --sidebar-accent-foreground: #ffffff;
+  --primary: #ec4899;
+  --primary-gradient-from: #ec4899;
+  --primary-gradient-to: #8b5cf6;
+}
+
+html {
+  background: var(--background);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
 /* ============================================
@@ -73,19 +92,15 @@ body {
   position: relative;
   overflow: hidden;
   border-radius: 1rem;
-  border: 1px solid rgb(38, 38, 38);
-  background: linear-gradient(
-    to bottom right,
-    rgb(23, 23, 23),
-    rgb(23, 23, 23),
-    rgba(38, 38, 38, 0.5)
-  );
+  border: 1px solid var(--surface-border);
+  background: var(--surface-panel);
   padding: 1.5rem;
+  box-shadow: var(--panel-shadow);
   transition: all 0.3s ease;
 }
 
 .card:hover {
-  border-color: rgb(64, 64, 64);
+  border-color: var(--surface-border-strong);
 }
 
 /* Card with glow effect */
@@ -273,7 +288,7 @@ body {
    ============================================ */
 .progress-bar {
   height: 0.5rem;
-  background: rgb(38, 38, 38);
+  background: var(--surface-muted);
   border-radius: 9999px;
   overflow: hidden;
 }
@@ -343,13 +358,13 @@ body {
 }
 
 .btn-secondary {
-  background: rgb(38, 38, 38);
-  color: rgb(212, 212, 212);
-  border: 1px solid rgb(64, 64, 64);
+  background: var(--surface-muted);
+  color: var(--foreground);
+  border: 1px solid var(--surface-border);
 }
 .btn-secondary:hover:not(:disabled) {
-  background: rgb(64, 64, 64);
-  color: white;
+  background: color-mix(in srgb, var(--surface-muted) 78%, var(--foreground));
+  color: var(--foreground);
 }
 
 .btn-danger {
@@ -366,11 +381,11 @@ body {
 
 .btn-ghost {
   background: transparent;
-  color: rgb(163, 163, 163);
+  color: var(--muted-foreground);
 }
 .btn-ghost:hover:not(:disabled) {
-  background: rgb(38, 38, 38);
-  color: white;
+  background: var(--surface-muted);
+  color: var(--foreground);
 }
 
 /* ============================================
@@ -417,8 +432,9 @@ body {
 }
 
 .badge-neutral {
-  background: rgb(38, 38, 38);
-  color: rgb(163, 163, 163);
+  background: var(--surface-muted);
+  color: var(--muted-foreground);
+  border: 1px solid var(--surface-border);
 }
 
 /* ============================================
@@ -590,10 +606,10 @@ body {
   width: 100%;
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  background: rgb(38, 38, 38);
-  border: 1px solid rgb(64, 64, 64);
+  background: var(--surface-panel);
+  border: 1px solid var(--surface-border);
   border-radius: 0.5rem;
-  color: white;
+  color: var(--foreground);
   transition: all 0.2s ease;
   outline: none;
 }
@@ -604,7 +620,7 @@ body {
 }
 
 .input::placeholder {
-  color: rgb(115, 115, 115);
+  color: var(--muted-foreground);
 }
 
 /* Checkbox styling */
@@ -612,8 +628,8 @@ body {
   width: 1rem;
   height: 1rem;
   border-radius: 0.25rem;
-  border: 1px solid rgb(64, 64, 64);
-  background: rgb(38, 38, 38);
+  border: 1px solid var(--surface-border-strong);
+  background: var(--surface-panel);
   cursor: pointer;
   accent-color: var(--primary);
 }
@@ -622,8 +638,8 @@ body {
    13. Tables
    ============================================ */
 .table-container {
-  background: rgba(23, 23, 23, 0.5);
-  border: 1px solid rgb(38, 38, 38);
+  background: var(--surface-panel);
+  border: 1px solid var(--surface-border);
   border-radius: 0.75rem;
   overflow: hidden;
 }
@@ -636,8 +652,8 @@ body {
 
 .table th {
   padding: 0.75rem 1.5rem;
-  background: rgb(23, 23, 23);
-  color: rgb(163, 163, 163);
+  background: var(--surface-muted);
+  color: var(--muted-foreground);
   font-weight: 500;
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -646,16 +662,16 @@ body {
 
 .table td {
   padding: 1rem 1.5rem;
-  color: white;
+  color: var(--foreground);
 }
 
 .table tbody tr {
-  border-top: 1px solid rgb(38, 38, 38);
+  border-top: 1px solid var(--surface-border);
   transition: background 0.2s ease;
 }
 
 .table tbody tr:hover {
-  background: rgba(38, 38, 38, 0.5);
+  background: var(--surface-muted);
 }
 
 /* ============================================
@@ -665,15 +681,15 @@ body {
   text-align: center;
   padding: 3rem 1.5rem;
   border-radius: 0.75rem;
-  background: rgba(38, 38, 38, 0.2);
-  border: 2px dashed rgb(64, 64, 64);
+  background: color-mix(in srgb, var(--surface-panel) 72%, transparent);
+  border: 2px dashed var(--surface-border-strong);
 }
 
 .empty-state-icon {
   width: 3rem;
   height: 3rem;
   margin: 0 auto 1rem;
-  color: rgb(64, 64, 64);
+  color: color-mix(in srgb, var(--muted-foreground) 55%, transparent);
 }
 
 /* ============================================
@@ -687,10 +703,10 @@ body {
   width: fit-content;
   margin: 0 auto;
   z-index: 50;
-  background: rgb(23, 23, 23);
-  border: 1px solid rgb(64, 64, 64);
+  background: var(--surface-panel);
+  border: 1px solid var(--surface-border);
   border-radius: 0.75rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--panel-shadow);
   padding: 0.75rem 1.5rem;
   display: flex;
   align-items: center;
@@ -755,7 +771,7 @@ body {
 .divider {
   width: 1px;
   height: 1.5rem;
-  background: rgb(64, 64, 64);
+  background: var(--surface-border);
 }
 
 /* ================================
@@ -770,9 +786,9 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: #0a0a0a;
-  color: #ffffff;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Inter, ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial;
   overflow: hidden;
 }

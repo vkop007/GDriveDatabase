@@ -1,14 +1,10 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { listFunctions } from "../../actions/function";
 import FunctionsClient from "@/components/functions/FunctionsClient";
-import { GOOGLE_TOKEN_COOKIE } from "@/lib/gdrive/google-oauth";
+import { hasCurrentDriveConnection } from "@/lib/gdrive/drive-connection-store";
 
 export default async function FunctionsPage() {
-  const cookieStore = await cookies();
-  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
-
-  if (!tokensStr) {
+  if (!(await hasCurrentDriveConnection())) {
     redirect("/dashboard");
   }
 

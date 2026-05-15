@@ -20,23 +20,23 @@ export function DocsTabs() {
   return (
     <div className="space-y-8">
       {/* Getting Started */}
-      <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
+      <div className="border border-slate-200 bg-white shadow-sm shadow-slate-900/5 rounded-xl overflow-hidden dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none">
+        <div className="p-6 border-b border-slate-200 flex items-start gap-4 dark:border-neutral-800">
           <div className="p-2 rounded-lg bg-linear-to-br from-green-500/20 to-emerald-500/20 border border-green-500/20">
             <Package className="w-5 h-5 text-green-400" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-1">
+            <h3 className="text-xl font-semibold text-slate-950 mb-1 dark:text-white">
               Getting Started
             </h3>
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">
               Install and initialize the GDatabase client.
             </p>
           </div>
         </div>
         <div className="p-6 space-y-6">
           <div>
-            <h4 className="text-sm font-medium mb-2 text-white flex items-center gap-2">
+            <h4 className="text-sm font-medium mb-2 text-slate-800 flex items-center gap-2 dark:text-white">
               <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-bold">
                 1
               </span>
@@ -50,13 +50,13 @@ export function DocsTabs() {
           </div>
 
           <div>
-            <h4 className="text-sm font-medium mb-2 text-white flex items-center gap-2">
+            <h4 className="text-sm font-medium mb-2 text-slate-800 flex items-center gap-2 dark:text-white">
               <span className="w-6 h-6 rounded-full bg-primary/20 text-primary text-xs flex items-center justify-center font-bold">
                 2
               </span>
               Initialize the Client
             </h4>
-            <p className="text-sm text-neutral-400 mb-4">
+            <p className="text-sm text-slate-500 dark:text-neutral-400 mb-4">
               Get your API Key from the{" "}
               <a
                 href="/dashboard/settings"
@@ -78,16 +78,16 @@ const db = new GDatabase("YOUR_API_KEY", "https://your-app.com");`}
       </div>
 
       {/* Schema Management */}
-      <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
+      <div className="border border-slate-200 bg-white shadow-sm shadow-slate-900/5 rounded-xl overflow-hidden dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none">
+        <div className="p-6 border-b border-slate-200 flex items-start gap-4 dark:border-neutral-800">
           <div className="p-2 rounded-lg bg-linear-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/20">
             <Settings className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-1">
+            <h3 className="text-xl font-semibold text-slate-950 mb-1 dark:text-white">
               Schema Management
             </h3>
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">
               Define and modify your table structure programmatically.
             </p>
           </div>
@@ -100,7 +100,7 @@ const db = new GDatabase("YOUR_API_KEY", "https://your-app.com");`}
                 <Search className="w-3 h-3" />
                 GET
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Get current schema
               </h4>
             </div>
@@ -122,7 +122,7 @@ console.log("Columns:", columns);`}
                 <PlusCircle className="w-3 h-3" />
                 ADD
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Add new columns
               </h4>
             </div>
@@ -173,7 +173,7 @@ await schema.addColumn({
                 <RefreshCw className="w-3 h-3" />
                 UPDATE
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Modify or remove columns
               </h4>
             </div>
@@ -200,16 +200,16 @@ await schema.set([
       </div>
 
       {/* CRUD Operations */}
-      <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
+      <div className="border border-slate-200 bg-white shadow-sm shadow-slate-900/5 rounded-xl overflow-hidden dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none">
+        <div className="p-6 border-b border-slate-200 flex items-start gap-4 dark:border-neutral-800">
           <div className="p-2 rounded-lg bg-linear-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/20">
             <Zap className="w-5 h-5 text-blue-400" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-1">
+            <h3 className="text-xl font-semibold text-slate-950 mb-1 dark:text-white">
               CRUD Operations
             </h3>
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">
               Create, Read, Update, and Delete documents.
             </p>
           </div>
@@ -222,7 +222,7 @@ await schema.set([
                 <Search className="w-3 h-3" />
                 LIST
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Fetch all documents
               </h4>
             </div>
@@ -245,7 +245,7 @@ console.log(users);`}
                 <PlusCircle className="w-3 h-3" />
                 CREATE
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Add a new document
               </h4>
             </div>
@@ -274,7 +274,7 @@ console.log(newUser.$id); // Auto-generated unique ID`}
                 <RefreshCw className="w-3 h-3" />
                 UPDATE
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Modify an existing document
               </h4>
             </div>
@@ -297,7 +297,7 @@ console.log(newUser.$id); // Auto-generated unique ID`}
                 <Trash2 className="w-3 h-3" />
                 DELETE
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Remove a document
               </h4>
             </div>
@@ -313,16 +313,16 @@ console.log(newUser.$id); // Auto-generated unique ID`}
       </div>
 
       {/* Table Relationships */}
-      <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
+      <div className="border border-slate-200 bg-white shadow-sm shadow-slate-900/5 rounded-xl overflow-hidden dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none">
+        <div className="p-6 border-b border-slate-200 flex items-start gap-4 dark:border-neutral-800">
           <div className="p-2 rounded-lg bg-linear-to-br from-violet-500/20 to-purple-500/20 border border-violet-500/20">
             <Database className="w-5 h-5 text-violet-400" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-1">
+            <h3 className="text-xl font-semibold text-slate-950 mb-1 dark:text-white">
               Table Relationships
             </h3>
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">
               Link tables together using relation columns.
             </p>
           </div>
@@ -335,7 +335,7 @@ console.log(newUser.$id); // Auto-generated unique ID`}
                 <FolderPlus className="w-3 h-3" />
                 ONE-TO-MANY
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Link posts to authors
               </h4>
             </div>
@@ -378,7 +378,7 @@ const post = await db.database("my-db").table("posts-id").create({
                 <Search className="w-3 h-3" />
                 QUERY
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Resolve related data
               </h4>
             </div>
@@ -405,7 +405,7 @@ console.log(postsWithAuthor[0].author.name); // "John Doe"`}
                 <RefreshCw className="w-3 h-3" />
                 MANY-TO-MANY
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Posts with multiple tags
               </h4>
             </div>
@@ -438,16 +438,16 @@ await db.database("my-db").table("posts-id").create({
       </div>
 
       {/* Storage Bucket */}
-      <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
+      <div className="border border-slate-200 bg-white shadow-sm shadow-slate-900/5 rounded-xl overflow-hidden dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none">
+        <div className="p-6 border-b border-slate-200 flex items-start gap-4 dark:border-neutral-800">
           <div className="p-2 rounded-lg bg-linear-to-br from-pink-500/20 to-rose-500/20 border border-pink-500/20">
             <HardDrive className="w-5 h-5 text-pink-400" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-1">
+            <h3 className="text-xl font-semibold text-slate-950 mb-1 dark:text-white">
               Storage Bucket
             </h3>
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">
               Upload, manage, and serve files from Google Drive storage.
             </p>
           </div>
@@ -460,7 +460,7 @@ await db.database("my-db").table("posts-id").create({
                 <Upload className="w-3 h-3" />
                 UPLOAD
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 Upload files to bucket
               </h4>
             </div>
@@ -503,7 +503,7 @@ await bucket.uploadFromBuffer(buffer, "doc.pdf", "application/pdf");`}
                 <Search className="w-3 h-3" />
                 LIST
               </span>
-              <h4 className="text-sm font-medium text-white">
+              <h4 className="text-sm font-medium text-slate-800 dark:text-white">
                 List and manage files
               </h4>
             </div>
@@ -527,68 +527,68 @@ const thumb = bucket.getThumbnailUrl("file-id", 200);`}
       </div>
 
       {/* Data Types */}
-      <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-neutral-800 flex items-start gap-4">
+      <div className="border border-slate-200 bg-white shadow-sm shadow-slate-900/5 rounded-xl overflow-hidden dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none">
+        <div className="p-6 border-b border-slate-200 flex items-start gap-4 dark:border-neutral-800">
           <div className="p-2 rounded-lg bg-linear-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/20">
             <Database className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white mb-1">
+            <h3 className="text-xl font-semibold text-slate-950 mb-1 dark:text-white">
               Supported Data Types
             </h3>
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">
               Field types available for your schema.
             </p>
           </div>
         </div>
         <div className="p-6">
           <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            <div className="bg-neutral-950/50 rounded-xl p-4 border border-neutral-800">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-neutral-800 dark:bg-neutral-950/50">
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-blue-500/10 text-blue-400 border border-blue-500/20">
                 string
               </span>
-              <p className="text-sm text-neutral-400 mt-2">
+              <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">
                 Text, emails, URLs
               </p>
             </div>
-            <div className="bg-neutral-950/50 rounded-xl p-4 border border-neutral-800">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-neutral-800 dark:bg-neutral-950/50">
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-green-500/10 text-green-400 border border-green-500/20">
                 integer
               </span>
-              <p className="text-sm text-neutral-400 mt-2">Whole numbers</p>
+              <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">Whole numbers</p>
             </div>
-            <div className="bg-neutral-950/50 rounded-xl p-4 border border-neutral-800">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-neutral-800 dark:bg-neutral-950/50">
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
                 boolean
               </span>
-              <p className="text-sm text-neutral-400 mt-2">True/false flags</p>
+              <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">True/false flags</p>
             </div>
-            <div className="bg-neutral-950/50 rounded-xl p-4 border border-neutral-800">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-neutral-800 dark:bg-neutral-950/50">
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                 datetime
               </span>
-              <p className="text-sm text-neutral-400 mt-2">Dates and times</p>
+              <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">Dates and times</p>
             </div>
-            <div className="bg-neutral-950/50 rounded-xl p-4 border border-neutral-800">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-neutral-800 dark:bg-neutral-950/50">
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
                 relation
               </span>
-              <p className="text-sm text-neutral-400 mt-2">
+              <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">
                 Link to other tables
               </p>
             </div>
-            <div className="bg-neutral-950/50 rounded-xl p-4 border border-neutral-800">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-neutral-800 dark:bg-neutral-950/50">
               <span className="px-2 py-0.5 rounded text-xs font-medium bg-pink-500/10 text-pink-400 border border-pink-500/20">
                 storage
               </span>
-              <p className="text-sm text-neutral-400 mt-2">Files from bucket</p>
+              <p className="text-sm text-slate-500 dark:text-neutral-400 mt-2">Files from bucket</p>
             </div>
           </div>
 
           <div className="mt-6 p-4 bg-linear-to-r from-blue-500/5 to-purple-500/5 border border-blue-500/20 rounded-xl flex items-start gap-3">
             <CheckCircle className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-neutral-300">
-              <strong className="text-white">Arrays:</strong> Add{" "}
+            <p className="text-sm text-slate-600 dark:text-neutral-300">
+              <strong className="text-slate-950 dark:text-white">Arrays:</strong> Add{" "}
               <code className="bg-blue-500/20 px-1.5 py-0.5 rounded text-blue-300 text-xs">
                 array: true
               </code>{" "}
@@ -599,12 +599,12 @@ const thumb = bucket.getThumbnailUrl("file-id", 200);`}
       </div>
 
       {/* Complete Example */}
-      <div className="border border-neutral-800 bg-neutral-900/50 rounded-xl overflow-hidden">
-        <div className="p-6 border-b border-neutral-800">
-          <h3 className="text-xl font-semibold text-white mb-1">
+      <div className="border border-slate-200 bg-white shadow-sm shadow-slate-900/5 rounded-xl overflow-hidden dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none">
+        <div className="p-6 border-b border-slate-200 dark:border-neutral-800">
+          <h3 className="text-xl font-semibold text-slate-950 mb-1 dark:text-white">
             Complete Example
           </h3>
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-slate-500 dark:text-neutral-400">
             A full workflow from setup to CRUD operations with schema and
             bucket.
           </p>

@@ -15,11 +15,11 @@ export default function SearchInput({
 }: SearchInputProps) {
   return (
     <div className="relative flex items-center w-full md:w-auto">
-      <Search className="absolute left-3 w-4 h-4 text-neutral-500" />
+      <Search className="absolute left-3 h-4 w-4 text-slate-400 dark:text-neutral-500" />
       <input
         type="text"
         placeholder={placeholder}
-        className="w-full md:w-64 py-2 pl-10 pr-3 text-sm bg-neutral-800 border border-neutral-700 rounded-lg text-white placeholder:text-neutral-500 focus:outline-none focus:border-neutral-500 focus:ring-2 focus:ring-neutral-500/20 transition-all"
+        className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-10 pr-3 text-sm text-slate-950 shadow-sm placeholder:text-slate-400 transition-all focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/15 dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500 md:w-64"
         value={value}
         onChange={(e) => onChange?.(e.target.value)}
       />

@@ -1,19 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { AppSession } from "@/lib/gdrive/google-oauth";
-import ProfileMenu from "./ProfileMenu";
 
 interface DashboardLayoutWrapperProps {
   children: React.ReactNode;
-  user: AppSession;
-  logoutAction: () => Promise<void>;
 }
 
 export default function DashboardLayoutWrapper({
   children,
-  user,
-  logoutAction,
 }: DashboardLayoutWrapperProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -51,13 +45,10 @@ export default function DashboardLayoutWrapper({
 
   return (
     <main
-      className={`flex-1 h-screen overflow-y-auto transition-all duration-300 ease-out ${
+      className={`flex-1 h-screen overflow-y-auto bg-slate-50 text-slate-950 transition-all duration-300 ease-out dark:bg-neutral-950 dark:text-white ${
         isCollapsed ? "md:ml-20" : "md:ml-68"
       }`}
     >
-      <div className="fixed right-4 top-4 z-30 md:right-6">
-        <ProfileMenu user={user} logoutAction={logoutAction} />
-      </div>
       {children}
     </main>
   );

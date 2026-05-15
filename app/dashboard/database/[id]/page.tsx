@@ -1,8 +1,7 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { listCollections } from "../../../actions";
 import DatabaseView from "../../../../components/DatabaseView";
-import { GOOGLE_TOKEN_COOKIE } from "@/lib/gdrive/google-oauth";
+import { hasCurrentDriveConnection } from "@/lib/gdrive/drive-connection-store";
 
 export default async function DatabasePage({
   params,
@@ -10,10 +9,8 @@ export default async function DatabasePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const cookieStore = await cookies();
-  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
 
-  if (!tokensStr) {
+  if (!(await hasCurrentDriveConnection())) {
     redirect("/dashboard");
   }
 

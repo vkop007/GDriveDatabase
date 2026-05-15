@@ -5,6 +5,7 @@ import {
   getDriveClientConfig,
   GOOGLE_TOKEN_COOKIE,
 } from "@/lib/gdrive/google-oauth";
+import { getAuth } from "@/lib/gdrive/auth";
 
 // Helper to initialize drive service from cookies or headers
 async function initService(req: NextRequest) {
@@ -20,6 +21,11 @@ async function initService(req: NextRequest) {
     req.headers.get("x-gdrive-project-id") ||
     cookieStore.get("gdrive_project_id")?.value;
   const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
+
+  if (!req.headers.get("x-gdrive-client-id") && !tokensStr) {
+    await getAuth();
+    return;
+  }
 
   let tokens;
   if (tokensStr) {

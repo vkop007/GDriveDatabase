@@ -31,14 +31,15 @@ export default function ResourceCard({
         shadowHover: "hover:shadow-primary/10",
         gradientStart: "from-primary/5",
         gradientEnd: "to-primary/5",
-        iconBoxGradientStart: "bg-linear-to-br from-neutral-800 to-neutral-900",
+        iconBoxGradientStart:
+          "bg-linear-to-br from-slate-100 to-white dark:from-neutral-800 dark:to-neutral-900",
         iconBoxHoverStart: "group-hover:from-primary/20",
         iconBoxHoverEnd: "group-hover:to-primary/20",
         iconBoxBorderHover: "group-hover:border-primary/30",
         iconColor: "text-primary",
         iconHoverColor: "group-hover:text-primary",
         badgeBorderHover: "group-hover:border-primary/20",
-        titleHover: "group-hover:text-primary-foreground",
+        titleHover: "group-hover:text-primary",
         Icon: Database,
         buttonVariant: "pink" as const,
       }
@@ -47,21 +48,22 @@ export default function ResourceCard({
         shadowHover: "hover:shadow-primary/10",
         gradientStart: "from-primary/5",
         gradientEnd: "to-primary/5",
-        iconBoxGradientStart: "bg-linear-to-br from-neutral-800 to-neutral-900",
+        iconBoxGradientStart:
+          "bg-linear-to-br from-slate-100 to-white dark:from-neutral-800 dark:to-neutral-900",
         iconBoxHoverStart: "group-hover:from-primary/20",
         iconBoxHoverEnd: "group-hover:to-primary/20",
         iconBoxBorderHover: "group-hover:border-primary/30",
         iconColor: "text-primary",
         iconHoverColor: "group-hover:text-primary",
         badgeBorderHover: "group-hover:border-primary/20",
-        titleHover: "group-hover:text-primary-foreground",
+        titleHover: "group-hover:text-primary",
         Icon: Table,
         buttonVariant: "pink" as const,
       };
 
   return (
     <div
-      className={`group relative bg-neutral-900/50 backdrop-blur-sm border border-white/5 rounded-2xl overflow-hidden ${theme.borderHover} transition-all duration-300 hover:shadow-xl ${theme.shadowHover} hover:-translate-y-1`}
+      className={`group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl dark:border-white/5 dark:bg-neutral-900/50 ${theme.borderHover} ${theme.shadowHover}`}
     >
       {/* Gradient Glow */}
       <div
@@ -71,14 +73,14 @@ export default function ResourceCard({
       <Link href={href} className="block p-6 relative z-10">
         <div className="flex items-start justify-between mb-6">
           <div
-            className={`w-12 h-12 rounded-xl ${theme.iconBoxGradientStart} border border-white/10 flex items-center justify-center ${theme.iconBoxHoverStart} ${theme.iconBoxHoverEnd} ${theme.iconBoxBorderHover} transition-all duration-300 shadow-lg`}
+            className={`w-12 h-12 rounded-xl ${theme.iconBoxGradientStart} border border-slate-200 dark:border-white/10 flex items-center justify-center ${theme.iconBoxHoverStart} ${theme.iconBoxHoverEnd} ${theme.iconBoxBorderHover} transition-all duration-300 shadow-lg shadow-slate-900/5 dark:shadow-black/20`}
           >
             <theme.Icon
-              className={`w-6 h-6 text-neutral-400 ${theme.iconHoverColor} transition-colors`}
+              className={`w-6 h-6 text-slate-500 dark:text-neutral-400 ${theme.iconHoverColor} transition-colors`}
             />
           </div>
           <span
-            className={`text-[10px] font-medium text-neutral-500 bg-neutral-900/50 border border-white/5 px-2 py-1 rounded-full ${theme.badgeBorderHover} transition-colors`}
+            className={`text-[10px] font-medium text-slate-500 dark:text-neutral-500 bg-slate-100 dark:bg-neutral-900/50 border border-slate-200 dark:border-white/5 px-2 py-1 rounded-full ${theme.badgeBorderHover} transition-colors`}
           >
             {new Date(createdTime).toLocaleDateString("en-US", {
               year: "numeric",
@@ -89,7 +91,7 @@ export default function ResourceCard({
         </div>
 
         <h3
-          className={`text-lg font-semibold text-white truncate mb-1 ${theme.titleHover} transition-colors`}
+          className={`text-lg font-semibold text-slate-950 dark:text-white truncate mb-1 ${theme.titleHover} transition-colors`}
           title={name}
         >
           {name}

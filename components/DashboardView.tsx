@@ -34,50 +34,40 @@ export default function DashboardView({
     : initialDatabases;
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white pt-20 px-4 pb-4 md:p-8">
+    <div className="min-h-screen bg-slate-50 px-4 pb-4 pt-20 text-slate-950 transition-colors dark:bg-neutral-950 dark:text-white md:p-8">
       <div className="max-w-full mx-auto space-y-8">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold bg-linear-to-r from-white via-white to-white bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-950 dark:text-white">
               Databases
             </h1>
             <div className="flex flex-wrap items-center gap-4 mt-2">
-              <p className="text-neutral-400">Manage your NoSQL Databases</p>
+              <p className="text-slate-500 dark:text-neutral-400">
+                Manage your NoSQL Databases
+              </p>
               {!needsDriveConnection && <ApiAccess />}
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            {!needsDriveConnection && (
-              <>
-                <SearchInput
-                  placeholder="Search databases..."
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                />
-                <CreateDatabaseModal />
-              </>
-            )}
-            {needsDriveConnection && (
-              <button
-                type="button"
-                onClick={() => setIsDriveSetupOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-primary/90"
-              >
-                <Link2 className="h-4 w-4" />
-                Connect Drive
-              </button>
-            )}
-          </div>
+          {!needsDriveConnection && (
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <SearchInput
+                placeholder="Search databases..."
+                value={searchQuery}
+                onChange={setSearchQuery}
+              />
+              <CreateDatabaseModal />
+            </div>
+          )}
         </header>
 
         {needsDriveConnection && (
-          <div className="rounded-2xl border border-primary/25 bg-primary/10 p-5">
+          <div className="rounded-2xl border border-primary/20 bg-white p-5 shadow-sm shadow-slate-900/5 dark:border-primary/25 dark:bg-primary/10 dark:shadow-none">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div>
-                <h2 className="font-semibold text-white">
+                <h2 className="font-semibold text-slate-950 dark:text-white">
                   Google Drive is not connected
                 </h2>
-                <p className="mt-1 text-sm text-neutral-400">
+                <p className="mt-1 text-sm text-slate-500 dark:text-neutral-400">
                   Connect your Drive credentials to load databases, create
                   collections, and enable storage.
                 </p>
@@ -85,7 +75,7 @@ export default function DashboardView({
               <button
                 type="button"
                 onClick={() => setIsDriveSetupOpen(true)}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-neutral-950 px-4 py-2.5 text-sm font-semibold text-primary transition hover:bg-primary/10"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-primary/25 bg-white px-4 py-2.5 text-sm font-semibold text-primary shadow-sm transition hover:bg-primary/10 dark:border-primary/30 dark:bg-neutral-950"
               >
                 <Link2 className="h-4 w-4" />
                 Connect Google Drive
@@ -98,7 +88,7 @@ export default function DashboardView({
           {files.length === 0 ? (
             <div className="col-span-full empty-state">
               <Database className="empty-state-icon" />
-              <p className="text-neutral-400">
+              <p className="text-slate-500 dark:text-neutral-400">
                 {searchQuery
                   ? `No databases found matching "${searchQuery}"`
                   : needsDriveConnection
