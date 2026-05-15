@@ -48,28 +48,16 @@ export default function DashboardView({
               {!needsDriveConnection && <ApiAccess />}
             </div>
           </div>
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            {!needsDriveConnection && (
-              <>
-                <SearchInput
-                  placeholder="Search databases..."
-                  value={searchQuery}
-                  onChange={setSearchQuery}
-                />
-                <CreateDatabaseModal />
-              </>
-            )}
-            {needsDriveConnection && (
-              <button
-                type="button"
-                onClick={() => setIsDriveSetupOpen(true)}
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/20 transition hover:bg-primary/90"
-              >
-                <Link2 className="h-4 w-4" />
-                Connect Drive
-              </button>
-            )}
-          </div>
+          {!needsDriveConnection && (
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <SearchInput
+                placeholder="Search databases..."
+                value={searchQuery}
+                onChange={setSearchQuery}
+              />
+              <CreateDatabaseModal />
+            </div>
+          )}
         </header>
 
         {needsDriveConnection && (

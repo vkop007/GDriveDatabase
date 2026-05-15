@@ -129,20 +129,19 @@ export default function BackupSettings() {
 
   if (checkingStatus) {
     return (
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
         <div className="flex items-center gap-3">
           <Loader2 className="w-5 h-5 text-primary animate-spin" />
-          <span className="text-neutral-400">Checking backup status...</span>
+          <span className="text-slate-500 dark:text-neutral-400">
+            Checking backup status...
+          </span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
-      {/* Glow effect */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-
+    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
       <div className="relative">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -150,10 +149,10 @@ export default function BackupSettings() {
             <DatabaseBackup className="w-5 h-5 text-emerald-400" />
           </div>
           <div>
-            <h2 className="text-xl font-semibold text-white">
+            <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
               Backup Database
             </h2>
-            <p className="text-neutral-400 text-sm">
+            <p className="text-slate-500 text-sm dark:text-neutral-400">
               Automatic daily backups to keep your data safe
             </p>
           </div>
@@ -167,7 +166,7 @@ export default function BackupSettings() {
                 <Shield className="w-5 h-5" />
                 <span className="font-medium">Auto-backup Enabled</span>
               </div>
-              <p className="text-neutral-400 text-sm">
+              <p className="text-slate-600 text-sm dark:text-neutral-400">
                 Your database is automatically backed up once per day when you
                 visit the site. Old backups are deleted before creating new
                 ones.
@@ -175,8 +174,8 @@ export default function BackupSettings() {
             </div>
 
             {lastBackup && (
-              <div className="flex items-center gap-2 text-sm text-neutral-300 bg-neutral-800/50 rounded-lg p-3 border border-neutral-700/50">
-                <Calendar className="w-4 h-4 text-neutral-500" />
+              <div className="flex items-center gap-2 text-sm text-slate-700 bg-slate-50 rounded-lg p-3 border border-slate-200 dark:text-neutral-300 dark:bg-neutral-800/50 dark:border-neutral-700/50">
+                <Calendar className="w-4 h-4 text-slate-400 dark:text-neutral-500" />
                 <span>Last backup: {lastBackup}</span>
               </div>
             )}
@@ -184,7 +183,7 @@ export default function BackupSettings() {
         ) : (
           // Auto-backup not enabled - show setup
           <>
-            <p className="text-neutral-400 text-sm mb-6">
+            <p className="text-slate-600 text-sm mb-6 dark:text-neutral-400">
               Enable automatic daily backups. Your database will be backed up
               once per day when you visit the site. Old backups are
               automatically deleted before creating new ones.
@@ -201,7 +200,7 @@ export default function BackupSettings() {
               {/* Authorization required state */}
               {awaitingAuth && authUrl && (
                 <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 space-y-3">
-                  <p className="text-amber-200 text-sm">
+                  <p className="text-amber-700 text-sm dark:text-amber-200">
                     <strong>One-time authorization required:</strong> The backup
                     script needs your permission to access Google Drive.
                   </p>
@@ -228,7 +227,7 @@ export default function BackupSettings() {
                       I&apos;ve Authorized
                     </button>
                   </div>
-                  <p className="text-amber-200/70 text-xs">
+                  <p className="text-amber-700/80 text-xs dark:text-amber-200/70">
                     Click &quot;Review Permissions&quot; and authorize, then
                     click the green button.
                   </p>

@@ -51,9 +51,12 @@ function StatusPill({
   tone: "green" | "amber" | "neutral";
 }) {
   const styles = {
-    green: "border-emerald-500/25 bg-emerald-500/10 text-emerald-300",
-    amber: "border-amber-500/25 bg-amber-500/10 text-amber-300",
-    neutral: "border-neutral-700 bg-neutral-900 text-neutral-300",
+    green:
+      "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+    amber:
+      "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+    neutral:
+      "border-slate-200 bg-slate-100 text-slate-600 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300",
   };
 
   return (
@@ -75,12 +78,12 @@ function DetailRow({
   value: string;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4 border-t border-neutral-800 py-3">
-      <div className="flex min-w-0 items-center gap-3 text-sm text-neutral-400">
-        <span className="text-neutral-500">{icon}</span>
+    <div className="flex items-center justify-between gap-4 border-t border-slate-200 py-3 dark:border-neutral-800">
+      <div className="flex min-w-0 items-center gap-3 text-sm text-slate-500 dark:text-neutral-400">
+        <span className="text-slate-400 dark:text-neutral-500">{icon}</span>
         <span>{label}</span>
       </div>
-      <span className="min-w-0 truncate text-right font-mono text-xs text-neutral-200">
+      <span className="min-w-0 truncate text-right font-mono text-xs text-slate-700 dark:text-neutral-200">
         {value}
       </span>
     </div>
@@ -119,17 +122,17 @@ export default function AccountDriveSettings({
   return (
     <>
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <section className="rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
                 <User className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
                   Account
                 </h2>
-                <p className="text-sm text-neutral-400">
+                <p className="text-sm text-slate-500 dark:text-neutral-400">
                   App login identity
                 </p>
               </div>
@@ -145,7 +148,7 @@ export default function AccountDriveSettings({
           </div>
 
           <div className="mt-6 flex items-center gap-4">
-            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-neutral-700 bg-neutral-950">
+            <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100 dark:border-neutral-700 dark:bg-neutral-950">
               {user?.picture ? (
                 <Image
                   src={user.picture}
@@ -161,10 +164,10 @@ export default function AccountDriveSettings({
               )}
             </div>
             <div className="min-w-0">
-              <p className="truncate text-lg font-semibold text-white">
+              <p className="truncate text-lg font-semibold text-slate-950 dark:text-white">
                 {displayName}
               </p>
-              <p className="truncate text-sm text-neutral-400">
+              <p className="truncate text-sm text-slate-500 dark:text-neutral-400">
                 {user?.email || "No email found"}
               </p>
             </div>
@@ -184,17 +187,17 @@ export default function AccountDriveSettings({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-neutral-800 bg-gradient-to-br from-neutral-900 via-neutral-900 to-neutral-800 p-6">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10">
                 <Database className="h-5 w-5 text-blue-300" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
                   Google Drive
                 </h2>
-                <p className="text-sm text-neutral-400">
+                <p className="text-sm text-slate-500 dark:text-neutral-400">
                   User-owned OAuth credentials
                 </p>
               </div>
@@ -248,7 +251,7 @@ export default function AccountDriveSettings({
               <button
                 type="submit"
                 disabled={!drive.hasCredentials && !drive.hasToken}
-                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-red-500/25 bg-red-500/10 px-5 text-sm font-semibold text-red-300 transition hover:bg-red-500/15 disabled:cursor-not-allowed disabled:border-neutral-800 disabled:bg-neutral-900 disabled:text-neutral-600 sm:w-auto"
+                className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-red-500/25 bg-red-500/10 px-5 text-sm font-semibold text-red-600 transition hover:bg-red-500/15 disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-100 disabled:text-slate-400 sm:w-auto dark:text-red-300 dark:disabled:border-neutral-800 dark:disabled:bg-neutral-900 dark:disabled:text-neutral-600"
               >
                 <Unplug className="h-4 w-4" />
                 Disconnect Drive
@@ -257,14 +260,14 @@ export default function AccountDriveSettings({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-sky-500/20 bg-sky-500/5 p-6 xl:col-span-2">
+        <section className="rounded-2xl border border-sky-500/20 bg-sky-50 p-6 xl:col-span-2 dark:bg-sky-500/5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-sm font-semibold text-sky-200">
+              <div className="flex items-center gap-2 text-sm font-semibold text-sky-700 dark:text-sky-200">
                 <Link2 className="h-4 w-4" />
                 Google OAuth Redirect URI
               </div>
-              <p className="mt-2 truncate font-mono text-sm text-neutral-100">
+              <p className="mt-2 truncate font-mono text-sm text-slate-700 dark:text-neutral-100">
                 {drive.redirectUri}
               </p>
             </div>
@@ -272,7 +275,7 @@ export default function AccountDriveSettings({
               <button
                 type="button"
                 onClick={copyRedirectUri}
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-sky-500/25 bg-sky-500/10 px-4 text-sm font-medium text-sky-100 transition hover:bg-sky-500/15"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-sky-500/25 bg-sky-500/10 px-4 text-sm font-medium text-sky-700 transition hover:bg-sky-500/15 dark:text-sky-100"
               >
                 <Copy className="h-4 w-4" />
                 Copy URI
@@ -281,7 +284,7 @@ export default function AccountDriveSettings({
                 href="https://console.cloud.google.com/apis/credentials"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-neutral-700 bg-neutral-900 px-4 text-sm font-medium text-neutral-200 transition hover:border-neutral-600 hover:bg-neutral-800"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-600 dark:hover:bg-neutral-800"
               >
                 <ExternalLink className="h-4 w-4" />
                 Google Console
