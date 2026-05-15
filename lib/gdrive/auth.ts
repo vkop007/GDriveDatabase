@@ -1,5 +1,6 @@
 import { initDriveService } from "gdrivekit";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import {
   getDriveClientConfig,
   getSessionCookieOptions,
@@ -10,7 +11,7 @@ import {
   saveCurrentDriveTokens,
 } from "./drive-connection-store";
 
-export async function getAuth() {
+export const getAuth = cache(async function getAuth() {
   const connection = await getCurrentDriveConnection();
 
   if (!connection) {
@@ -27,7 +28,7 @@ export async function getAuth() {
   );
 
   return { ...connection, driveService };
-}
+});
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const { tokens, clientId, clientSecret } = await getAuth();

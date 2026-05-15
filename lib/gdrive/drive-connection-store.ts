@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { cache } from "react";
 import {
   APP_SESSION_COOKIE,
   DRIVE_OAUTH_STATE_COOKIE,
@@ -50,7 +51,7 @@ function getSessionUserId(session: AppSession) {
   return session.sub || session.email;
 }
 
-export async function getCurrentAppSession() {
+export const getCurrentAppSession = cache(async function getCurrentAppSession() {
   const cookieStore = await cookies();
   const sessionValue = cookieStore.get(APP_SESSION_COOKIE)?.value;
 
@@ -61,7 +62,7 @@ export async function getCurrentAppSession() {
   } catch {
     return null;
   }
-}
+});
 
 async function getLegacyCookieConnection() {
   const cookieStore = await cookies();
@@ -282,41 +283,47 @@ export async function saveDriveConnection(
   return true;
 }
 
-export async function getCurrentDriveConnection() {
-  const session = await getCurrentAppSession();
-  const dbReady = await ensureTursoSchema();
-  const db = getTursoClient();
+export const getCurrentDriveConnection = cache(
+  async function getCurrentDriveConnection() {
+    const session = await getCurrentAppSession();
+    const dbReady = await ensureTursoSchema();
+    const db = getTursoClient();
 
-  if (session && dbReady && db) {
-    const result = await db.execute({
-      sql: "SELECT * FROM drive_connections WHERE user_id = ?",
-      args: [getSessionUserId(session)],
-    });
-    const row = result.rows[0];
+    if (session && dbReady && db) {
+      const result = await db.execute({
+        sql: "SELECT * FROM drive_connections WHERE user_id = ?",
+        args: [getSessionUserId(session)],
+      });
+      const row = result.rows[0];
 
-    if (row) {
-      return {
-        userId: readString(row.user_id) || getSessionUserId(session),
-        userEmail: readString(row.user_email),
-        userName: readString(row.user_name),
-        userPicture: readString(row.user_picture),
-        clientId: readString(row.client_id) || "",
-        clientSecret: decryptJson<string>(
-          readString(row.client_secret_encrypted) || ""
-        ),
-        projectId: readString(row.project_id) || "",
-        tokens: decryptJson<OAuthTokens>(readString(row.tokens_encrypted) || ""),
-        scopes: readString(row.scopes),
-      } satisfies StoredDriveConnection;
+      if (row) {
+        return {
+          userId: readString(row.user_id) || getSessionUserId(session),
+          userEmail: readString(row.user_email),
+          userName: readString(row.user_name),
+          userPicture: readString(row.user_picture),
+          clientId: readString(row.client_id) || "",
+          clientSecret: decryptJson<string>(
+            readString(row.client_secret_encrypted) || ""
+          ),
+          projectId: readString(row.project_id) || "",
+          tokens: decryptJson<OAuthTokens>(
+            readString(row.tokens_encrypted) || ""
+          ),
+          scopes: readString(row.scopes),
+        } satisfies StoredDriveConnection;
+      }
     }
+
+    return getLegacyCookieConnection();
   }
+);
 
-  return getLegacyCookieConnection();
-}
-
-export async function hasCurrentDriveConnection() {
-  return Boolean(await getCurrentDriveConnection());
-}
+export const hasCurrentDriveConnection = cache(
+  async function hasCurrentDriveConnection() {
+    return Boolean(await getCurrentDriveConnection());
+  }
+);
 
 export async function saveCurrentDriveTokens(tokens: OAuthTokens) {
   const session = await getCurrentAppSession();

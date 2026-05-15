@@ -28,9 +28,11 @@ function parseAppSession(value?: string) {
 export default async function SettingsPage() {
   const cookieStore = await cookies();
   const headerStore = await headers();
-  const apiKey = await getApiKey();
+  const [apiKey, driveConnection] = await Promise.all([
+    getApiKey(),
+    getCurrentDriveConnection(),
+  ]);
   const user = parseAppSession(cookieStore.get(APP_SESSION_COOKIE)?.value);
-  const driveConnection = await getCurrentDriveConnection();
   const driveClientId = driveConnection?.clientId || null;
   const driveProjectId = driveConnection?.projectId || null;
   const hasCredentials = Boolean(

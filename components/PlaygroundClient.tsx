@@ -193,7 +193,7 @@ function highlightJSONString(json: string, startKey: number): React.ReactNode {
 interface DatabaseTreeItem {
   id: string;
   name: string;
-  tables: { id: string; name: string; schema: any[] }[];
+  tables: { id: string; name: string; schema?: any[] }[];
 }
 
 interface PlaygroundClientProps {

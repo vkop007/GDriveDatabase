@@ -23,9 +23,11 @@ export async function renameItem(
     // Revalidate relevant caches
     if (type === "database") {
       revalidateTag("databases", { expire: 0 });
+      revalidateTag("database-nav-tree", { expire: 0 });
       revalidateTag("database-tree", { expire: 0 });
     } else if (type === "collection" && parentId) {
       revalidateTag(`collections-${parentId}`, { expire: 0 });
+      revalidateTag("database-nav-tree", { expire: 0 });
       revalidateTag("database-tree", { expire: 0 });
     }
 

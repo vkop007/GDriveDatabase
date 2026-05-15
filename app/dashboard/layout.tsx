@@ -1,4 +1,4 @@
-import { getDatabaseTree } from "../actions";
+import { getDatabaseNavTree } from "../actions";
 import { logout } from "../actions/user";
 import Sidebar from "../../components/Sidebar";
 import DashboardLayoutWrapper from "../../components/DashboardLayout";
@@ -27,7 +27,7 @@ export default async function DashboardLayout({
   }
 
   const hasDriveConnection = await hasCurrentDriveConnection();
-  const treeData = hasDriveConnection ? await getDatabaseTree() : [];
+  const treeData = hasDriveConnection ? await getDatabaseNavTree() : [];
 
   return (
     <div className="flex min-h-screen bg-slate-50 text-slate-950 dark:bg-neutral-950 dark:text-white">

@@ -90,6 +90,9 @@ export async function createTable(formData: FormData) {
   }
 
   revalidatePath(`/dashboard/database/${parentId}`);
+  revalidateTag(`collections-${parentId}`, { expire: 0 });
+  revalidateTag("database-nav-tree", { expire: 0 });
+  revalidateTag("database-tree", { expire: 0 });
   return { success: true };
 }
 
@@ -647,6 +650,9 @@ export async function deleteCollection(formData: FormData) {
     throw error;
   }
 
+  revalidateTag(`collections-${parentId}`, { expire: 0 });
+  revalidateTag("database-nav-tree", { expire: 0 });
+  revalidateTag("database-tree", { expire: 0 });
   redirect(`/dashboard/database/${parentId}`);
 }
 
