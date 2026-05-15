@@ -33,7 +33,7 @@ export default function CopyButton({
   return (
     <button
       onClick={handleCopy}
-      className={`badge badge-neutral hover:bg-neutral-700 cursor-pointer transition-colors ${className}`}
+      className={`badge badge-neutral cursor-pointer transition-colors hover:border-primary/20 hover:bg-slate-200 dark:hover:bg-neutral-700 ${className}`}
       title={text}
     >
       <span>{label}</span>
@@ -53,7 +53,7 @@ export default function CopyButton({
         </svg>
       ) : (
         <svg
-          className="w-3.5 h-3.5 text-neutral-500 group-hover:text-white"
+          className="h-3.5 w-3.5 text-slate-500 dark:text-neutral-500"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

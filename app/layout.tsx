@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { ConfirmProvider } from "../contexts/ConfirmContext";
+import { ThemeProvider } from "../components/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,25 +26,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
+        suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ConfirmProvider>{children}</ConfirmProvider>
+        <ThemeProvider>
+          <ConfirmProvider>{children}</ConfirmProvider>
+        </ThemeProvider>
         <Toaster
-          theme="dark"
+          theme="system"
           position="bottom-right"
           toastOptions={{
             style: {
-              background: "rgb(10 10 10)",
-              border: "1px solid transparent",
-              backgroundImage:
-                "linear-gradient(rgb(10 10 10), rgb(10 10 10)), linear-gradient(135deg, rgb(168 85 247), rgb(236 72 153))",
-              backgroundOrigin: "border-box",
-              backgroundClip: "padding-box, border-box",
-              color: "rgb(245 245 245)",
+              background: "var(--surface-panel)",
+              border: "1px solid var(--surface-border)",
+              color: "var(--foreground)",
               borderRadius: "12px",
               fontSize: "13px",
+              boxShadow: "var(--panel-shadow)",
             },
           }}
         />

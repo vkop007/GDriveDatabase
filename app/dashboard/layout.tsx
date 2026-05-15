@@ -38,7 +38,7 @@ export default async function DashboardLayout({
   const treeData = hasDriveConnection ? await getDatabaseTree() : [];
 
   return (
-    <div className="flex min-h-screen bg-neutral-950">
+    <div className="flex min-h-screen bg-slate-50 text-slate-950 dark:bg-neutral-950 dark:text-white">
       <Sidebar treeData={treeData} user={user} logoutAction={logout} />
       <DashboardLayoutWrapper>{children}</DashboardLayoutWrapper>
     </div>

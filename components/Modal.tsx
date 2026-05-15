@@ -49,7 +49,7 @@ export default function Modal({
       {/* Backdrop */}
       <div
         ref={overlayRef}
-        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+        className="absolute inset-0 bg-slate-950/30 backdrop-blur-md dark:bg-black/70"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -57,16 +57,16 @@ export default function Modal({
       {/* Modal Container */}
       <div className={`relative w-full ${maxWidth} animate-slide-up`}>
         {/* Outer glow */}
-        <div className="absolute -inset-1 bg-linear-to-r from-primary/30 via-purple-500/20 to-primary/30 rounded-[20px] blur-xl opacity-60" />
+        <div className="absolute -inset-1 rounded-[20px] bg-linear-to-r from-primary/20 via-purple-500/10 to-primary/20 opacity-60 blur-xl dark:from-primary/30 dark:via-purple-500/20 dark:to-primary/30" />
 
         {/* Modal */}
-        <div className="relative overflow-hidden rounded-2xl border border-neutral-700/60 bg-neutral-900/95 shadow-2xl backdrop-blur-xl">
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20 backdrop-blur-xl dark:border-neutral-700/60 dark:bg-neutral-900/95 dark:shadow-black/40">
           {/* Corner glows */}
-          <div className="absolute top-0 right-0 w-40 h-40 bg-primary/15 blur-[60px] rounded-full pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/10 blur-[50px] rounded-full pointer-events-none" />
+          <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-primary/10 blur-[60px] dark:bg-primary/15" />
+          <div className="pointer-events-none absolute bottom-0 left-0 h-32 w-32 rounded-full bg-purple-500/5 blur-[50px] dark:bg-purple-500/10" />
 
           {/* Header */}
-          <div className="relative flex items-center justify-between px-6 py-5 border-b border-neutral-800/80">
+          <div className="relative flex items-center justify-between border-b border-slate-200 px-6 py-5 dark:border-neutral-800/80">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <div className="absolute inset-0 rounded-xl bg-primary/30 blur-md" />
@@ -74,11 +74,14 @@ export default function Modal({
                   <div className="w-2.5 h-2.5 rounded-full bg-white shadow-md" />
                 </div>
               </div>
-              <h2 className="text-xl font-semibold text-white">{title}</h2>
+              <h2 className="text-xl font-semibold text-slate-950 dark:text-white">
+                {title}
+              </h2>
             </div>
             <button
               onClick={onClose}
-              className="p-2 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800/80 transition-all duration-200"
+              aria-label="Close modal"
+              className="rounded-lg p-2 text-slate-400 transition-all duration-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:bg-neutral-800/80 dark:hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
