@@ -11,12 +11,16 @@ import {
   buildDriveOAuthUrl,
   createOAuthState,
   getBaseUrlFromHeaders,
-  getDriveClientConfig,
   getSessionCookieOptions,
   APP_LOGIN_STATE_COOKIE,
   DRIVE_OAUTH_STATE_COOKIE,
   GOOGLE_TOKEN_COOKIE,
 } from "@/lib/gdrive/google-oauth";
+import {
+  savePendingDriveCredentials,
+  getCurrentDriveConnection,
+} from "@/lib/gdrive/drive-connection-store";
+import { getAuth as getDriveAuth } from "@/lib/gdrive/auth";
 
 import { createTable } from "./actions/table";
 import {
@@ -29,24 +33,7 @@ const ROOT_FOLDER_NAME = "GDriveDatabase";
 const SECRETS_FILE = path.join(process.cwd(), "api-secrets.json");
 
 export async function getAuth() {
-  const cookieStore = await cookies();
-  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
-  const clientId = cookieStore.get("gdrive_client_id")?.value;
-  const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
-  const projectId = cookieStore.get("gdrive_project_id")?.value;
-
-  if (!tokensStr || !clientId || !clientSecret || !projectId) {
-    throw new Error("Not authenticated");
-  }
-
-  const tokens = JSON.parse(tokensStr);
-
-  const driveService = initDriveService(
-    getDriveClientConfig({ clientId, clientSecret, projectId }),
-    tokens
-  );
-
-  return { tokens, clientId, clientSecret, projectId, driveService };
+  return getDriveAuth();
 }
 
 const API_CONFIG_FILE = "api-config.json";
@@ -202,6 +189,19 @@ export async function getApiAuth(apiKey: string) {
           console.log("[getApiAuth] Synced fresh tokens from session");
         }
       }
+
+      if (!cookieTokensStr) {
+        const currentConnection = await getCurrentDriveConnection();
+        if (currentConnection?.tokens?.access_token) {
+          tokensToUse = currentConnection.tokens;
+          const updatedSecrets = { ...secrets, tokens: currentConnection.tokens };
+          await fs.writeFile(
+            SECRETS_FILE,
+            JSON.stringify(updatedSecrets, null, 2)
+          );
+          console.log("[getApiAuth] Synced fresh tokens from stored session");
+        }
+      }
     } catch (cookieError) {
       // If we can't get cookies (e.g., external API call), use stored tokens
       console.log("[getApiAuth] Using stored tokens (no active session)");
@@ -269,14 +269,26 @@ export async function connectDriveWithGoogle(formData: FormData) {
     const headerStore = await headers();
     const stateCookieOptions = getSessionCookieOptions(10 * 60);
     const credentialCookieOptions = getSessionCookieOptions(60 * 60 * 24 * 30);
-
-    cookieStore.set("gdrive_client_id", clientId, credentialCookieOptions);
-    cookieStore.set(
-      "gdrive_client_secret",
+    const savedPendingCredentials = await savePendingDriveCredentials(state, {
+      clientId,
       clientSecret,
-      credentialCookieOptions
-    );
-    cookieStore.set("gdrive_project_id", projectId, credentialCookieOptions);
+      projectId,
+    });
+
+    if (savedPendingCredentials) {
+      cookieStore.delete("gdrive_client_id");
+      cookieStore.delete("gdrive_client_secret");
+      cookieStore.delete("gdrive_project_id");
+    } else {
+      cookieStore.set("gdrive_client_id", clientId, credentialCookieOptions);
+      cookieStore.set(
+        "gdrive_client_secret",
+        clientSecret,
+        credentialCookieOptions
+      );
+      cookieStore.set("gdrive_project_id", projectId, credentialCookieOptions);
+    }
+
     cookieStore.set(DRIVE_OAUTH_STATE_COOKIE, state, stateCookieOptions);
 
     authUrl = buildDriveOAuthUrl(

@@ -4,11 +4,8 @@ import Sidebar from "../../components/Sidebar";
 import DashboardLayoutWrapper from "../../components/DashboardLayout";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import {
-  type AppSession,
-  APP_SESSION_COOKIE,
-  GOOGLE_TOKEN_COOKIE,
-} from "@/lib/gdrive/google-oauth";
+import { type AppSession, APP_SESSION_COOKIE } from "@/lib/gdrive/google-oauth";
+import { hasCurrentDriveConnection } from "@/lib/gdrive/drive-connection-store";
 
 export default async function DashboardLayout({
   children,
@@ -17,10 +14,6 @@ export default async function DashboardLayout({
 }) {
   const cookieStore = await cookies();
   const appSession = cookieStore.get(APP_SESSION_COOKIE)?.value;
-  const driveTokens = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
-  const driveClientId = cookieStore.get("gdrive_client_id")?.value;
-  const driveClientSecret = cookieStore.get("gdrive_client_secret")?.value;
-  const driveProjectId = cookieStore.get("gdrive_project_id")?.value;
 
   if (!appSession) {
     redirect("/");
@@ -33,8 +26,7 @@ export default async function DashboardLayout({
     user = { email: "Google account" };
   }
 
-  const hasDriveConnection =
-    driveTokens && driveClientId && driveClientSecret && driveProjectId;
+  const hasDriveConnection = await hasCurrentDriveConnection();
   const treeData = hasDriveConnection ? await getDatabaseTree() : [];
 
   return (

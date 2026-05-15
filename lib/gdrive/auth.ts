@@ -5,26 +5,28 @@ import {
   getSessionCookieOptions,
   GOOGLE_TOKEN_COOKIE,
 } from "./google-oauth";
+import {
+  getCurrentDriveConnection,
+  saveCurrentDriveTokens,
+} from "./drive-connection-store";
 
 export async function getAuth() {
-  const cookieStore = await cookies();
-  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
-  const clientId = cookieStore.get("gdrive_client_id")?.value;
-  const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
-  const projectId = cookieStore.get("gdrive_project_id")?.value;
+  const connection = await getCurrentDriveConnection();
 
-  if (!tokensStr || !clientId || !clientSecret || !projectId) {
+  if (!connection) {
     throw new Error("Not authenticated");
   }
 
-  const tokens = JSON.parse(tokensStr);
-
-  initDriveService(
-    getDriveClientConfig({ clientId, clientSecret, projectId }),
-    tokens
+  const driveService = initDriveService(
+    getDriveClientConfig({
+      clientId: connection.clientId,
+      clientSecret: connection.clientSecret,
+      projectId: connection.projectId,
+    }),
+    connection.tokens
   );
 
-  return { tokens, clientId, clientSecret, projectId };
+  return { ...connection, driveService };
 }
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
@@ -73,6 +75,7 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
 
     const newTokens = await refreshResponse.json();
     const updatedTokens = { ...tokens, ...newTokens };
+    await saveCurrentDriveTokens(updatedTokens);
 
     // Note: Cookie update may fail in Server Components - that's OK
     // Middleware will handle persistent token updates

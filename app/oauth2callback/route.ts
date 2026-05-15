@@ -7,6 +7,10 @@ import {
   DRIVE_OAUTH_STATE_COOKIE,
   GOOGLE_TOKEN_COOKIE,
 } from "@/lib/gdrive/google-oauth";
+import {
+  consumePendingDriveCredentials,
+  saveDriveConnection,
+} from "@/lib/gdrive/drive-connection-store";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -24,8 +28,6 @@ export async function GET(request: NextRequest) {
 
   const cookieStore = await cookies();
   const expectedState = cookieStore.get(DRIVE_OAUTH_STATE_COOKIE)?.value;
-  const clientId = cookieStore.get("gdrive_client_id")?.value;
-  const clientSecret = cookieStore.get("gdrive_client_secret")?.value;
 
   if (!state || !expectedState || state !== expectedState) {
     return NextResponse.json(
@@ -34,7 +36,17 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (!clientId || !clientSecret) {
+  const pendingCredentials = await consumePendingDriveCredentials(state);
+  const clientId =
+    pendingCredentials?.clientId || cookieStore.get("gdrive_client_id")?.value;
+  const clientSecret =
+    pendingCredentials?.clientSecret ||
+    cookieStore.get("gdrive_client_secret")?.value;
+  const projectId =
+    pendingCredentials?.projectId ||
+    cookieStore.get("gdrive_project_id")?.value;
+
+  if (!clientId || !clientSecret || !projectId) {
     return NextResponse.json(
       { error: "Missing Google Drive credentials. Please connect Drive again." },
       { status: 400 }
@@ -67,14 +79,27 @@ export async function GET(request: NextRequest) {
     }
 
     cookieStore.delete(DRIVE_OAUTH_STATE_COOKIE);
-    cookieStore.set(
-      GOOGLE_TOKEN_COOKIE,
-      JSON.stringify(tokens),
-      getSessionCookieOptions(60 * 60 * 24 * 30)
+    const savedConnection = await saveDriveConnection(
+      { clientId, clientSecret, projectId },
+      tokens,
+      pendingCredentials
     );
 
+    if (savedConnection) {
+      cookieStore.delete(GOOGLE_TOKEN_COOKIE);
+      cookieStore.delete("gdrive_client_id");
+      cookieStore.delete("gdrive_client_secret");
+      cookieStore.delete("gdrive_project_id");
+    } else {
+      cookieStore.set(
+        GOOGLE_TOKEN_COOKIE,
+        JSON.stringify(tokens),
+        getSessionCookieOptions(60 * 60 * 24 * 30)
+      );
+    }
+
     // Save user profile to Drive
-    await saveUserProfile(tokens);
+    await saveUserProfile(tokens, { clientId, clientSecret, projectId });
 
     return NextResponse.redirect(new URL("/dashboard", request.url));
   } catch (error: any) {

@@ -5,9 +5,9 @@ import {
   APP_SESSION_COOKIE,
   getBaseUrlFromHeaders,
   getGoogleRedirectUri,
-  GOOGLE_TOKEN_COOKIE,
   type AppSession,
 } from "@/lib/gdrive/google-oauth";
+import { getCurrentDriveConnection } from "@/lib/gdrive/drive-connection-store";
 
 export const dynamic = "force-dynamic";
 import ApiSettings from "../../../components/settings/ApiSettings";
@@ -30,13 +30,13 @@ export default async function SettingsPage() {
   const headerStore = await headers();
   const apiKey = await getApiKey();
   const user = parseAppSession(cookieStore.get(APP_SESSION_COOKIE)?.value);
-  const driveClientId = cookieStore.get("gdrive_client_id")?.value || null;
-  const driveClientSecret =
-    cookieStore.get("gdrive_client_secret")?.value || null;
-  const driveProjectId = cookieStore.get("gdrive_project_id")?.value || null;
-  const driveToken = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value || null;
+  const driveConnection = await getCurrentDriveConnection();
+  const driveClientId = driveConnection?.clientId || null;
+  const driveProjectId = driveConnection?.projectId || null;
   const hasCredentials = Boolean(
-    driveClientId && driveClientSecret && driveProjectId
+    driveConnection?.clientId &&
+      driveConnection.clientSecret &&
+      driveConnection.projectId
   );
 
   return (
@@ -64,8 +64,8 @@ export default async function SettingsPage() {
           drive={{
             clientId: driveClientId,
             hasCredentials,
-            hasToken: Boolean(driveToken),
-            isConnected: hasCredentials && Boolean(driveToken),
+            hasToken: Boolean(driveConnection?.tokens),
+            isConnected: hasCredentials && Boolean(driveConnection?.tokens),
             projectId: driveProjectId,
             redirectUri: getGoogleRedirectUri(
               getBaseUrlFromHeaders(headerStore)

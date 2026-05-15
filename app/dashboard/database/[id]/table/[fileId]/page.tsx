@@ -1,4 +1,3 @@
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTableData, getSimpleTableData } from "../../../../../actions/table";
 import ColumnsView from "./columns";
@@ -6,7 +5,7 @@ import DataView from "./data";
 import ApiAccess from "../../../../../../components/ApiAccess";
 import Link from "next/link";
 import { Database, ChevronRight, Table2, Layers } from "lucide-react";
-import { GOOGLE_TOKEN_COOKIE } from "@/lib/gdrive/google-oauth";
+import { hasCurrentDriveConnection } from "@/lib/gdrive/drive-connection-store";
 
 // Force dynamic rendering to ensure fresh data after edits
 // Force dynamic rendering removed to enable caching
@@ -22,10 +21,7 @@ export default async function TablePage({
   const { id: databaseId, fileId } = await params;
   const { tab = "data" } = await searchParams;
 
-  const cookieStore = await cookies();
-  const tokensStr = cookieStore.get(GOOGLE_TOKEN_COOKIE)?.value;
-
-  if (!tokensStr) {
+  if (!(await hasCurrentDriveConnection())) {
     redirect("/dashboard");
   }
 
