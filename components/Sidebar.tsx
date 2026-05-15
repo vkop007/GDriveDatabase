@@ -22,6 +22,8 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import RenameModal from "./RenameModal";
+import ProfileMenu from "./ProfileMenu";
+import type { AppSession } from "@/lib/gdrive/google-oauth";
 
 interface SidebarProps {
   treeData: {
@@ -29,9 +31,11 @@ interface SidebarProps {
     name: string;
     tables: { id: string; name: string }[];
   }[];
+  user: AppSession;
+  logoutAction: () => Promise<void>;
 }
 
-export default function Sidebar({ treeData }: SidebarProps) {
+export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false); // Mobile menu
@@ -562,33 +566,18 @@ export default function Sidebar({ treeData }: SidebarProps) {
           </Link>
         </nav>
 
-        {/* Footer Status */}
+        {/* Footer Account */}
         <div
           className={`relative p-3 border-t border-neutral-800/50 ${
             isCollapsed ? "flex justify-center" : ""
           }`}
         >
-          {isCollapsed ? (
-            <div className="relative">
-              <div className="absolute inset-0 bg-emerald-500 rounded-full blur-md opacity-50 animate-pulse" />
-              <div className="relative w-3 h-3 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/50" />
-            </div>
-          ) : (
-            <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-linear-to-r from-neutral-900/90 to-neutral-800/60 border border-neutral-700/40 backdrop-blur-sm">
-              <div className="relative">
-                {/* Animated ring */}
-                <div
-                  className="absolute -inset-1 rounded-full border border-emerald-500/30 animate-ping"
-                  style={{ animationDuration: "2s" }}
-                />
-                <div className="absolute inset-0 bg-emerald-500 rounded-full blur-sm opacity-60 animate-pulse" />
-                <div className="relative w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-lg shadow-emerald-500/50" />
-              </div>
-              <span className="text-xs text-neutral-400 font-medium tracking-wide">
-                System Online
-              </span>
-            </div>
-          )}
+          <ProfileMenu
+            user={user}
+            logoutAction={logoutAction}
+            variant="sidebar"
+            collapsed={isCollapsed}
+          />
         </div>
 
         {/* Collapse Toggle Button - Centered on right edge */}

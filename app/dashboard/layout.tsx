@@ -39,10 +39,8 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-neutral-950">
-      <Sidebar treeData={treeData} />
-      <DashboardLayoutWrapper user={user} logoutAction={logout}>
-        {children}
-      </DashboardLayoutWrapper>
+      <Sidebar treeData={treeData} user={user} logoutAction={logout} />
+      <DashboardLayoutWrapper>{children}</DashboardLayoutWrapper>
     </div>
   );
 }
