@@ -14,14 +14,17 @@ import {
   FolderKanban,
   GitBranch,
   KeyRound,
+  Moon,
   Network,
   Rows3,
   Search,
   Settings2,
   Sparkles,
+  Sun,
   UploadCloud,
   Workflow,
 } from "lucide-react";
+import { useTheme } from "./ThemeProvider";
 
 interface LoginClientProps {
   onSubmit: (formData: FormData) => void;
@@ -167,12 +170,12 @@ function SignInForm({
 
       {!isGoogleLoginConfigured && (
         <div
-          className={`rounded-lg border border-amber-400/25 bg-amber-400/10 text-sm leading-6 text-amber-100 ${
+          className={`rounded-lg border border-amber-300/60 bg-amber-50 text-sm leading-6 text-amber-800 dark:border-amber-400/25 dark:bg-amber-400/10 dark:text-amber-100 ${
             compact ? "p-3" : "p-4"
           }`}
         >
           Google login needs server env vars:
-          <span className="mt-1 block font-mono text-xs text-amber-100/80">
+          <span className="mt-1 block font-mono text-xs text-amber-700 dark:text-amber-100/80">
             GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
           </span>
         </div>
@@ -181,17 +184,62 @@ function SignInForm({
   );
 }
 
+function HeaderSignInButton({ disabled }: { disabled: boolean }) {
+  const { pending } = useFormStatus();
+  const isDisabled = disabled || pending;
+
+  return (
+    <button
+      type="submit"
+      disabled={isDisabled}
+      className="inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-slate-200 bg-white/85 px-3.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:border-white/12 dark:bg-white/8 dark:text-white dark:hover:border-white/22 dark:hover:bg-white/12 dark:disabled:bg-neutral-800 dark:disabled:text-neutral-500"
+    >
+      {pending ? "Opening..." : "Sign in"}
+    </button>
+  );
+}
+
+function HeaderSignInForm({
+  onSubmit,
+  isGoogleLoginConfigured,
+}: LoginClientProps) {
+  return (
+    <form action={onSubmit}>
+      <HeaderSignInButton disabled={!isGoogleLoginConfigured} />
+    </form>
+  );
+}
+
+function LandingThemeToggle() {
+  const { theme, toggleTheme } = useTheme();
+  const isDark = theme === "dark";
+  const nextTheme = isDark ? "light" : "dark";
+
+  return (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={`Switch to ${nextTheme} theme`}
+      title={`Switch to ${nextTheme} theme`}
+      aria-pressed={isDark}
+      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white/85 text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-950 dark:border-white/12 dark:bg-white/8 dark:text-white/78 dark:hover:border-white/22 dark:hover:bg-white/12 dark:hover:text-white"
+    >
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+    </button>
+  );
+}
+
 export default function LoginClient({
   onSubmit,
   isGoogleLoginConfigured,
 }: LoginClientProps) {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#07080d] text-white">
-      <section className="relative isolate overflow-hidden border-b border-white/10">
+    <main className="min-h-screen overflow-x-hidden bg-slate-50 text-slate-950 transition-colors duration-300 dark:bg-[#07080d] dark:text-white">
+      <section className="relative isolate overflow-hidden border-b border-slate-200 transition-colors duration-300 dark:border-white/10">
         <div className="absolute inset-0 -z-10">
-          <div className="h-full w-full bg-[url('/logo.png')] bg-[length:34rem_34rem] bg-[position:78%_12%] bg-no-repeat opacity-[0.035]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,8,13,0.70)_0%,rgba(7,8,13,0.94)_72%,#07080d_100%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.055)_1px,transparent_1px)] bg-[size:72px_72px] opacity-30" />
+          <div className="h-full w-full bg-[url('/logo.png')] bg-[length:34rem_34rem] bg-[position:78%_12%] bg-no-repeat opacity-[0.045] dark:opacity-[0.035]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,250,252,0.74)_0%,rgba(248,250,252,0.96)_72%,#f8fafc_100%)] dark:bg-[linear-gradient(180deg,rgba(7,8,13,0.70)_0%,rgba(7,8,13,0.94)_72%,#07080d_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.055)_1px,transparent_1px)] bg-[size:72px_72px] opacity-70 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.055)_1px,transparent_1px)] dark:opacity-30" />
         </div>
 
         <header className="mx-auto flex w-full max-w-[22rem] items-center justify-between px-5 py-5 sm:max-w-7xl sm:px-8 lg:px-10">
@@ -206,39 +254,54 @@ export default function LoginClient({
             />
             <div>
               <p className="text-sm font-semibold leading-5">GDrive Database</p>
-              <p className="text-xs text-white/45">Drive-backed data platform</p>
+              <p className="text-xs text-slate-500 dark:text-white/45">
+                Drive-backed data platform
+              </p>
             </div>
           </div>
 
           <nav
             aria-label="Landing page"
-            className="hidden items-center gap-7 text-sm text-white/58 md:flex"
+            className="hidden items-center gap-7 text-sm text-slate-500 md:flex dark:text-white/58"
           >
-            <a className="transition hover:text-white" href="#platform">
+            <a
+              className="transition hover:text-slate-950 dark:hover:text-white"
+              href="#platform"
+            >
               Platform
             </a>
-            <a className="transition hover:text-white" href="#workflow">
+            <a
+              className="transition hover:text-slate-950 dark:hover:text-white"
+              href="#workflow"
+            >
               Workflow
             </a>
-            <a className="transition hover:text-white" href="#sdk">
+            <a
+              className="transition hover:text-slate-950 dark:hover:text-white"
+              href="#sdk"
+            >
               SDK
             </a>
-            <a className="transition hover:text-white" href="#features">
+            <a
+              className="transition hover:text-slate-950 dark:hover:text-white"
+              href="#features"
+            >
               Features
             </a>
           </nav>
 
-          <a
-            href="#signin"
-            className="rounded-lg border border-white/12 bg-white/8 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/22 hover:bg-white/12"
-          >
-            Sign in
-          </a>
+          <div className="flex items-center gap-2">
+            <LandingThemeToggle />
+            <HeaderSignInForm
+              onSubmit={onSubmit}
+              isGoogleLoginConfigured={isGoogleLoginConfigured}
+            />
+          </div>
         </header>
 
         <div className="mx-auto grid w-full min-w-0 max-w-[22rem] items-center gap-12 px-5 pb-20 pt-12 sm:max-w-7xl sm:px-8 md:pt-20 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.82fr)] lg:px-10">
           <div className="min-w-0 max-w-3xl">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-pink-400/24 bg-pink-400/10 px-3 py-1.5 text-xs font-semibold text-pink-200">
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1.5 text-xs font-semibold text-pink-700 dark:border-pink-400/24 dark:bg-pink-400/10 dark:text-pink-200">
               <Sparkles className="h-3.5 w-3.5" />
               Google Drive as an operational database
             </div>
@@ -247,7 +310,7 @@ export default function LoginClient({
               Build database apps on top of Google Drive.
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/64">
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 dark:text-white/64">
               GDrive Database turns Drive into a structured NoSQL workspace with
               tables, schema, storage, server functions, SDK access, and API docs
               in one dashboard.
@@ -264,30 +327,30 @@ export default function LoginClient({
               />
               <a
                 href="#platform"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/12 px-5 text-sm font-semibold text-white/82 transition hover:border-white/25 hover:bg-white/8"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-pink-300 hover:text-pink-600 dark:border-white/12 dark:bg-transparent dark:text-white/82 dark:hover:border-white/25 dark:hover:bg-white/8 dark:hover:text-white"
               >
                 Explore platform
                 <ArrowRight className="h-4 w-4" />
               </a>
             </div>
 
-            <div className="mt-8 grid gap-3 text-sm text-white/54 sm:grid-cols-3">
+            <div className="mt-8 grid gap-3 text-sm text-slate-600 sm:grid-cols-3 dark:text-white/54">
               {heroPillars.map((item) => (
                 <div key={item} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-300" />
+                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-300" />
                   <span>{item}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/30">
+          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-200/70 transition-colors duration-300 dark:border-white/10 dark:bg-white/[0.04] dark:shadow-black/30">
             <div className="mb-8 flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-pink-400/12 text-pink-200">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-pink-600 dark:bg-pink-400/12 dark:text-pink-200">
                 <Database className="h-5 w-5" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-pink-200">
+                <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
                   Platform map
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold">
@@ -307,10 +370,12 @@ export default function LoginClient({
               ].map(([label, route]) => (
                 <div
                   key={label}
-                  className="rounded-lg border border-white/10 bg-[#0b0d14] p-4"
+                  className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-[#0b0d14]"
                 >
                   <p className="text-sm font-semibold">{label}</p>
-                  <p className="mt-1 font-mono text-xs text-white/38">{route}</p>
+                  <p className="mt-1 font-mono text-xs text-slate-500 dark:text-white/38">
+                    {route}
+                  </p>
                 </div>
               ))}
             </div>
@@ -320,17 +385,19 @@ export default function LoginClient({
 
       <section
         id="platform"
-        className="scroll-mt-24 border-b border-white/10 bg-[#07080d]"
+        className="scroll-mt-24 border-b border-slate-200 bg-slate-50 transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
             <div>
-              <p className="text-sm font-semibold text-pink-200">Platform</p>
+              <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
+                Platform
+              </p>
               <h2 className="mt-3 text-4xl font-semibold leading-tight">
                 A full dashboard for Drive-backed data operations.
               </h2>
             </div>
-            <p className="max-w-2xl text-base leading-7 text-white/56 lg:ml-auto">
+            <p className="max-w-2xl text-base leading-7 text-slate-600 lg:ml-auto dark:text-white/56">
               The app already includes pages and components for records, files,
               server functions, SDK docs, account settings, backups, and usage.
               The landing page now explains that actual product surface.
@@ -341,13 +408,13 @@ export default function LoginClient({
             {platformModules.map((module) => (
               <article
                 key={module.title}
-                className="rounded-lg border border-white/10 bg-white/[0.035] p-6"
+                className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/70 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none"
               >
-                <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-lg bg-pink-400/12 text-pink-200">
+                <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-lg bg-pink-50 text-pink-600 dark:bg-pink-400/12 dark:text-pink-200">
                   <module.icon className="h-5 w-5" />
                 </div>
                 <h3 className="text-xl font-semibold">{module.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/54">
+                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/54">
                   {module.description}
                 </p>
               </article>
@@ -358,11 +425,13 @@ export default function LoginClient({
 
       <section
         id="workflow"
-        className="scroll-mt-24 border-b border-white/10 bg-[#090b12]"
+        className="scroll-mt-24 border-b border-slate-200 bg-white transition-colors duration-300 dark:border-white/10 dark:bg-[#090b12]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold text-pink-200">Workflow</p>
+            <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
+              Workflow
+            </p>
             <h2 className="mt-3 text-4xl font-semibold leading-tight">
               From Drive folder to usable data platform in minutes.
             </h2>
@@ -372,13 +441,13 @@ export default function LoginClient({
             {workflowSteps.map((step, index) => (
               <div
                 key={step.title}
-                className="rounded-lg border border-white/10 bg-white/[0.035] p-6"
+                className="rounded-lg border border-slate-200 bg-slate-50 p-6 shadow-sm shadow-slate-200/70 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none"
               >
-                <div className="mb-8 flex h-10 w-10 items-center justify-center rounded-lg bg-white text-sm font-semibold text-slate-950">
+                <div className="mb-8 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-950 text-sm font-semibold text-white dark:bg-white dark:text-slate-950">
                   {index + 1}
                 </div>
                 <h3 className="text-xl font-semibold">{step.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/52">
+                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/52">
                   {step.description}
                 </p>
               </div>
@@ -389,17 +458,19 @@ export default function LoginClient({
 
       <section
         id="features"
-        className="scroll-mt-24 border-b border-white/10 bg-[#07080d]"
+        className="scroll-mt-24 border-b border-slate-200 bg-slate-50 transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
-              <p className="text-sm font-semibold text-pink-200">Features</p>
+              <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
+                Features
+              </p>
               <h2 className="mt-3 text-4xl font-semibold leading-tight">
                 Built for teams that already live in Google Drive.
               </h2>
             </div>
-            <p className="max-w-2xl text-base leading-7 text-white/56 lg:ml-auto">
+            <p className="max-w-2xl text-base leading-7 text-slate-600 lg:ml-auto dark:text-white/56">
               Use Drive for storage and GDrive Database for the operational
               layer: records, schema, APIs, files, functions, and settings in
               one place.
@@ -410,13 +481,13 @@ export default function LoginClient({
             {featureRows.map((feature) => (
               <article
                 key={feature.title}
-                className="rounded-lg border border-white/10 bg-white/[0.035] p-6"
+                className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/70 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none"
               >
-                <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-lg bg-pink-400/12 text-pink-200">
+                <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-lg bg-pink-50 text-pink-600 dark:bg-pink-400/12 dark:text-pink-200">
                   <feature.icon className="h-5 w-5" />
                 </div>
                 <h3 className="text-xl font-semibold">{feature.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-white/54">
+                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/54">
                   {feature.description}
                 </p>
               </article>
@@ -427,15 +498,17 @@ export default function LoginClient({
 
       <section
         id="schema"
-        className="scroll-mt-24 border-b border-white/10 bg-[#090b12]"
+        className="scroll-mt-24 border-b border-slate-200 bg-white transition-colors duration-300 dark:border-white/10 dark:bg-[#090b12]"
       >
         <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
           <div>
-            <p className="text-sm font-semibold text-pink-200">Data model</p>
+            <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
+              Data model
+            </p>
             <h2 className="mt-3 text-4xl font-semibold leading-tight">
               Schema where you need it, Drive ownership where you want it.
             </h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/56">
+            <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 dark:text-white/56">
               Define practical column types, relationships, storage fields, and
               defaults while keeping files and data anchored in Google Drive.
             </p>
@@ -445,10 +518,12 @@ export default function LoginClient({
             {schemaTypes.map((type) => (
               <div
                 key={type}
-                className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.04] px-4 py-4"
+                className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-4 dark:border-white/10 dark:bg-white/[0.04]"
               >
-                <span className="font-mono text-sm text-white/82">{type}</span>
-                <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+                <span className="font-mono text-sm text-slate-800 dark:text-white/82">
+                  {type}
+                </span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-300" />
               </div>
             ))}
           </div>
@@ -457,21 +532,23 @@ export default function LoginClient({
 
       <section
         id="sdk"
-        className="scroll-mt-24 border-b border-white/10 bg-[#07080d]"
+        className="scroll-mt-24 border-b border-slate-200 bg-slate-50 transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
       >
         <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:px-10">
           <div>
-            <p className="text-sm font-semibold text-pink-200">SDK</p>
+            <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
+              SDK
+            </p>
             <h2 className="mt-3 text-4xl font-semibold leading-tight">
               A TypeScript client for data, schema, and bucket files.
             </h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/56">
+            <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 dark:text-white/56">
               The README documents the `gdatabase` package with chainable calls
               for tables, records, schema management, relations, and storage.
             </p>
           </div>
 
-          <pre className="overflow-x-auto rounded-lg border border-white/10 bg-[#0b0d14] p-5 text-sm leading-7 text-white/72">
+          <pre className="overflow-x-auto rounded-lg border border-slate-200 bg-slate-950 p-5 text-sm leading-7 text-slate-100 shadow-sm dark:border-white/10 dark:bg-[#0b0d14] dark:text-white/72">
             <code>{`const db = new GDatabase(apiKey, appUrl);
 
 await db.database("crm").table("customers").create({
@@ -487,10 +564,12 @@ const rows = await db
         </div>
       </section>
 
-      <section className="border-b border-white/10 bg-[#090b12]">
+      <section className="border-b border-slate-200 bg-white transition-colors duration-300 dark:border-white/10 dark:bg-[#090b12]">
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold text-pink-200">Use cases</p>
+            <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
+              Use cases
+            </p>
             <h2 className="mt-3 text-4xl font-semibold leading-tight">
               Useful when a full database is too much and spreadsheets are not
               enough.
@@ -501,18 +580,20 @@ const rows = await db
             {useCases.map((item) => (
               <div
                 key={item}
-                className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.035] p-5"
+                className="flex items-start gap-3 rounded-lg border border-slate-200 bg-slate-50 p-5 shadow-sm shadow-slate-200/70 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none"
               >
-                <Network className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
-                <p className="text-base leading-7 text-white/72">{item}</p>
+                <Network className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600 dark:text-emerald-300" />
+                <p className="text-base leading-7 text-slate-700 dark:text-white/72">
+                  {item}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-white/10 bg-[#05060a]">
-        <div className="mx-auto grid max-w-[22rem] gap-10 px-5 py-12 text-sm text-white/54 sm:max-w-7xl sm:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr] sm:px-8 lg:px-10">
+      <footer className="border-t border-slate-200 bg-white transition-colors duration-300 dark:border-white/10 dark:bg-[#05060a]">
+        <div className="mx-auto grid max-w-[22rem] gap-10 px-5 py-12 text-sm text-slate-600 sm:max-w-7xl sm:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr] sm:px-8 lg:px-10 dark:text-white/54">
           <div>
             <div className="flex items-center gap-3">
               <Image
@@ -523,8 +604,12 @@ const rows = await db
                 className="h-8 w-8 rounded-md"
               />
               <div>
-                <p className="font-semibold text-white">GDrive Database</p>
-                <p className="text-xs text-white/40">Drive-native database workspace</p>
+                <p className="font-semibold text-slate-950 dark:text-white">
+                  GDrive Database
+                </p>
+                <p className="text-xs text-slate-500 dark:text-white/40">
+                  Drive-native database workspace
+                </p>
               </div>
             </div>
             <p className="mt-5 max-w-sm leading-6">
@@ -534,34 +619,53 @@ const rows = await db
           </div>
 
           <div>
-            <p className="font-semibold text-white">Product</p>
+            <p className="font-semibold text-slate-950 dark:text-white">
+              Product
+            </p>
             <div className="mt-4 grid gap-3">
-              <a href="#platform" className="transition hover:text-white">
+              <a
+                href="#platform"
+                className="transition hover:text-slate-950 dark:hover:text-white"
+              >
                 Platform
               </a>
-              <a href="#features" className="transition hover:text-white">
+              <a
+                href="#features"
+                className="transition hover:text-slate-950 dark:hover:text-white"
+              >
                 Features
               </a>
-              <a href="#schema" className="transition hover:text-white">
+              <a
+                href="#schema"
+                className="transition hover:text-slate-950 dark:hover:text-white"
+              >
                 Schema
               </a>
             </div>
           </div>
 
           <div>
-            <p className="font-semibold text-white">Developers</p>
+            <p className="font-semibold text-slate-950 dark:text-white">
+              Developers
+            </p>
             <div className="mt-4 grid gap-3">
-              <a href="#sdk" className="transition hover:text-white">
+              <a
+                href="#sdk"
+                className="transition hover:text-slate-950 dark:hover:text-white"
+              >
                 SDK
               </a>
-              <a href="#signin" className="transition hover:text-white">
+              <a
+                href="#signin"
+                className="transition hover:text-slate-950 dark:hover:text-white"
+              >
                 Sign in
               </a>
             </div>
           </div>
 
           <div>
-            <p className="font-semibold text-white">Stack</p>
+            <p className="font-semibold text-slate-950 dark:text-white">Stack</p>
             <div className="mt-4 grid gap-3">
               <span className="flex items-center gap-2">
                 <Files className="h-4 w-4" />
@@ -579,8 +683,8 @@ const rows = await db
           </div>
         </div>
 
-        <div className="border-t border-white/10">
-          <div className="mx-auto flex max-w-[22rem] flex-col gap-3 px-5 py-6 text-xs text-white/36 sm:max-w-7xl sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
+        <div className="border-t border-slate-200 dark:border-white/10">
+          <div className="mx-auto flex max-w-[22rem] flex-col gap-3 px-5 py-6 text-xs text-slate-500 sm:max-w-7xl sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10 dark:text-white/36">
             <span>© 2026 GDrive Database</span>
             <span>Built for Drive-backed apps and internal tools.</span>
           </div>
