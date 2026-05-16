@@ -14,12 +14,10 @@ import {
   FolderKanban,
   GitBranch,
   KeyRound,
-  LockKeyhole,
   Network,
   Rows3,
   Search,
   Settings2,
-  ShieldCheck,
   Sparkles,
   UploadCloud,
   Workflow,
@@ -130,13 +128,6 @@ const useCases = [
   "File-heavy portals that need records and bucket storage together",
 ];
 
-const securityPoints = [
-  "OAuth login stays server-side",
-  "No service account JSON in the browser",
-  "Drive remains the source of truth",
-  "Access can be revoked from Google",
-];
-
 function GoogleMark() {
   return (
     <span className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-950">
@@ -232,8 +223,8 @@ export default function LoginClient({
             <a className="transition hover:text-white" href="#sdk">
               SDK
             </a>
-            <a className="transition hover:text-white" href="#security">
-              Security
+            <a className="transition hover:text-white" href="#features">
+              Features
             </a>
           </nav>
 
@@ -262,7 +253,10 @@ export default function LoginClient({
               in one dashboard.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div
+              id="signin"
+              className="mt-8 flex scroll-mt-24 flex-col gap-3 sm:flex-row sm:items-center"
+            >
               <SignInForm
                 onSubmit={onSubmit}
                 isGoogleLoginConfigured={isGoogleLoginConfigured}
@@ -517,56 +511,6 @@ const rows = await db
         </div>
       </section>
 
-      <section id="security" className="scroll-mt-24 bg-[#07080d]">
-        <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
-          <div>
-            <p className="text-sm font-semibold text-pink-200">Security</p>
-            <h2 className="mt-3 text-4xl font-semibold leading-tight">
-              Sign in with Google. Keep control in your account.
-            </h2>
-            <p className="mt-5 max-w-xl text-base leading-7 text-white/56">
-              The dashboard uses OAuth for access and avoids manual credential
-              uploads in the browser. Your Drive remains the source of truth
-              while the app provides the database workflow on top.
-            </p>
-          </div>
-
-          <div
-            id="signin"
-            className="scroll-mt-24 rounded-lg border border-white/10 bg-white/[0.04] p-6"
-          >
-            <div className="mb-6 flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-400/12 text-emerald-200">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <div>
-                <h3 className="text-2xl font-semibold">
-                  Start with your Google account
-                </h3>
-                <p className="mt-2 text-sm leading-6 text-white/54">
-                  Connect once, then open your dashboard, tables, files, API
-                  docs, usage, and function tools.
-                </p>
-              </div>
-            </div>
-
-            <SignInForm
-              onSubmit={onSubmit}
-              isGoogleLoginConfigured={isGoogleLoginConfigured}
-            />
-
-            <div className="mt-6 grid gap-3 text-sm text-white/54 sm:grid-cols-2">
-              {securityPoints.map((item) => (
-                <div key={item} className="flex items-center gap-2">
-                  <LockKeyhole className="h-4 w-4 text-emerald-300" />
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
       <footer className="border-t border-white/10 bg-[#05060a]">
         <div className="mx-auto grid max-w-[22rem] gap-10 px-5 py-12 text-sm text-white/54 sm:max-w-7xl sm:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr] sm:px-8 lg:px-10">
           <div>
@@ -609,9 +553,6 @@ const rows = await db
             <div className="mt-4 grid gap-3">
               <a href="#sdk" className="transition hover:text-white">
                 SDK
-              </a>
-              <a href="#security" className="transition hover:text-white">
-                Security
               </a>
               <a href="#signin" className="transition hover:text-white">
                 Sign in
