@@ -184,6 +184,32 @@ function SignInForm({
   );
 }
 
+function HeaderSignInButton({ disabled }: { disabled: boolean }) {
+  const { pending } = useFormStatus();
+  const isDisabled = disabled || pending;
+
+  return (
+    <button
+      type="submit"
+      disabled={isDisabled}
+      className="inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-slate-200 bg-white/85 px-3.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:border-white/12 dark:bg-white/8 dark:text-white dark:hover:border-white/22 dark:hover:bg-white/12 dark:disabled:bg-neutral-800 dark:disabled:text-neutral-500"
+    >
+      {pending ? "Opening..." : "Sign in"}
+    </button>
+  );
+}
+
+function HeaderSignInForm({
+  onSubmit,
+  isGoogleLoginConfigured,
+}: LoginClientProps) {
+  return (
+    <form action={onSubmit}>
+      <HeaderSignInButton disabled={!isGoogleLoginConfigured} />
+    </form>
+  );
+}
+
 function LandingThemeToggle() {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme === "dark";
@@ -266,12 +292,10 @@ export default function LoginClient({
 
           <div className="flex items-center gap-2">
             <LandingThemeToggle />
-            <a
-              href="#signin"
-              className="inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-slate-200 bg-white/85 px-3.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-950 dark:border-white/12 dark:bg-white/8 dark:text-white dark:hover:border-white/22 dark:hover:bg-white/12"
-            >
-              Sign in
-            </a>
+            <HeaderSignInForm
+              onSubmit={onSubmit}
+              isGoogleLoginConfigured={isGoogleLoginConfigured}
+            />
           </div>
         </header>
 
