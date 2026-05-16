@@ -1,20 +1,27 @@
 "use client";
 
-import { useFormStatus } from "react-dom";
 import Image from "next/image";
+import { useFormStatus } from "react-dom";
 import {
   ArrowRight,
+  BarChart3,
   CheckCircle2,
   Cloud,
   Code2,
   Database,
   FileJson,
+  Files,
   FolderKanban,
+  GitBranch,
+  KeyRound,
   LockKeyhole,
-  Play,
+  Network,
   Rows3,
+  Search,
+  Settings2,
   ShieldCheck,
   Sparkles,
+  UploadCloud,
   Workflow,
 } from "lucide-react";
 
@@ -23,44 +30,111 @@ interface LoginClientProps {
   isGoogleLoginConfigured: boolean;
 }
 
-const productStats = [
-  { label: "Tables", value: "12", icon: Database },
-  { label: "Rows synced", value: "8.4k", icon: Rows3 },
-  { label: "Automations", value: "6", icon: Workflow },
-];
-
-const features = [
-  {
-    title: "Drive-first database",
-    description:
-      "Turn folders, files, and structured data into a workspace your team already understands.",
-    icon: Cloud,
-  },
-  {
-    title: "API-ready tables",
-    description:
-      "Expose Drive-backed data through stable endpoints without hand-rolling storage glue.",
-    icon: Code2,
-  },
-  {
-    title: "Visual data control",
-    description:
-      "Manage records, files, schema, usage, and functions from one focused dashboard.",
-    icon: FolderKanban,
-  },
+const heroPillars = [
+  "Google Drive backend",
+  "Schema-aware tables",
+  "SDK and API access",
 ];
 
 const workflowSteps = [
-  "Connect your Google account",
-  "Choose a Drive folder or database",
-  "Manage data, files, functions, and APIs",
+  {
+    title: "Connect Google Drive",
+    description:
+      "Sign in with OAuth, then connect the Drive workspace that should hold your data.",
+  },
+  {
+    title: "Model your data",
+    description:
+      "Create databases, tables, columns, relations, storage fields, and defaults from the dashboard.",
+  },
+  {
+    title: "Build with APIs",
+    description:
+      "Use the TypeScript SDK, generated API docs, file bucket, and server functions to ship apps faster.",
+  },
 ];
 
-const tableRows = [
-  ["Customers", "4 columns", "Synced"],
-  ["Orders", "8 columns", "Synced"],
-  ["Inventory", "6 columns", "Ready"],
-  ["Invoices", "5 columns", "Live"],
+const platformModules = [
+  {
+    title: "Dashboard",
+    description: "Create databases, review usage, and manage Drive-backed resources.",
+    icon: FolderKanban,
+  },
+  {
+    title: "Tables",
+    description: "Edit rows, columns, schema, query filters, and linked records.",
+    icon: Rows3,
+  },
+  {
+    title: "Storage bucket",
+    description: "Upload and serve files from Drive while linking them to records.",
+    icon: UploadCloud,
+  },
+  {
+    title: "Functions",
+    description: "Run server-side workflows and automation around your Drive data.",
+    icon: Workflow,
+  },
+  {
+    title: "API docs",
+    description: "Use clean SDK examples for CRUD, schema changes, bucket files, and keys.",
+    icon: Code2,
+  },
+  {
+    title: "Settings",
+    description: "Control account, API keys, backups, and Google Drive connection details.",
+    icon: Settings2,
+  },
+];
+
+const featureRows = [
+  {
+    title: "NoSQL records stored in Drive",
+    description:
+      "Use Google Drive as the durable backend while the app gives teams a database-style control plane.",
+    icon: Cloud,
+  },
+  {
+    title: "Schema and relationships",
+    description:
+      "Define strings, numbers, booleans, dates, storage fields, and relation columns for linked data.",
+    icon: GitBranch,
+  },
+  {
+    title: "Developer-ready SDK",
+    description:
+      "Use the `gdatabase` package to create, list, update, delete, and evolve tables from TypeScript.",
+    icon: FileJson,
+  },
+  {
+    title: "Searchable operational UI",
+    description:
+      "Work with records through a dashboard built for repeated editing, inspection, and management.",
+    icon: Search,
+  },
+];
+
+const schemaTypes = [
+  "string",
+  "integer",
+  "boolean",
+  "datetime",
+  "relation",
+  "storage",
+];
+
+const useCases = [
+  "Internal tools backed by team-owned Drive files",
+  "Content, inventory, and customer data dashboards",
+  "Small SaaS prototypes without database infrastructure",
+  "File-heavy portals that need records and bucket storage together",
+];
+
+const securityPoints = [
+  "OAuth login stays server-side",
+  "No service account JSON in the browser",
+  "Drive remains the source of truth",
+  "Access can be revoked from Google",
 ];
 
 function GoogleMark() {
@@ -71,11 +145,7 @@ function GoogleMark() {
   );
 }
 
-function GoogleSignInButton({
-  disabled,
-}: {
-  disabled: boolean;
-}) {
+function GoogleSignInButton({ disabled }: { disabled: boolean }) {
   const { pending } = useFormStatus();
   const isDisabled = disabled || pending;
 
@@ -98,7 +168,10 @@ function SignInForm({
   compact = false,
 }: LoginClientProps & { compact?: boolean }) {
   return (
-    <form action={onSubmit} className={`space-y-4 ${compact ? "w-full sm:w-auto" : ""}`}>
+    <form
+      action={onSubmit}
+      className={`space-y-4 ${compact ? "w-full sm:w-auto" : ""}`}
+    >
       <GoogleSignInButton disabled={!isGoogleLoginConfigured} />
 
       {!isGoogleLoginConfigured && (
@@ -125,8 +198,8 @@ export default function LoginClient({
     <main className="min-h-screen overflow-x-hidden bg-[#07080d] text-white">
       <section className="relative isolate overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 -z-10">
-          <div className="h-full w-full bg-[url('/logo.png')] bg-[length:42rem_42rem] bg-[position:75%_8%] bg-no-repeat opacity-[0.04]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,8,13,0.72)_0%,rgba(7,8,13,0.94)_62%,#07080d_100%)]" />
+          <div className="h-full w-full bg-[url('/logo.png')] bg-[length:34rem_34rem] bg-[position:78%_12%] bg-no-repeat opacity-[0.035]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,8,13,0.70)_0%,rgba(7,8,13,0.94)_72%,#07080d_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.055)_1px,transparent_1px)] bg-[size:72px_72px] opacity-30" />
         </div>
 
@@ -150,11 +223,14 @@ export default function LoginClient({
             aria-label="Landing page"
             className="hidden items-center gap-7 text-sm text-white/58 md:flex"
           >
+            <a className="transition hover:text-white" href="#platform">
+              Platform
+            </a>
             <a className="transition hover:text-white" href="#workflow">
               Workflow
             </a>
-            <a className="transition hover:text-white" href="#features">
-              Features
+            <a className="transition hover:text-white" href="#sdk">
+              SDK
             </a>
             <a className="transition hover:text-white" href="#security">
               Security
@@ -169,7 +245,7 @@ export default function LoginClient({
           </a>
         </header>
 
-        <div className="mx-auto grid w-full min-w-0 max-w-[22rem] items-center gap-12 px-5 pb-20 pt-12 sm:max-w-7xl sm:px-8 md:pt-20 lg:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)] lg:px-10">
+        <div className="mx-auto grid w-full min-w-0 max-w-[22rem] items-center gap-12 px-5 pb-20 pt-12 sm:max-w-7xl sm:px-8 md:pt-20 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.82fr)] lg:px-10">
           <div className="min-w-0 max-w-3xl">
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-pink-400/24 bg-pink-400/10 px-3 py-1.5 text-xs font-semibold text-pink-200">
               <Sparkles className="h-3.5 w-3.5" />
@@ -181,9 +257,9 @@ export default function LoginClient({
             </h1>
 
             <p className="mt-6 max-w-2xl text-lg leading-8 text-white/64">
-              GDrive Database gives your Drive folders a structured dashboard,
-              table editor, API layer, file bucket, and automation surface
-              without moving data away from Google.
+              GDrive Database turns Drive into a structured NoSQL workspace with
+              tables, schema, storage, server functions, SDK access, and API docs
+              in one dashboard.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -193,20 +269,16 @@ export default function LoginClient({
                 compact
               />
               <a
-                href="#features"
+                href="#platform"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-white/12 px-5 text-sm font-semibold text-white/82 transition hover:border-white/25 hover:bg-white/8"
               >
-                <Play className="h-4 w-4" />
-                See how it works
+                Explore platform
+                <ArrowRight className="h-4 w-4" />
               </a>
             </div>
 
             <div className="mt-8 grid gap-3 text-sm text-white/54 sm:grid-cols-3">
-              {[
-                "Server-side OAuth",
-                "No JSON key uploads",
-                "Drive remains source of truth",
-              ].map((item) => (
+              {heroPillars.map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-300" />
                   <span>{item}</span>
@@ -215,100 +287,74 @@ export default function LoginClient({
             </div>
           </div>
 
-          <div className="relative hidden min-w-0 sm:block">
-            <div className="absolute -inset-4 rounded-lg border border-white/8 bg-white/[0.025]" />
-            <div className="relative w-full min-w-0 overflow-hidden rounded-lg border border-white/12 bg-[#0d1018]/92 shadow-2xl shadow-black/50">
-              <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full bg-red-400/90" />
-                  <span className="h-3 w-3 rounded-full bg-amber-300/90" />
-                  <span className="h-3 w-3 rounded-full bg-emerald-300/90" />
-                </div>
-                <div className="hidden rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/52 sm:block">
-                  drive://production
-                </div>
+          <div className="rounded-lg border border-white/10 bg-white/[0.04] p-6 shadow-2xl shadow-black/30">
+            <div className="mb-8 flex items-start gap-3">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-pink-400/12 text-pink-200">
+                <Database className="h-5 w-5" />
               </div>
-
-              <div className="grid min-h-[32rem] md:grid-cols-[13rem_1fr]">
-                <aside className="border-b border-white/10 bg-white/[0.03] p-4 md:border-b-0 md:border-r">
-                  <div className="mb-5 flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-pink-500/15 text-pink-200">
-                      <Database className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">Workspace</p>
-                      <p className="text-xs text-white/40">Google Drive</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2 text-sm">
-                    {["Dashboard", "Tables", "Bucket", "Functions", "API Docs"].map(
-                      (item, index) => (
-                        <div
-                          key={item}
-                          className={`rounded-lg px-3 py-2 ${
-                            index === 1
-                              ? "bg-white text-slate-950"
-                              : "text-white/52"
-                          }`}
-                        >
-                          {item}
-                        </div>
-                      )
-                    )}
-                  </div>
-                </aside>
-
-                <div className="p-5">
-                  <div className="mb-5 flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
-                    <div>
-                      <p className="text-xs font-semibold uppercase text-pink-200/80">
-                        Database
-                      </p>
-                      <h2 className="mt-2 text-2xl font-semibold">
-                        Production data
-                      </h2>
-                    </div>
-                    <div className="rounded-lg border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-sm font-medium text-emerald-200">
-                      Synced 18s ago
-                    </div>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    {productStats.map((stat) => (
-                      <div
-                        key={stat.label}
-                        className="rounded-lg border border-white/10 bg-white/[0.04] p-4"
-                      >
-                        <stat.icon className="mb-5 h-4 w-4 text-pink-200" />
-                        <p className="text-3xl font-semibold">{stat.value}</p>
-                        <p className="mt-1 text-xs text-white/42">
-                          {stat.label}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-5 overflow-hidden rounded-lg border border-white/10">
-                    <div className="grid grid-cols-[1.2fr_0.8fr_0.7fr] bg-white/[0.04] px-4 py-3 text-xs font-semibold uppercase text-white/38">
-                      <span>Collection</span>
-                      <span>Schema</span>
-                      <span>Status</span>
-                    </div>
-                    {tableRows.map(([name, schema, status]) => (
-                      <div
-                        key={name}
-                        className="grid grid-cols-[1.2fr_0.8fr_0.7fr] border-t border-white/10 px-4 py-4 text-sm"
-                      >
-                        <span className="font-medium">{name}</span>
-                        <span className="text-white/48">{schema}</span>
-                        <span className="text-emerald-300">{status}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div>
+                <p className="text-sm font-semibold text-pink-200">
+                  Platform map
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold">
+                  Everything on the public page points to code already in this
+                  app.
+                </h2>
               </div>
             </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {[
+                ["Dashboard", "/dashboard"],
+                ["Bucket", "/dashboard/bucket"],
+                ["Functions", "/dashboard/functions"],
+                ["API docs", "/dashboard/apidocs"],
+                ["Usage", "/dashboard/usage"],
+                ["Settings", "/dashboard/settings"],
+              ].map(([label, route]) => (
+                <div
+                  key={label}
+                  className="rounded-lg border border-white/10 bg-[#0b0d14] p-4"
+                >
+                  <p className="text-sm font-semibold">{label}</p>
+                  <p className="mt-1 font-mono text-xs text-white/38">{route}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="platform" className="border-b border-white/10 bg-[#07080d]">
+        <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
+          <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
+            <div>
+              <p className="text-sm font-semibold text-pink-200">Platform</p>
+              <h2 className="mt-3 text-4xl font-semibold leading-tight">
+                A full dashboard for Drive-backed data operations.
+              </h2>
+            </div>
+            <p className="max-w-2xl text-base leading-7 text-white/56 lg:ml-auto">
+              The app already includes pages and components for records, files,
+              server functions, SDK docs, account settings, backups, and usage.
+              The landing page now explains that actual product surface.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {platformModules.map((module) => (
+              <article
+                key={module.title}
+                className="rounded-lg border border-white/10 bg-white/[0.035] p-6"
+              >
+                <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-lg bg-pink-400/12 text-pink-200">
+                  <module.icon className="h-5 w-5" />
+                </div>
+                <h3 className="text-xl font-semibold">{module.title}</h3>
+                <p className="mt-3 text-sm leading-6 text-white/54">
+                  {module.description}
+                </p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -325,16 +371,15 @@ export default function LoginClient({
           <div className="mt-10 grid gap-4 md:grid-cols-3">
             {workflowSteps.map((step, index) => (
               <div
-                key={step}
+                key={step.title}
                 className="rounded-lg border border-white/10 bg-white/[0.035] p-6"
               >
                 <div className="mb-8 flex h-10 w-10 items-center justify-center rounded-lg bg-white text-sm font-semibold text-slate-950">
                   {index + 1}
                 </div>
-                <h3 className="text-xl font-semibold">{step}</h3>
+                <h3 className="text-xl font-semibold">{step.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-white/52">
-                  Keep the workflow familiar while giving teams a cleaner
-                  database interface on top of existing Drive assets.
+                  {step.description}
                 </p>
               </div>
             ))}
@@ -352,14 +397,14 @@ export default function LoginClient({
               </h2>
             </div>
             <p className="max-w-2xl text-base leading-7 text-white/56 lg:ml-auto">
-              Use Drive for storage, GDrive Database for the operational layer:
-              records, schema, APIs, usage, file bucket, and server-side
-              functions in one place.
+              Use Drive for storage and GDrive Database for the operational
+              layer: records, schema, APIs, files, functions, and settings in
+              one place.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
-            {features.map((feature) => (
+          <div className="mt-10 grid gap-4 md:grid-cols-2">
+            {featureRows.map((feature) => (
               <article
                 key={feature.title}
                 className="rounded-lg border border-white/10 bg-white/[0.035] p-6"
@@ -377,7 +422,87 @@ export default function LoginClient({
         </div>
       </section>
 
-      <section id="security" className="bg-[#090b12]">
+      <section id="schema" className="border-b border-white/10 bg-[#090b12]">
+        <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
+          <div>
+            <p className="text-sm font-semibold text-pink-200">Data model</p>
+            <h2 className="mt-3 text-4xl font-semibold leading-tight">
+              Schema where you need it, Drive ownership where you want it.
+            </h2>
+            <p className="mt-5 max-w-xl text-base leading-7 text-white/56">
+              Define practical column types, relationships, storage fields, and
+              defaults while keeping files and data anchored in Google Drive.
+            </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {schemaTypes.map((type) => (
+              <div
+                key={type}
+                className="flex items-center justify-between rounded-lg border border-white/10 bg-white/[0.04] px-4 py-4"
+              >
+                <span className="font-mono text-sm text-white/82">{type}</span>
+                <CheckCircle2 className="h-4 w-4 text-emerald-300" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="sdk" className="border-b border-white/10 bg-[#07080d]">
+        <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:px-10">
+          <div>
+            <p className="text-sm font-semibold text-pink-200">SDK</p>
+            <h2 className="mt-3 text-4xl font-semibold leading-tight">
+              A TypeScript client for data, schema, and bucket files.
+            </h2>
+            <p className="mt-5 max-w-xl text-base leading-7 text-white/56">
+              The README documents the `gdatabase` package with chainable calls
+              for tables, records, schema management, relations, and storage.
+            </p>
+          </div>
+
+          <pre className="overflow-x-auto rounded-lg border border-white/10 bg-[#0b0d14] p-5 text-sm leading-7 text-white/72">
+            <code>{`const db = new GDatabase(apiKey, appUrl);
+
+await db.database("crm").table("customers").create({
+  name: "Ada Lovelace",
+  status: "active",
+});
+
+const rows = await db
+  .database("crm")
+  .table("customers")
+  .list();`}</code>
+          </pre>
+        </div>
+      </section>
+
+      <section className="border-b border-white/10 bg-[#090b12]">
+        <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold text-pink-200">Use cases</p>
+            <h2 className="mt-3 text-4xl font-semibold leading-tight">
+              Useful when a full database is too much and spreadsheets are not
+              enough.
+            </h2>
+          </div>
+
+          <div className="mt-10 grid gap-4 md:grid-cols-2">
+            {useCases.map((item) => (
+              <div
+                key={item}
+                className="flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.035] p-5"
+              >
+                <Network className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
+                <p className="text-base leading-7 text-white/72">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="security" className="bg-[#07080d]">
         <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
           <div>
             <p className="text-sm font-semibold text-pink-200">Security</p>
@@ -386,8 +511,8 @@ export default function LoginClient({
             </h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-white/56">
               The dashboard uses OAuth for access and avoids manual credential
-              uploads. Your Drive remains the source of truth while the app
-              provides the database workflow on top.
+              uploads in the browser. Your Drive remains the source of truth
+              while the app provides the database workflow on top.
             </p>
           </div>
 
@@ -413,12 +538,7 @@ export default function LoginClient({
             />
 
             <div className="mt-6 grid gap-3 text-sm text-white/54 sm:grid-cols-2">
-              {[
-                "OAuth credentials stay server-side",
-                "No service account JSON in the browser",
-                "Drive data remains in Google",
-                "Access can be revoked from Google",
-              ].map((item) => (
+              {securityPoints.map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <LockKeyhole className="h-4 w-4 text-emerald-300" />
                   <span>{item}</span>
@@ -429,21 +549,81 @@ export default function LoginClient({
         </div>
       </section>
 
-      <footer className="border-t border-white/10 bg-[#07080d]">
-        <div className="mx-auto flex max-w-[22rem] flex-col gap-4 px-5 py-8 text-sm text-white/42 sm:max-w-7xl sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/logo.png"
-              alt=""
-              width={28}
-              height={28}
-              className="h-7 w-7 rounded-md"
-            />
-            <span>GDrive Database</span>
+      <footer className="border-t border-white/10 bg-[#05060a]">
+        <div className="mx-auto grid max-w-[22rem] gap-10 px-5 py-12 text-sm text-white/54 sm:max-w-7xl sm:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr] sm:px-8 lg:px-10">
+          <div>
+            <div className="flex items-center gap-3">
+              <Image
+                src="/logo.png"
+                alt=""
+                width={34}
+                height={34}
+                className="h-8 w-8 rounded-md"
+              />
+              <div>
+                <p className="font-semibold text-white">GDrive Database</p>
+                <p className="text-xs text-white/40">Drive-native database workspace</p>
+              </div>
+            </div>
+            <p className="mt-5 max-w-sm leading-6">
+              A NoSQL-style dashboard, SDK, and API layer powered by Google
+              Drive ownership.
+            </p>
           </div>
-          <div className="flex items-center gap-2">
-            <FileJson className="h-4 w-4" />
-            Drive-native database workspace
+
+          <div>
+            <p className="font-semibold text-white">Product</p>
+            <div className="mt-4 grid gap-3">
+              <a href="#platform" className="transition hover:text-white">
+                Platform
+              </a>
+              <a href="#features" className="transition hover:text-white">
+                Features
+              </a>
+              <a href="#schema" className="transition hover:text-white">
+                Schema
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <p className="font-semibold text-white">Developers</p>
+            <div className="mt-4 grid gap-3">
+              <a href="#sdk" className="transition hover:text-white">
+                SDK
+              </a>
+              <a href="#security" className="transition hover:text-white">
+                Security
+              </a>
+              <a href="#signin" className="transition hover:text-white">
+                Sign in
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <p className="font-semibold text-white">Stack</p>
+            <div className="mt-4 grid gap-3">
+              <span className="flex items-center gap-2">
+                <Files className="h-4 w-4" />
+                Google Drive
+              </span>
+              <span className="flex items-center gap-2">
+                <KeyRound className="h-4 w-4" />
+                Google OAuth
+              </span>
+              <span className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Usage dashboard
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-white/10">
+          <div className="mx-auto flex max-w-[22rem] flex-col gap-3 px-5 py-6 text-xs text-white/36 sm:max-w-7xl sm:flex-row sm:items-center sm:justify-between sm:px-8 lg:px-10">
+            <span>© 2026 GDrive Database</span>
+            <span>Built for Drive-backed apps and internal tools.</span>
           </div>
         </div>
       </footer>
