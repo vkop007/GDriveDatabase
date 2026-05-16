@@ -196,7 +196,7 @@ function LandingThemeToggle() {
       aria-label={`Switch to ${nextTheme} theme`}
       title={`Switch to ${nextTheme} theme`}
       aria-pressed={isDark}
-      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:border-pink-300 hover:text-pink-600 dark:border-white/12 dark:bg-white/8 dark:text-white/78 dark:hover:border-white/22 dark:hover:bg-white/12 dark:hover:text-white"
+      className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white/85 text-slate-700 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-950 dark:border-white/12 dark:bg-white/8 dark:text-white/78 dark:hover:border-white/22 dark:hover:bg-white/12 dark:hover:text-white"
     >
       {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </button>
@@ -268,7 +268,7 @@ export default function LoginClient({
             <LandingThemeToggle />
             <a
               href="#signin"
-              className="shrink-0 whitespace-nowrap rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-pink-300 hover:text-pink-600 dark:border-white/12 dark:bg-white/8 dark:text-white dark:hover:border-white/22 dark:hover:bg-white/12"
+              className="inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-slate-200 bg-white/85 px-3.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-950 dark:border-white/12 dark:bg-white/8 dark:text-white dark:hover:border-white/22 dark:hover:bg-white/12"
             >
               Sign in
             </a>
