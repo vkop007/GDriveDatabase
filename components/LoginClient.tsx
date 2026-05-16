@@ -324,7 +324,10 @@ export default function LoginClient({
         </div>
       </section>
 
-      <section id="platform" className="border-b border-white/10 bg-[#07080d]">
+      <section
+        id="platform"
+        className="scroll-mt-24 border-b border-white/10 bg-[#07080d]"
+      >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
             <div>
@@ -359,7 +362,10 @@ export default function LoginClient({
         </div>
       </section>
 
-      <section id="workflow" className="border-b border-white/10 bg-[#090b12]">
+      <section
+        id="workflow"
+        className="scroll-mt-24 border-b border-white/10 bg-[#090b12]"
+      >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold text-pink-200">Workflow</p>
@@ -387,7 +393,10 @@ export default function LoginClient({
         </div>
       </section>
 
-      <section id="features" className="border-b border-white/10 bg-[#07080d]">
+      <section
+        id="features"
+        className="scroll-mt-24 border-b border-white/10 bg-[#07080d]"
+      >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
@@ -422,7 +431,10 @@ export default function LoginClient({
         </div>
       </section>
 
-      <section id="schema" className="border-b border-white/10 bg-[#090b12]">
+      <section
+        id="schema"
+        className="scroll-mt-24 border-b border-white/10 bg-[#090b12]"
+      >
         <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
           <div>
             <p className="text-sm font-semibold text-pink-200">Data model</p>
@@ -449,7 +461,10 @@ export default function LoginClient({
         </div>
       </section>
 
-      <section id="sdk" className="border-b border-white/10 bg-[#07080d]">
+      <section
+        id="sdk"
+        className="scroll-mt-24 border-b border-white/10 bg-[#07080d]"
+      >
         <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:px-10">
           <div>
             <p className="text-sm font-semibold text-pink-200">SDK</p>
@@ -502,7 +517,7 @@ const rows = await db
         </div>
       </section>
 
-      <section id="security" className="bg-[#07080d]">
+      <section id="security" className="scroll-mt-24 bg-[#07080d]">
         <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
           <div>
             <p className="text-sm font-semibold text-pink-200">Security</p>
@@ -516,7 +531,10 @@ const rows = await db
             </p>
           </div>
 
-          <div id="signin" className="rounded-lg border border-white/10 bg-white/[0.04] p-6">
+          <div
+            id="signin"
+            className="scroll-mt-24 rounded-lg border border-white/10 bg-white/[0.04] p-6"
+          >
             <div className="mb-6 flex items-start gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-400/12 text-emerald-200">
                 <ShieldCheck className="h-5 w-5" />
