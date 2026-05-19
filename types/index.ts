@@ -18,11 +18,28 @@ export interface ValidationRules {
   message?: string;
 }
 
+export type JsonPrimitive = string | number | boolean | null;
+
+export type JsonValue =
+  | JsonPrimitive
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+export type DocumentValue = JsonValue | undefined;
+
+export type ColumnType =
+  | "string"
+  | "integer"
+  | "boolean"
+  | "datetime"
+  | "relation"
+  | "storage";
+
 export interface ColumnDefinition {
   key: string;
-  type: "string" | "integer" | "boolean" | "datetime" | "relation" | "storage";
+  type: ColumnType;
   required: boolean;
-  default?: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  default?: DocumentValue;
   array?: boolean;
   relationTableId?: string;
   validation?: ValidationRules;
@@ -31,17 +48,57 @@ export interface ColumnDefinition {
   indexFileId?: string;
 }
 
-export interface RowData {
+export type DocumentRow = {
   $id: string;
   $createdAt: string;
   $updatedAt: string;
-  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-}
+} & Record<string, DocumentValue>;
+
+export type RowData = DocumentRow;
 
 export interface TableFile {
   name: string;
   schema: ColumnDefinition[];
   documents: RowData[];
+}
+
+export interface DriveFile {
+  id: string;
+  name: string;
+  mimeType: string;
+  trashed?: boolean;
+  parents?: string[];
+  createdTime?: string;
+  modifiedTime?: string;
+  webViewLink?: string;
+  webContentLink?: string;
+  thumbnailLink?: string;
+  size?: string;
+}
+
+export type Database = DriveFile;
+
+export type Table = DriveFile & {
+  schema?: ColumnDefinition[];
+};
+
+export type DatabaseNavItem = Pick<Database, "id" | "name"> & {
+  tables: Pick<Table, "id" | "name">[];
+};
+
+export type DatabaseTreeItem = Pick<Database, "id" | "name"> & {
+  tables: (Pick<Table, "id" | "name"> & { schema: ColumnDefinition[] })[];
+};
+
+export type BucketFile = DriveFile;
+
+export type BucketUploadResult =
+  | { success: true; files: BucketFile[] }
+  | { success: false; error: string };
+
+export interface RelationOption {
+  id: string;
+  label: string;
 }
 
 export interface JsonTableEditorProps {

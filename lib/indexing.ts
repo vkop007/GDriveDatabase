@@ -1,7 +1,7 @@
 import { getAuth } from "./gdrive/auth";
 import { initDriveService, GoogleDriveService } from "gdrivekit";
 import { createFileInFolder } from "./gdrive/operations";
-import { RowData } from "../types";
+import { DocumentValue, RowData } from "../types";
 
 export const INDEX_FOLDER_NAME = ".indexes";
 
@@ -46,9 +46,7 @@ export async function getIndexFolderId(
     console.warn("Index folder search failed, trying create", e);
   }
 
-  // Create it
-  // Create it
-  const createResponse: any = await drive.createFolder(
+  const createResponse = await drive.createFolder(
     INDEX_FOLDER_NAME,
     databaseId
   );
@@ -57,10 +55,11 @@ export async function getIndexFolderId(
     JSON.stringify(createResponse)
   );
 
-  if (createResponse?.id) return createResponse.id;
-  if (createResponse?.data?.id) return createResponse.data.id;
+  if (createResponse.data?.id) {
+    return createResponse.data.id;
+  }
 
-  return createResponse.id;
+  throw new Error("Failed to create index folder");
 }
 
 // Generate a file name for the index
@@ -118,7 +117,7 @@ export async function checkUniqueConstraint(
   databaseId: string,
   tableId: string,
   columnKey: string,
-  value: any,
+  value: DocumentValue,
   excludeDocId?: string,
   driveService?: GoogleDriveService,
   indexFileId?: string
@@ -166,8 +165,8 @@ export async function updateIndex(
   databaseId: string,
   tableId: string,
   columnKey: string,
-  oldValue: any,
-  newValue: any,
+  oldValue: DocumentValue,
+  newValue: DocumentValue,
   docId: string,
   driveService?: GoogleDriveService,
   indexFileId?: string
@@ -180,7 +179,7 @@ export async function updateIndex(
     indexFileId
   );
   let index = content;
-  let currentFileId = fileId;
+  const currentFileId = fileId;
 
   if (!index) {
     index = {

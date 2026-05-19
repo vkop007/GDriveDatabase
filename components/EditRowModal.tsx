@@ -1,10 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { updateDocument, getSimpleTableData } from "../app/actions/table";
 import { listBucketFiles } from "../app/actions/bucket";
-import { ColumnDefinition, RowData } from "../types";
+import {
+  BucketFile,
+  ColumnDefinition,
+  DocumentValue,
+  RelationOption,
+  RowData,
+} from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
 import { X, Loader2, AlertCircle, Shield } from "lucide-react";
@@ -38,6 +44,12 @@ function getValidationHint(col: ColumnDefinition): string | null {
   return hints.length > 0 ? hints.join(" · ") : null;
 }
 
+function getInputValue(value: DocumentValue): string {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
 export default function EditRowModal({
   isOpen,
   onClose,
@@ -48,20 +60,25 @@ export default function EditRowModal({
 }: EditRowModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState<Record<string, any>>({});
+  const [formData, setFormData] = useState<Record<string, DocumentValue>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [relationOptions, setRelationOptions] = useState<
-    Record<string, { id: string; label: string }[]>
+    Record<string, RelationOption[]>
   >({});
-  const [mediaOptions, setMediaOptions] = useState<Record<string, any[]>>({});
+  const [mediaOptions, setMediaOptions] = useState<Record<string, BucketFile[]>>(
+    {}
+  );
 
   // Filter out system columns for editing
-  const editableColumns = schema.filter((col) => !col.key.startsWith("$"));
+  const editableColumns = useMemo(
+    () => schema.filter((col) => !col.key.startsWith("$")),
+    [schema]
+  );
 
   // Initialize form data when document changes
   useEffect(() => {
     if (isOpen && document) {
-      const initialData: Record<string, any> = {};
+      const initialData: Record<string, DocumentValue> = {};
       editableColumns.forEach((col) => {
         initialData[col.key] = document[col.key] ?? "";
       });
@@ -90,7 +107,7 @@ export default function EditRowModal({
       if (storageColumns.length > 0) {
         // Fetch once for all storage columns since they share the same bucket
         listBucketFiles().then((files) => {
-          const fileOptions = files.map((f: any) => ({
+          const fileOptions = files.map((f) => ({
             id: f.id,
             name: f.name,
             mimeType: f.mimeType,
@@ -107,7 +124,7 @@ export default function EditRowModal({
         });
       }
     }
-  }, [isOpen, document]);
+  }, [isOpen, document, editableColumns]);
 
   if (!isOpen) return null;
 
@@ -121,7 +138,7 @@ export default function EditRowModal({
 
     try {
       // Process form data based on schema types
-      const processedData: Record<string, any> = {};
+      const processedData: Record<string, DocumentValue> = {};
 
       editableColumns.forEach((col) => {
         // For arrays, read from the hidden input field (used by ArrayInput)
@@ -132,15 +149,16 @@ export default function EditRowModal({
           ) as HTMLInputElement;
           const val = hiddenInput?.value || "[]";
           try {
-            const parsed = JSON.parse(val);
+            const parsed = JSON.parse(val) as unknown;
+            const parsedValues = Array.isArray(parsed) ? parsed : [];
             if (col.type === "integer") {
-              processedData[col.key] = parsed.map((v: string) =>
-                parseInt(v, 10)
+              processedData[col.key] = parsedValues.map((v) =>
+                parseInt(String(v), 10)
               );
             } else {
-              processedData[col.key] = parsed;
+              processedData[col.key] = parsedValues.map((v) => String(v));
             }
-          } catch (e) {
+          } catch {
             processedData[col.key] = [];
           }
         } else {
@@ -149,7 +167,7 @@ export default function EditRowModal({
             if (col.type === "boolean") {
               processedData[col.key] = val === true || val === "true";
             } else if (col.type === "integer") {
-              processedData[col.key] = parseInt(val as string, 10);
+              processedData[col.key] = parseInt(String(val), 10);
             } else {
               processedData[col.key] = val;
             }
@@ -194,7 +212,7 @@ export default function EditRowModal({
     }
   };
 
-  const handleInputChange = (key: string, value: any) => {
+  const handleInputChange = (key: string, value: DocumentValue) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
     // Clear error when user starts typing
     if (fieldErrors[key]) {
@@ -222,6 +240,8 @@ export default function EditRowModal({
               const hasError = !!fieldErrors[col.key];
               const hint = getValidationHint(col);
 
+              const documentValue = document[col.key];
+
               return (
                 <div key={col.key} className="space-y-2">
                   <label className="text-xs font-medium text-neutral-400 uppercase tracking-wider flex items-center gap-2">
@@ -240,8 +260,8 @@ export default function EditRowModal({
                       type={col.type as "string" | "integer"}
                       placeholder={`Add ${col.type} value...`}
                       initialValues={
-                        Array.isArray(document[col.key])
-                          ? document[col.key].map(String)
+                        Array.isArray(documentValue)
+                          ? documentValue.map(String)
                           : []
                       }
                     />
@@ -272,7 +292,7 @@ export default function EditRowModal({
                         const val = formData[col.key];
                         if (!val) return "";
                         try {
-                          const date = new Date(val);
+                          const date = new Date(String(val));
                           // Format: YYYY-MM-DDTHH:mm
                           const year = date.getFullYear();
                           const month = String(date.getMonth() + 1).padStart(
@@ -314,7 +334,7 @@ export default function EditRowModal({
                   ) : col.type === "storage" ? (
                     <div className="relative">
                       <select
-                        value={formData[col.key] ?? ""}
+                        value={getInputValue(formData[col.key])}
                         onChange={(e) =>
                           handleInputChange(col.key, e.target.value)
                         }
@@ -341,7 +361,7 @@ export default function EditRowModal({
                   ) : col.type === "relation" ? (
                     <div className="relative">
                       <select
-                        value={formData[col.key] ?? ""}
+                        value={getInputValue(formData[col.key])}
                         onChange={(e) =>
                           handleInputChange(col.key, e.target.value)
                         }
@@ -368,7 +388,7 @@ export default function EditRowModal({
                   ) : col.validation?.enum && col.validation.enum.length > 0 ? (
                     // Render select for enum fields
                     <select
-                      value={formData[col.key] ?? ""}
+                      value={getInputValue(formData[col.key])}
                       onChange={(e) =>
                         handleInputChange(col.key, e.target.value)
                       }
@@ -397,7 +417,7 @@ export default function EditRowModal({
                           ? "url"
                           : "text"
                       }
-                      value={formData[col.key] ?? ""}
+                      value={getInputValue(formData[col.key])}
                       onChange={(e) =>
                         handleInputChange(col.key, e.target.value)
                       }

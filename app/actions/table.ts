@@ -8,6 +8,8 @@ import { createFileInFolder } from "../../lib/gdrive/operations";
 import { validateDocument } from "../../lib/validation";
 import {
   ColumnDefinition,
+  DocumentValue,
+  Table,
   RowData,
   TableFile,
   ValidationError,
@@ -21,8 +23,9 @@ export async function listCollections(databaseId: string) {
       await operations.listOperations.listFilesInFolder(databaseId);
     console.log("List response count:", response.data?.files?.length);
     // Filter for JSON files just in case, though listFilesInFolder might return all types
-    return (response.data?.files || []).filter(
-      (f: any) => f.mimeType === "application/json",
+    const files = (response.data?.files || []) as Table[];
+    return files.filter(
+      (f) => f.mimeType === "application/json",
     );
   } catch (error) {
     console.error("Error listing collections:", error);
@@ -78,8 +81,8 @@ export async function createTable(formData: FormData) {
     console.log("Create result:", JSON.stringify(result));
 
     if (!result.success || !result.data?.id) {
-      console.error("Failed to create file:", (result as any).error);
-      throw new Error(`Failed to create file: ${(result as any).error}`);
+      console.error("Failed to create file");
+      throw new Error("Failed to create file");
     }
   } catch (error) {
     console.error("Error creating table:", error);
@@ -115,7 +118,7 @@ export async function getTableData(fileId: string) {
 export async function updateTableSchema(formData: FormData) {
   const fileId = formData.get("fileId") as string;
   const key = formData.get("key") as string;
-  const type = formData.get("type") as any;
+  const type = formData.get("type") as ColumnDefinition["type"];
   const required = formData.get("required") === "on";
   const isArray = formData.get("array") === "on";
   const defaultValue = formData.get("default") as string;
@@ -189,16 +192,6 @@ export async function updateTableSchema(formData: FormData) {
     if (validationMessage) {
       validation.message = validationMessage;
     }
-  }
-
-  // Import at top if not present, but we are inside function so we can't.
-  // We assume checkingUniqueConstraint and rebuildIndex are imported at top of file.
-  // Or we dynamically import or use the ones we added to imports.
-
-  interface UpdateSchemaResult {
-    success: boolean;
-    error?: string;
-    column?: ColumnDefinition;
   }
 
   // ... inside updateTableSchema ...
@@ -325,17 +318,17 @@ export async function addDocument(formData: FormData): Promise<{
 }> {
   const fileId = formData.get("fileId") as string;
   const dataStr = formData.get("data") as string;
-  let databaseId = formData.get("databaseId") as string;
+  let databaseId = formData.get("databaseId")?.toString() ?? "";
 
   if (!fileId || !dataStr) {
     return { success: false, error: "Missing parameters" };
   }
 
-  const data = JSON.parse(dataStr);
+  const data = JSON.parse(dataStr) as Record<string, unknown>;
   const table = await getFreshTableData(fileId);
 
   if (!databaseId) {
-    databaseId = await getParentId(fileId);
+    databaseId = (await getParentId(fileId)) ?? "";
   }
 
   // Validate against schema with Zod
@@ -429,7 +422,7 @@ export async function updateDocument(formData: FormData): Promise<{
   const fileId = formData.get("fileId") as string;
   const docId = formData.get("docId") as string;
   const dataStr = formData.get("data") as string;
-  let databaseId = formData.get("databaseId") as string;
+  let databaseId = formData.get("databaseId")?.toString() ?? "";
 
   console.log("[updateDocument] Called with:", { fileId, docId, dataStr });
 
@@ -439,7 +432,7 @@ export async function updateDocument(formData: FormData): Promise<{
   }
 
   try {
-    const data = JSON.parse(dataStr);
+    const data = JSON.parse(dataStr) as Record<string, unknown>;
     console.log("[updateDocument] Parsed data:", data);
 
     const table = await getFreshTableData(fileId);
@@ -459,7 +452,7 @@ export async function updateDocument(formData: FormData): Promise<{
     }
 
     if (!databaseId) {
-      databaseId = await getParentId(fileId);
+      databaseId = (await getParentId(fileId)) ?? "";
     }
 
     // Validate against schema with Zod
@@ -505,7 +498,7 @@ export async function updateDocument(formData: FormData): Promise<{
 
     // Capture old values for index update
     const oldDoc = table.documents[docIndex];
-    const oldValues: Record<string, any> = {};
+    const oldValues: Record<string, DocumentValue> = {};
     uniqueColumns.forEach((col) => {
       oldValues[col.key] = oldDoc[col.key];
     });
@@ -688,7 +681,7 @@ export async function getParentId(fileId: string) {
     );
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as { parents?: string[] };
   return data.parents?.[0];
 }
 
@@ -710,9 +703,9 @@ export async function getParentInfo(
       return { id: parentId, name: "Collection" };
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { id: string; name: string };
     return { id: data.id, name: data.name };
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -740,7 +733,10 @@ export async function getSimpleTableData(tableId: string) {
 
     const results = table.documents.map((doc) => ({
       id: doc.$id,
-      label: doc[labelField] || doc.$id,
+      label:
+        typeof doc[labelField] === "string" && doc[labelField]
+          ? doc[labelField]
+          : doc.$id,
     }));
     console.log("Returning results:", results);
     return results;

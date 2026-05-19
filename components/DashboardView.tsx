@@ -9,9 +9,10 @@ import SearchInput from "./SearchInput";
 import { Database, Link2 } from "lucide-react";
 import ResourceCard from "./ResourceCard";
 import DriveSetupClient from "./DriveSetupClient";
+import type { Database as DatabaseFile } from "../types";
 
 interface DashboardViewProps {
-  initialDatabases: any[];
+  initialDatabases: DatabaseFile[];
   needsDriveConnection?: boolean;
   driveSetupAction?: (formData: FormData) => void;
 }
@@ -21,8 +22,10 @@ export default function DashboardView({
   needsDriveConnection = false,
   driveSetupAction,
 }: DashboardViewProps) {
-  const [renamingDatabase, setRenamingDatabase] = useState<any>(null);
-  const [settingsDatabase, setSettingsDatabase] = useState<any>(null);
+  const [renamingDatabase, setRenamingDatabase] =
+    useState<DatabaseFile | null>(null);
+  const [settingsDatabase, setSettingsDatabase] =
+    useState<DatabaseFile | null>(null);
   const [isDriveSetupOpen, setIsDriveSetupOpen] =
     useState(needsDriveConnection);
   const [searchQuery, setSearchQuery] = useState("");
@@ -97,7 +100,7 @@ export default function DashboardView({
               </p>
             </div>
           ) : (
-            files.map((file: any) => (
+            files.map((file) => (
               <ResourceCard
                 key={file.id}
                 name={file.name}

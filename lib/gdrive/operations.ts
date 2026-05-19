@@ -1,10 +1,31 @@
-import { operations } from "gdrivekit";
+import { operations, type GoogleDriveService } from "gdrivekit";
 import { getAuth } from "./auth";
-import { cookies } from "next/headers";
+import type { DriveFile } from "../../types";
 
 export const ROOT_FOLDER_NAME = "GDriveDatabase";
 
-export async function getOrCreateRootFolder(auth?: any) {
+function getCreatedFileId(response: unknown): string | null {
+  if (!response || typeof response !== "object") {
+    return null;
+  }
+
+  const record = response as {
+    id?: unknown;
+    data?: { id?: unknown };
+  };
+
+  if (typeof record.id === "string") {
+    return record.id;
+  }
+
+  if (typeof record.data?.id === "string") {
+    return record.data.id;
+  }
+
+  return null;
+}
+
+export async function getOrCreateRootFolder(auth?: unknown) {
   if (!auth) {
     await getAuth();
   }
@@ -32,10 +53,10 @@ export async function getOrCreateRootFolder(auth?: any) {
     JSON.stringify(createResponse)
   );
 
-  if (createResponse?.data?.id) {
-    return createResponse.data.id;
-  } else if ((createResponse as any)?.id) {
-    return (createResponse as any).id;
+  const createdFileId = getCreatedFileId(createResponse);
+
+  if (createdFileId) {
+    return createdFileId;
   }
 
   throw new Error(
@@ -49,7 +70,7 @@ const SYSTEM_FOLDER_NAME = "_SystemData";
  * Get or create the _SystemData folder inside GDriveDatabase root.
  * This folder stores system files like api-config.json, backups, user-profile.json
  */
-export async function getOrCreateSystemFolder(auth?: any) {
+export async function getOrCreateSystemFolder(auth?: unknown) {
   const rootId = await getOrCreateRootFolder(auth);
 
   try {
@@ -57,8 +78,9 @@ export async function getOrCreateSystemFolder(auth?: any) {
     const response = await operations.listOperations.listFoldersInFolder(
       rootId
     );
-    const systemFolder = response.data?.files?.find(
-      (f: any) => f.name === SYSTEM_FOLDER_NAME && !f.trashed
+    const folders = (response.data?.files ?? []) as DriveFile[];
+    const systemFolder = folders.find(
+      (f) => f.name === SYSTEM_FOLDER_NAME && !f.trashed
     );
 
     if (systemFolder) {
@@ -75,16 +97,14 @@ export async function getOrCreateSystemFolder(auth?: any) {
     rootId
   );
 
-  if (createResponse?.data?.id) {
-    return createResponse.data.id;
-  } else if ((createResponse as any)?.id) {
-    return (createResponse as any).id;
+  const createdFileId = getCreatedFileId(createResponse);
+
+  if (createdFileId) {
+    return createdFileId;
   }
 
   throw new Error("Failed to create _SystemData folder");
 }
-
-import { fetchWithAuth } from "./auth";
 
 // Custom move file implementation to bypass gdrivekit issue or limitations
 export async function moveFile(
@@ -122,12 +142,10 @@ export async function moveFile(
   }
 }
 
-import { GoogleDriveService } from "gdrivekit";
-
 export async function createFileInFolder(
   folderId: string,
   name: string,
-  content: any,
+  content: unknown,
   driveService?: GoogleDriveService
 ) {
   if (!driveService) {
@@ -139,17 +157,19 @@ export async function createFileInFolder(
 
     if (driveService) {
       // Use driveService if available
-      const result = await driveService.createJsonFile(name, content);
+      const result = await driveService.createJsonFile(
+        JSON.stringify(content),
+        name
+      );
       console.log(
         "[createFileInFolder] driveService.createJsonFile result:",
         JSON.stringify(result)
       );
 
       // Check for common return patterns
-      if (result && (result as any).id) {
-        fileId = (result as any).id;
-      } else if (result && (result as any).data && (result as any).data.id) {
-        fileId = (result as any).data.id;
+      const createdFileId = getCreatedFileId(result);
+      if (createdFileId) {
+        fileId = createdFileId;
       } else {
         throw new Error(
           "Failed to create file via driveService: ID not found in response"

@@ -1,10 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { addDocument, getSimpleTableData } from "../app/actions/table";
 import { listBucketFiles } from "../app/actions/bucket";
-import { ColumnDefinition } from "../types";
+import {
+  BucketFile,
+  ColumnDefinition,
+  DocumentValue,
+  RelationOption,
+} from "../types";
 import { toast } from "sonner";
 import ArrayInput from "./ArrayInput";
 import { Loader2, Plus, X, Table2, AlertCircle, Shield } from "lucide-react";
@@ -42,12 +47,17 @@ export default function AddRowForm({
   const [isLoading, setIsLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [relationOptions, setRelationOptions] = useState<
-    Record<string, { id: string; label: string }[]>
+    Record<string, RelationOption[]>
   >({});
-  const [mediaOptions, setMediaOptions] = useState<Record<string, any[]>>({});
+  const [mediaOptions, setMediaOptions] = useState<Record<string, BucketFile[]>>(
+    {}
+  );
 
   const router = useRouter();
-  const inputColumns = schema.filter((col) => !col.key.startsWith("$"));
+  const inputColumns = useMemo(
+    () => schema.filter((col) => !col.key.startsWith("$")),
+    [schema]
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -76,7 +86,7 @@ export default function AddRowForm({
       if (storageColumns.length > 0) {
         // Fetch once for all storage columns since they share the same bucket
         listBucketFiles().then((files) => {
-          const fileOptions = files.map((f: any) => ({
+          const fileOptions = files.map((f) => ({
             id: f.id,
             name: f.name,
             mimeType: f.mimeType,
@@ -93,7 +103,7 @@ export default function AddRowForm({
         });
       }
     }
-  }, [isOpen]);
+  }, [isOpen, inputColumns]);
 
   if (!isOpen) {
     return (
@@ -146,18 +156,21 @@ export default function AddRowForm({
 
             const form = e.currentTarget;
             const formData = new FormData(form);
-            const data: Record<string, any> = {};
+            const data: Record<string, DocumentValue> = {};
 
             inputColumns.forEach((col) => {
               const val = formData.get(col.key);
 
               if (col.array && val !== null && val !== "") {
                 try {
-                  const parsed = JSON.parse(val as string);
+                  const parsed = JSON.parse(String(val)) as unknown;
+                  const parsedValues = Array.isArray(parsed) ? parsed : [];
                   if (col.type === "integer") {
-                    data[col.key] = parsed.map((v: string) => parseInt(v, 10));
+                    data[col.key] = parsedValues.map((v) =>
+                      parseInt(String(v), 10)
+                    );
                   } else {
-                    data[col.key] = parsed;
+                    data[col.key] = parsedValues.map((v) => String(v));
                   }
                 } catch (e) {
                   console.error("Failed to parse array input", e);
@@ -169,9 +182,9 @@ export default function AddRowForm({
                     form.elements.namedItem(col.key) as HTMLInputElement
                   ).checked;
                 } else if (col.type === "integer") {
-                  data[col.key] = parseInt(val as string, 10);
+                  data[col.key] = parseInt(String(val), 10);
                 } else {
-                  data[col.key] = val;
+                  data[col.key] = String(val);
                 }
               } else if (col.type === "boolean") {
                 data[col.key] = (

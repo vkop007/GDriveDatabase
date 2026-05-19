@@ -8,7 +8,7 @@ import GradientButton from "./GradientButton";
 interface ResourceCardProps {
   name: string;
   id: string;
-  createdTime: string | Date;
+  createdTime?: string | Date;
   type: "database" | "collection";
   href: string;
   onSettingsClick: (e: React.MouseEvent) => void;
@@ -82,11 +82,13 @@ export default function ResourceCard({
           <span
             className={`text-[10px] font-medium text-slate-500 dark:text-neutral-500 bg-slate-100 dark:bg-neutral-900/50 border border-slate-200 dark:border-white/5 px-2 py-1 rounded-full ${theme.badgeBorderHover} transition-colors`}
           >
-            {new Date(createdTime).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            })}
+            {createdTime
+              ? new Date(createdTime).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : "No date"}
           </span>
         </div>
 

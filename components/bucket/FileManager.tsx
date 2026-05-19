@@ -7,7 +7,6 @@ import {
   Upload,
   File as FileIcon,
   Loader2,
-  Image as ImageIcon,
   LayoutGrid,
   Table as TableIcon,
   Video,
@@ -29,6 +28,7 @@ import Image from "next/image";
 import UploadSuccessModal from "./UploadSuccessModal";
 import { useConfirm } from "../../contexts/ConfirmContext";
 import { createPortal } from "react-dom";
+import type { BucketFile } from "../../types";
 
 // Helper to get file icon based on MIME type
 const getFileIcon = (mimeType: string) => {
@@ -135,19 +135,19 @@ const getSmallFileIcon = (mimeType: string) => {
 };
 
 interface FileManagerProps {
-  initialFiles: any[];
+  initialFiles: BucketFile[];
 }
 
 export default function FileManager({ initialFiles }: FileManagerProps) {
   const [files, setFiles] = useState(initialFiles);
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
-  const [uploadedFiles, setUploadedFiles] = useState<any[] | null>(null);
+  const [uploadedFiles, setUploadedFiles] = useState<BucketFile[] | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
   const [isDragging, setIsDragging] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
-  const [previewFile, setPreviewFile] = useState<any | null>(null);
+  const [previewFile, setPreviewFile] = useState<BucketFile | null>(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragCounter = useRef(0);
@@ -163,7 +163,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
     });
 
     try {
-      const result = (await uploadBucketFiles(formData)) as any;
+      const result = await uploadBucketFiles(formData);
       if (result.success && result.files) {
         setUploadedFiles(result.files);
       } else {
@@ -203,7 +203,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
     setIsDeleting(null);
   };
 
-  const startRename = (file: any) => {
+  const startRename = (file: BucketFile) => {
     setRenamingId(file.id);
     setRenameValue(file.name);
   };
@@ -268,7 +268,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
       });
 
       try {
-        const result = (await uploadBucketFiles(formData)) as any;
+        const result = await uploadBucketFiles(formData);
         if (result.success && result.files) {
           setUploadedFiles(result.files);
         } else {

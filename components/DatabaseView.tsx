@@ -2,25 +2,22 @@
 
 import { useState } from "react";
 import ApiAccess from "./ApiAccess";
-import CopyButton from "./CopyButton";
 import CreateTableModal from "./CreateTableModal";
 import RenameModal from "./RenameModal";
 import ItemSettingsModal from "./ItemSettingsModal";
 import SearchInput from "./SearchInput";
-import { deleteCollection } from "../app/actions";
 import Link from "next/link";
 import {
-  Settings,
   Table,
   Database,
   ChevronRight,
   Layers,
-  CreditCard,
 } from "lucide-react";
 import ResourceCard from "./ResourceCard";
+import type { Table as TableFile } from "../types";
 
 interface DatabaseViewProps {
-  initialTables: any[];
+  initialTables: TableFile[];
   databaseId: string;
 }
 
@@ -29,8 +26,10 @@ export default function DatabaseView({
   databaseId,
 }: DatabaseViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
-  const [renamingCollection, setRenamingCollection] = useState<any>(null);
-  const [settingsCollection, setSettingsCollection] = useState<any>(null);
+  const [renamingCollection, setRenamingCollection] =
+    useState<TableFile | null>(null);
+  const [settingsCollection, setSettingsCollection] =
+    useState<TableFile | null>(null);
 
   const files = searchQuery
     ? initialTables.filter((file) =>
@@ -93,7 +92,7 @@ export default function DatabaseView({
               </p>
             </div>
           ) : (
-            files.map((file: any) => (
+            files.map((file) => (
               <ResourceCard
                 key={file.id}
                 name={file.name}
