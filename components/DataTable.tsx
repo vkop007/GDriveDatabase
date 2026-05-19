@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { bulkDeleteDocuments, deleteDocument, updateDocument } from "../app/actions/table";
-import { TableFile, RowData } from "../types";
+import { DocumentValue, TableFile, RowData } from "../types";
 import BulkActionBar from "./BulkActionBar";
 import EditRowModal from "./EditRowModal";
 import InlineEditableCell from "./InlineEditableCell";
@@ -216,7 +216,7 @@ export default function DataTable({
   const handleInlineEditSave = async (
     rowId: string,
     columnKey: string,
-    newValue: any
+    newValue: DocumentValue
   ): Promise<boolean> => {
     try {
       const doc = table.documents.find((d) => d.$id === rowId);
@@ -370,7 +370,7 @@ export default function DataTable({
       } else {
         toast.error(result.error || "Failed to delete rows");
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while deleting");
     } finally {
       setIsDeleting(false);
@@ -397,7 +397,7 @@ export default function DataTable({
       await deleteDocument(formData);
       toast.success("Row deleted successfully");
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete row");
     } finally {
       setDeletingRowId(null);
@@ -660,7 +660,6 @@ export default function DataTable({
                             ? JSON.stringify(value)
                             : String(value ?? "");
 
-                        const isSystemField = col.key.startsWith("$");
                         const isId = col.key === "$id";
                         const isTimestamp =
                           col.key === "$createdAt" || col.key === "$updatedAt";
@@ -726,6 +725,7 @@ export default function DataTable({
                                   className="inline-flex items-center gap-2 text-primary hover:underline"
                                 >
                                   <div className="w-8 h-8 rounded bg-neutral-800 border border-neutral-700 flex items-center justify-center overflow-hidden">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                       src={`/api/resources?id=${displayValue}`}
                                       alt="File"

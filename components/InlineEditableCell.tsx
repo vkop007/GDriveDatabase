@@ -3,12 +3,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Check, X, Edit2 } from "lucide-react";
 import { toast } from "sonner";
+import type { DocumentValue } from "../types";
 
 interface InlineEditableCellProps {
-  value: any;
+  value: DocumentValue;
   displayValue: string;
   columnType?: "text" | "number" | "email" | "date" | "datetime" | "boolean";
-  onSave: (newValue: any) => Promise<boolean>;
+  onSave: (newValue: DocumentValue) => Promise<boolean>;
   onCancel?: () => void;
   isEditing?: boolean;
   onEditStart?: () => void;
@@ -33,38 +34,21 @@ export default function InlineEditableCell({
 }: InlineEditableCellProps) {
   const [editValue, setEditValue] = useState(String(value ?? ""));
   const [isSaving, setIsSaving] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement | HTMLSelectElement | null>(null);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
-      inputRef.current.select();
+      if ("select" in inputRef.current) {
+        inputRef.current.select();
+      }
     }
   }, [isEditing]);
-
-  const formatValue = (val: any, type: string): string => {
-    if (val == null || val === "") return "";
-    
-    switch (type) {
-      case "number":
-        return String(Number(val));
-      case "date":
-        if (val instanceof Date) return val.toISOString().split("T")[0];
-        return String(val).split("T")[0];
-      case "datetime":
-        if (val instanceof Date) return val.toISOString();
-        return String(val);
-      case "boolean":
-        return String(val).toLowerCase() === "true" ? "true" : "false";
-      default:
-        return String(val);
-    }
-  };
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      let convertedValue: any = editValue;
+      let convertedValue: DocumentValue = editValue;
 
       // Type conversion and validation
       if (columnType === "number") {
@@ -133,6 +117,12 @@ export default function InlineEditableCell({
     }
   };
 
+  const handleEditStart = () => {
+    if (!disabled) {
+      onEditStart?.();
+    }
+  };
+
   const getInputType = () => {
     switch (columnType) {
       case "number":
@@ -171,7 +161,9 @@ export default function InlineEditableCell({
         <div className="flex-1 relative">
           {columnType === "boolean" && (
             <select
-              ref={inputRef as any}
+              ref={(element) => {
+                inputRef.current = element;
+              }}
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -185,7 +177,9 @@ export default function InlineEditableCell({
           )}
           {columnType !== "boolean" && (
             <input
-              ref={inputRef}
+              ref={(element) => {
+                inputRef.current = element;
+              }}
               type={getInputType()}
               value={editValue}
               onChange={(e) => setEditValue(e.target.value)}
@@ -223,11 +217,13 @@ export default function InlineEditableCell({
 
   return (
     <div
-      onClick={onEditStart}
-      className={`cursor-pointer hover:text-primary transition-all duration-200 text-white rounded pl-2 pr-6 py-1 relative group/text hover:bg-neutral-700/20 flex items-center active:scale-95 ${maxWidth}`}
+      onClick={handleEditStart}
+      className={`${
+        disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+      } hover:text-primary transition-all duration-200 text-white rounded pl-2 pr-6 py-1 relative group/text hover:bg-neutral-700/20 flex items-center active:scale-95 ${maxWidth}`}
       title={displayValue}
       role="button"
-      tabIndex={0}
+      tabIndex={disabled ? -1 : 0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();

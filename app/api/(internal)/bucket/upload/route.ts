@@ -15,6 +15,10 @@ export async function POST(request: NextRequest) {
 
     const result = await processAndUploadFiles(files);
 
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 500 });
+    }
+
     // We don't revalidateTag here because API usage might not need immediate dashboard UI update,
     // or we can't trigger Next.js cache revalidation easily from API route without importing revalidateTag.
     // Actually we can import it.

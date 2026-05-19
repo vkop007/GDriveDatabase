@@ -1,8 +1,4 @@
-import {
-  updateTableSchema,
-  deleteColumn,
-  listTables,
-} from "../../../../../actions/table";
+import { deleteColumn, listTables } from "../../../../../actions/table";
 import { TableFile } from "../../../../../../types";
 import { Plus, Key, Type, ToggleLeft, List, Trash2, Link2 } from "lucide-react";
 import AddColumnForm from "../../../../../../components/AddColumnForm";
@@ -188,7 +184,13 @@ export default async function ColumnsView({
                       </span>
                     ) : (
                       <span className="text-neutral-400 font-mono text-xs">
-                        {col.default ?? "—"}
+                        {col.default === undefined ||
+                        col.default === null ||
+                        col.default === ""
+                          ? "—"
+                          : typeof col.default === "object"
+                          ? JSON.stringify(col.default)
+                          : String(col.default)}
                       </span>
                     )}
                   </td>

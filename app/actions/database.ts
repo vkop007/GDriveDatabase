@@ -5,16 +5,18 @@ import { redirect } from "next/navigation";
 import { getAuth } from "../../lib/gdrive/auth";
 import { getOrCreateRootFolder } from "../../lib/gdrive/operations";
 import { BUCKET_FOLDER_NAME } from "../../lib/gdrive/bucket-service";
+import type { Database } from "../../types";
 
-export async function listDatabases() {
+export async function listDatabases(): Promise<Database[]> {
   try {
     const rootId = await getOrCreateRootFolder();
     const response = await operations.listOperations.listFoldersInFolder(
       rootId
     );
     return (
-      response.data?.files?.filter((f: any) => f.name !== BUCKET_FOLDER_NAME) ||
-      []
+      ((response.data?.files || []) as Database[]).filter(
+        (f) => f.name !== BUCKET_FOLDER_NAME
+      )
     );
   } catch (error) {
     console.error("Error listing databases:", error);

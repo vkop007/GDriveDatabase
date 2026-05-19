@@ -3,10 +3,34 @@ import { getAuth } from "./auth";
 import { writeFile, unlink, mkdir } from "fs/promises";
 import path from "path";
 import os from "os";
+import type { BucketFile, BucketUploadResult, DriveFile } from "../../types";
 
 export const BUCKET_FOLDER_NAME = "Buckets";
 
-export async function getOrCreateBucketFolder(auth?: any) {
+type DriveAuth = {
+  clientId: string;
+  clientSecret: string;
+  projectId: string;
+  tokens: Parameters<typeof initDriveService>[1] | Record<string, unknown>;
+};
+
+function toBucketFile(file: BucketFile): BucketFile {
+  return {
+    id: file.id,
+    name: file.name,
+    mimeType: file.mimeType,
+    trashed: file.trashed,
+    parents: file.parents,
+    createdTime: file.createdTime,
+    modifiedTime: file.modifiedTime,
+    webViewLink: file.webViewLink,
+    webContentLink: file.webContentLink,
+    thumbnailLink: file.thumbnailLink,
+    size: file.size,
+  };
+}
+
+export async function getOrCreateBucketFolder(auth?: DriveAuth) {
   if (!auth) auth = await getAuth();
 
   // Ensure service is initialized
@@ -17,7 +41,7 @@ export async function getOrCreateBucketFolder(auth?: any) {
       project_id: auth.projectId,
       redirect_uris: [`${process.env.NEXT_PUBLIC_BASE_URL}/oauth2callback`],
     },
-    auth.tokens
+    auth.tokens as Parameters<typeof initDriveService>[1]
   );
 
   // 1. Check if folder exists
@@ -25,8 +49,9 @@ export async function getOrCreateBucketFolder(auth?: any) {
     BUCKET_FOLDER_NAME
   );
 
-  const existing = listResponse.data?.files?.find(
-    (f: any) => f.name === BUCKET_FOLDER_NAME && !f.trashed
+  const folders = (listResponse.data?.files ?? []) as DriveFile[];
+  const existing = folders.find(
+    (f) => f.name === BUCKET_FOLDER_NAME && !f.trashed
   );
 
   if (existing?.id) {
@@ -64,7 +89,9 @@ export async function getOrCreateBucketFolder(auth?: any) {
   return createResponse.data.id;
 }
 
-export async function processAndUploadFiles(files: File[]) {
+export async function processAndUploadFiles(
+  files: File[]
+): Promise<BucketUploadResult> {
   const auth = await getAuth();
   const bucketId = await getOrCreateBucketFolder(auth);
 
@@ -84,10 +111,12 @@ export async function processAndUploadFiles(files: File[]) {
 
     console.log("Uploading files to GDrive Bucket:", filePaths);
 
-    // @ts-ignore
-    const uploadedFiles = await operations.batchOperations.uploadMultipleFiles(
+    const uploadResults = await operations.batchOperations.uploadMultipleFiles(
       filePaths,
       bucketId
+    );
+    const uploadedFiles = uploadResults.flatMap(({ result }) =>
+      result.success && result.data ? [toBucketFile(result.data)] : []
     );
 
     return { success: true, files: uploadedFiles };
@@ -98,7 +127,7 @@ export async function processAndUploadFiles(files: File[]) {
     for (const p of filePaths) {
       try {
         await unlink(p);
-      } catch (e) {
+      } catch {
         /* ignore */
       }
     }

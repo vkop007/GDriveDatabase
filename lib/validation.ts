@@ -3,6 +3,7 @@
 import { z } from "zod";
 import type {
   ColumnDefinition,
+  DocumentValue,
   ValidationRules,
   ValidationError,
 } from "../types";
@@ -140,7 +141,7 @@ export function validateDocument(
   data: Record<string, unknown>,
   columns: ColumnDefinition[]
 ):
-  | { success: true; data: Record<string, unknown> }
+  | { success: true; data: Record<string, DocumentValue> }
   | { success: false; errors: ValidationError[] } {
   const schema = buildTableSchema(columns);
 
@@ -155,7 +156,7 @@ export function validateDocument(
   const result = schema.safeParse(dataToValidate);
 
   if (result.success) {
-    return { success: true, data: result.data };
+    return { success: true, data: result.data as Record<string, DocumentValue> };
   }
 
   // Zod 4 uses 'issues' property

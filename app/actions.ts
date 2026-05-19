@@ -28,13 +28,22 @@ import {
   getOrCreateRootFolder,
   getOrCreateSystemFolder,
 } from "../lib/gdrive/operations";
+import type {
+  Database,
+  DatabaseNavItem,
+  DatabaseTreeItem,
+  DriveFile,
+  Table,
+  TableFile,
+} from "../types";
 
-const ROOT_FOLDER_NAME = "GDriveDatabase";
 const SECRETS_FILE = path.join(process.cwd(), "api-secrets.json");
 
 export async function getAuth() {
   return getDriveAuth();
 }
+
+type DriveAuth = Awaited<ReturnType<typeof getAuth>>;
 
 const API_CONFIG_FILE = "api-config.json";
 
@@ -60,8 +69,9 @@ export async function generateApiKey() {
     const files = await operations.listOperations.listFilesInFolder(
       systemFolderId
     );
-    const existingConfig = files.data?.files?.find(
-      (f: any) => f.name === API_CONFIG_FILE && !f.trashed
+    const systemFiles = (files.data?.files ?? []) as DriveFile[];
+    const existingConfig = systemFiles.find(
+      (f) => f.name === API_CONFIG_FILE && !f.trashed
     );
 
     if (existingConfig) {
@@ -101,8 +111,9 @@ export async function getApiKey() {
     const files = await operations.listOperations.listFilesInFolder(
       systemFolderId
     );
-    const configFile = files.data?.files?.find(
-      (f: any) => f.name === API_CONFIG_FILE && !f.trashed
+    const systemFiles = (files.data?.files ?? []) as DriveFile[];
+    const configFile = systemFiles.find(
+      (f) => f.name === API_CONFIG_FILE && !f.trashed
     );
 
     if (configFile) {
@@ -122,8 +133,7 @@ export async function getApiKey() {
 }
 
 export async function deleteApiKey() {
-  const { tokens, clientId, clientSecret, projectId, driveService } =
-    await getAuth();
+  const { driveService } = await getAuth();
 
   try {
     // Read existing secrets to keep other data if needed, but for now we just clear the file or remove the key
@@ -142,8 +152,9 @@ export async function deleteApiKey() {
     const files = await operations.listOperations.listFilesInFolder(
       systemFolderId
     );
-    const existingConfig = files.data?.files?.find(
-      (f: any) => f.name === API_CONFIG_FILE && !f.trashed
+    const systemFiles = (files.data?.files ?? []) as DriveFile[];
+    const existingConfig = systemFiles.find(
+      (f) => f.name === API_CONFIG_FILE && !f.trashed
     );
 
     if (existingConfig) {
@@ -202,7 +213,7 @@ export async function getApiAuth(apiKey: string) {
           console.log("[getApiAuth] Synced fresh tokens from stored session");
         }
       }
-    } catch (cookieError) {
+    } catch {
       // If we can't get cookies (e.g., external API call), use stored tokens
       console.log("[getApiAuth] Using stored tokens (no active session)");
     }
@@ -314,7 +325,7 @@ const SYSTEM_NAMES = [
 ];
 
 // Internal fetch function for databases
-async function _listDatabases(auth: any) {
+async function _listDatabases(auth: DriveAuth): Promise<Database[]> {
   initDriveService(
     {
       client_id: auth.clientId,
@@ -331,10 +342,10 @@ async function _listDatabases(auth: any) {
     const response = await operations.listOperations.listFoldersInFolder(
       rootId
     );
-    const folders = response.data?.files || [];
+    const folders = (response.data?.files || []) as Database[];
     // Filter out system folders (starting with _ or . or in SYSTEM_NAMES)
     return folders.filter(
-      (f: any) =>
+      (f) =>
         !f.name.startsWith("_") &&
         !f.name.startsWith(".") &&
         !SYSTEM_NAMES.includes(f.name)
@@ -406,7 +417,10 @@ export async function deleteDatabase(formData: FormData) {
 }
 
 // Internal fetch for collections
-async function _listCollections(databaseId: string, auth: any) {
+async function _listCollections(
+  databaseId: string,
+  auth: DriveAuth
+): Promise<Table[]> {
   initDriveService(
     {
       client_id: auth.clientId,
@@ -422,8 +436,9 @@ async function _listCollections(databaseId: string, auth: any) {
     const response = await operations.listOperations.listFilesInFolder(
       databaseId
     );
-    return (response.data?.files || []).filter(
-      (f: any) => f.mimeType === "application/json"
+    const files = (response.data?.files || []) as Table[];
+    return files.filter(
+      (f) => f.mimeType === "application/json"
     );
   } catch (error) {
     console.error("Error listing collections:", error);
@@ -440,7 +455,7 @@ export const listCollections = async (databaseId: string) => {
   )();
 };
 
-export const getDatabaseNavTree = async () => {
+export const getDatabaseNavTree = async (): Promise<DatabaseNavItem[]> => {
   const auth = await getAuth();
 
   return unstable_cache(
@@ -449,13 +464,13 @@ export const getDatabaseNavTree = async () => {
         console.log("Fetching database nav tree...");
         const databases = await _listDatabases(auth);
         const treeProps = await Promise.all(
-          databases.map(async (db: any) => {
+          databases.map(async (db) => {
             const tables = await _listCollections(db.id, auth);
 
             return {
               id: db.id,
               name: db.name,
-              tables: tables.map((table: any) => ({
+              tables: tables.map((table) => ({
                 id: table.id,
                 name: table.name,
               })),
@@ -474,7 +489,7 @@ export const getDatabaseNavTree = async () => {
   )();
 };
 
-export const getDatabaseTree = async () => {
+export const getDatabaseTree = async (): Promise<DatabaseTreeItem[]> => {
   const auth = await getAuth();
 
   // Initialize service needed for reading file content
@@ -497,15 +512,17 @@ export const getDatabaseTree = async () => {
 
         // 2. Fetch all collections for all databases in parallel
         const treeProps = await Promise.all(
-          databases.map(async (db: any) => {
+          databases.map(async (db) => {
             // This runs in parallel for each database
             const tables = await _listCollections(db.id, auth);
 
             // Fetch schema for each table (Parallel)
             const tablesWithSchema = await Promise.all(
-              tables.map(async (t: any) => {
+              tables.map(async (t) => {
                 try {
-                  const content = await driveService.selectJsonContent(t.id);
+                  const content = (await driveService.selectJsonContent(
+                    t.id
+                  )) as Partial<TableFile>;
                   // selectJsonContent returns the parsed object directly
                   return {
                     id: t.id,
@@ -583,7 +600,7 @@ export async function createDocument(formData: FormData) {
   let jsonContent;
   try {
     jsonContent = JSON.parse(content);
-  } catch (e) {
+  } catch {
     throw new Error("Invalid JSON content");
   }
 
@@ -599,7 +616,7 @@ export async function createDocument(formData: FormData) {
     if (result.success && result.data.id) {
       await moveFile(result.data.id, rootId);
     } else {
-      throw new Error((result as any).error || "Failed to create file");
+      throw new Error(result.error || "Failed to create file");
     }
   } catch (error) {
     console.error("Error creating document:", error);

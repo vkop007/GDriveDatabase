@@ -7,8 +7,11 @@ import {
   getOrCreateBucketFolder,
   processAndUploadFiles,
 } from "../../lib/gdrive/bucket-service";
+import type { BucketFile, BucketUploadResult } from "../../types";
 
-async function _listBucketFiles(auth: any) {
+type DriveAuth = Awaited<ReturnType<typeof getAuth>>;
+
+async function _listBucketFiles(auth: DriveAuth): Promise<BucketFile[]> {
   try {
     const bucketId = await getOrCreateBucketFolder(auth);
     initDriveService(
@@ -24,12 +27,12 @@ async function _listBucketFiles(auth: any) {
     const response = await operations.listOperations.listFilesInFolder(
       bucketId
     );
-    const files = response.data?.files || [];
+    const files = (response.data?.files || []) as BucketFile[];
 
     // Filter out database tables (which are JSON files) and other system files
     // We only want to show "bucket" assets (images, videos, PDFs, etc.)
     return files.filter(
-      (f: any) => f.mimeType !== "application/json" && !f.name.endsWith(".json")
+      (f) => f.mimeType !== "application/json" && !f.name.endsWith(".json")
     );
   } catch (error) {
     console.error("Error listing bucket files:", error);
@@ -37,7 +40,7 @@ async function _listBucketFiles(auth: any) {
   }
 }
 
-export const listBucketFiles = async () => {
+export const listBucketFiles = async (): Promise<BucketFile[]> => {
   const auth = await getAuth();
   return unstable_cache(
     async () => _listBucketFiles(auth),
@@ -46,7 +49,9 @@ export const listBucketFiles = async () => {
   )();
 };
 
-export async function uploadBucketFiles(formData: FormData) {
+export async function uploadBucketFiles(
+  formData: FormData
+): Promise<BucketUploadResult> {
   const files = formData.getAll("files") as File[];
   if (!files || files.length === 0) {
     throw new Error("No files uploaded");

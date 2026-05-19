@@ -1,49 +1,59 @@
 "use client";
 
-import { useCallback, useMemo, useEffect } from "react";
+import { useCallback, useMemo, useEffect, type MouseEvent } from "react";
 import {
   ReactFlow,
   Background,
   Controls,
   MiniMap,
-  Node,
-  Edge,
   useNodesState,
   useEdgesState,
   ConnectionMode,
-  Panel,
   Handle,
   Position,
   MarkerType,
-  ReactFlowInstance,
+  type Node,
+  type Edge,
+  type ReactFlowInstance,
+  type NodeProps,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { Database, FileJson, Network, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import type { ColumnDefinition, DatabaseTreeItem } from "../types";
 
 /* ---------------- TYPES ---------------- */
 
-interface TreeData {
-  id: string;
-  name: string;
-  tables: {
-    id: string;
-    name: string;
-    schema?: {
-      key: string;
-      type: string;
-      relationTableId?: string;
-    }[];
-  }[];
-}
+type RootNodeData = {
+  label: string;
+  dbCount: number;
+};
+
+type DatabaseNodeData = {
+  label: string;
+  tableCount: number;
+  dbId: string;
+};
+
+type TableNodeData = {
+  label: string;
+  tableId: string;
+  dbId: string;
+  schema: ColumnDefinition[];
+};
+
+type RootGraphNode = Node<RootNodeData, "root">;
+type DatabaseGraphNode = Node<DatabaseNodeData, "database">;
+type TableGraphNode = Node<TableNodeData, "table">;
+type GraphNode = RootGraphNode | DatabaseGraphNode | TableGraphNode;
 
 interface GraphVisualizerProps {
-  treeData: TreeData[];
+  treeData: DatabaseTreeItem[];
 }
 
 /* ---------------- NODES ---------------- */
 
-function RootNode({ data }: { data: any }) {
+function RootNode({ data }: NodeProps<RootGraphNode>) {
   return (
     <div className="relative group cursor-pointer">
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
@@ -94,7 +104,7 @@ function RootNode({ data }: { data: any }) {
   );
 }
 
-function DatabaseNode({ data }: { data: any }) {
+function DatabaseNode({ data }: NodeProps<DatabaseGraphNode>) {
   return (
     <div className="group relative transition-all duration-500 hover:-translate-y-2 cursor-pointer">
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
@@ -141,7 +151,7 @@ function DatabaseNode({ data }: { data: any }) {
   );
 }
 
-function TableNode({ data }: { data: any }) {
+function TableNode({ data }: NodeProps<TableGraphNode>) {
   return (
     <div className="group relative transition-all duration-400 hover:-translate-y-1.5 cursor-pointer">
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
@@ -209,7 +219,7 @@ function TableNode({ data }: { data: any }) {
         {/* Columns List */}
         <div className="space-y-1">
           {data.schema && data.schema.length > 0 ? (
-            data.schema.slice(0, 5).map((col: any) => (
+            data.schema.slice(0, 5).map((col) => (
               <div
                 key={col.key}
                 className="flex items-center justify-between text-xs"
@@ -252,25 +262,11 @@ const nodeTypes = {
 /* ---------------- MAIN ---------------- */
 
 /* ---------------- MAIN ---------------- */
-// Helper to calculate subtree width
-const getSubtreeWidth = (db: TreeData["tables"][0] | any) => {
-  // If it's a database, width is based on table count
-  if (db.tables) {
-    // Database width is max(db node width, sum of children widths)
-    // Let's approximate widths: DbNode ~ 300px, TableNode ~ 250px + gap
-    const tableWidth = 280;
-    const dbNodeWidth = 380; // Min space for db node
-    const childrenWidth = Math.max(db.tables.length * tableWidth, dbNodeWidth);
-    return childrenWidth;
-  }
-  return 280; // Table width
-};
-
 export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
   const router = useRouter();
 
   const { initialNodes, initialEdges } = useMemo(() => {
-    const nodes: Node[] = [];
+    const nodes: GraphNode[] = [];
     const edges: Edge[] = [];
 
     // Layout Configuration
@@ -455,7 +451,7 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
   }, [initialNodes, initialEdges, setNodes, setEdges]);
 
   const onNodeClick = useCallback(
-    (_: any, node: Node) => {
+    (_: MouseEvent, node: GraphNode) => {
       if (node.type === "database") {
         router.push(`/dashboard/database/${node.data.dbId}`);
       }
@@ -469,7 +465,7 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
   );
 
   // Force edges to re-render after initialization
-  const onInit = useCallback((instance: ReactFlowInstance) => {
+  const onInit = useCallback((instance: ReactFlowInstance<GraphNode, Edge>) => {
     // Small delay to ensure nodes are measured
     setTimeout(() => {
       instance.fitView({ padding: 0.2 });
@@ -513,7 +509,7 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
         </defs>
       </svg>
 
-      <ReactFlow
+      <ReactFlow<GraphNode, Edge>
         nodes={nodes}
         edges={edges}
         onNodesChange={onNodesChange}
