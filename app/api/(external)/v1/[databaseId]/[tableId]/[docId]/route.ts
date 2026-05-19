@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiAuth } from "@/app/actions";
+import {
+  externalApiErrorResponse,
+  requireExternalApiAuth,
+} from "@/lib/external-api";
 import { TableFile, RowData } from "@/types";
 
 // GET - Get single document by ID
@@ -9,14 +12,11 @@ export async function GET(
     params,
   }: { params: Promise<{ databaseId: string; tableId: string; docId: string }> }
 ) {
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+  const authResult = await requireExternalApiAuth(req);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = await getApiAuth(apiKey);
+    const { driveService } = authResult.auth;
     const { tableId, docId } = await params;
 
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
@@ -36,10 +36,7 @@ export async function GET(
 
     return NextResponse.json(doc);
   } catch (error) {
-    console.error("API Error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return externalApiErrorResponse(error);
   }
 }
 
@@ -50,14 +47,11 @@ export async function PATCH(
     params,
   }: { params: Promise<{ databaseId: string; tableId: string; docId: string }> }
 ) {
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+  const authResult = await requireExternalApiAuth(req);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = await getApiAuth(apiKey);
+    const { driveService } = authResult.auth;
     const { tableId, docId } = await params;
     const body = await req.json();
 
@@ -101,7 +95,7 @@ export async function PATCH(
     }
 
     // Check Unique Constraints
-    const { checkUniqueConstraint, updateIndex, deleteIndex } = await import(
+    const { checkUniqueConstraint, updateIndex } = await import(
       "@/lib/indexing"
     );
     const { databaseId } = await params;
@@ -177,10 +171,7 @@ export async function PATCH(
 
     return NextResponse.json(updatedDoc);
   } catch (error) {
-    console.error("API Error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return externalApiErrorResponse(error);
   }
 }
 
@@ -191,14 +182,11 @@ export async function DELETE(
     params,
   }: { params: Promise<{ databaseId: string; tableId: string; docId: string }> }
 ) {
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+  const authResult = await requireExternalApiAuth(req);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = await getApiAuth(apiKey);
+    const { driveService } = authResult.auth;
     const { databaseId, tableId, docId } = await params;
 
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
@@ -248,9 +236,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, deletedId: docId });
   } catch (error) {
-    console.error("API Error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return externalApiErrorResponse(error);
   }
 }

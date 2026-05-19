@@ -1,19 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiAuth } from "@/app/actions";
+import {
+  externalApiErrorResponse,
+  requireExternalApiAuth,
+} from "@/lib/external-api";
 import { getOrCreateBucketFolder } from "@/lib/gdrive/bucket-service";
 import { operations, initDriveService } from "gdrivekit";
 
-export async function GET(request: NextRequest) {
-  const apiKey =
-    request.headers.get("x-api-key") ||
-    request.nextUrl.searchParams.get("x-api-key");
+type DriveFile = {
+  createdTime?: string;
+  id?: string;
+  mimeType?: string;
+  modifiedTime?: string;
+  name?: string;
+  size?: string;
+  thumbnailLink?: string;
+  webContentLink?: string;
+  webViewLink?: string;
+};
 
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+export async function GET(request: NextRequest) {
+  const authResult = await requireExternalApiAuth(request);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const apiAuth = await getApiAuth(apiKey);
+    const apiAuth = authResult.auth;
 
     // Build auth object that getOrCreateBucketFolder expects
     const auth = {
@@ -41,16 +51,16 @@ export async function GET(request: NextRequest) {
     const response = await operations.listOperations.listFilesInFolder(
       bucketId
     );
-    const files = response.data?.files || [];
+    const files = (response.data?.files || []) as DriveFile[];
 
     // Filter for media/document files only (not folders)
     const bucketFiles = files.filter(
-      (f: any) => f.mimeType !== "application/vnd.google-apps.folder"
+      (f) => f.mimeType !== "application/vnd.google-apps.folder"
     );
 
     return NextResponse.json({
       success: true,
-      files: bucketFiles.map((f: any) => ({
+      files: bucketFiles.map((f) => ({
         id: f.id,
         name: f.name,
         mimeType: f.mimeType,
@@ -63,9 +73,6 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("API List Bucket Error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return externalApiErrorResponse(error);
   }
 }

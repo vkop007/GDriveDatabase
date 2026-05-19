@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiAuth } from "@/app/actions";
+import {
+  externalApiErrorResponse,
+  requireExternalApiAuth,
+} from "@/lib/external-api";
 import { TableFile, ColumnDefinition } from "@/types";
 import { rebuildIndex } from "@/lib/indexing";
 
@@ -8,14 +11,11 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ databaseId: string; tableId: string }> }
 ) {
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+  const authResult = await requireExternalApiAuth(req);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = await getApiAuth(apiKey);
+    const { driveService } = authResult.auth;
     const { tableId } = await params;
 
     const table = (await driveService.selectJsonContent(tableId)) as TableFile;
@@ -31,10 +31,7 @@ export async function GET(
       schema: table.schema || [],
     });
   } catch (error) {
-    console.error("API Error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return externalApiErrorResponse(error);
   }
 }
 
@@ -43,14 +40,11 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ databaseId: string; tableId: string }> }
 ) {
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+  const authResult = await requireExternalApiAuth(req);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = await getApiAuth(apiKey);
+    const { driveService } = authResult.auth;
     const { databaseId, tableId } = await params;
     const body = await req.json();
 
@@ -139,11 +133,7 @@ export async function POST(
 
     return NextResponse.json({ column: newColumn }, { status: 201 });
   } catch (error) {
-    console.error("API Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return externalApiErrorResponse(error);
   }
 }
 
@@ -152,14 +142,11 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ databaseId: string; tableId: string }> }
 ) {
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+  const authResult = await requireExternalApiAuth(req);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = await getApiAuth(apiKey);
+    const { driveService } = authResult.auth;
     const { tableId } = await params;
     const body = await req.json();
 
@@ -218,9 +205,6 @@ export async function PUT(
 
     return NextResponse.json({ schema: table.schema });
   } catch (error) {
-    console.error("API Error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return externalApiErrorResponse(error);
   }
 }

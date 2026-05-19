@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function ApiAccess({
   databaseId,
@@ -11,12 +11,8 @@ export default function ApiAccess({
   tableId?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [origin, setOrigin] = useState("");
-
-  useEffect(() => {
-    console.log("Its Calling: " + window.location.origin);
-    setOrigin(window.location.origin);
-  }, []);
+  const origin =
+    typeof window === "undefined" ? "" : window.location.origin;
 
   if (!isOpen) {
     return (
@@ -35,7 +31,8 @@ export default function ApiAccess({
         <h2 className="text-xl font-bold mb-4">API Access</h2>
         <p className="text-neutral-400 text-sm mb-6">
           Use your API Key to access your database programmatically. Include it
-          in the <code>x-api-key</code> header or query parameter.
+          in the <code>Authorization: Bearer</code> header. API keys in URL
+          query parameters are rejected.
         </p>
 
         <div className="space-y-4">
@@ -74,6 +71,15 @@ export default function ApiAccess({
                 </>
               )}
             </p>
+          </div>
+
+          <div>
+            <label className="text-xs font-medium text-neutral-500 uppercase block mb-2">
+              Auth Header
+            </label>
+            <div className="bg-neutral-950 border border-neutral-800 rounded p-3 text-sm font-mono text-neutral-300 break-all">
+              Authorization: Bearer YOUR_API_KEY
+            </div>
           </div>
 
           <div>
