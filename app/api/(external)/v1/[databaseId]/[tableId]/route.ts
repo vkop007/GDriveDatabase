@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiAuth } from "@/app/actions";
+import {
+  externalApiErrorResponse,
+  requireExternalApiAuth,
+} from "@/lib/external-api";
 import { TableFile, RowData } from "@/types";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ databaseId: string; tableId: string }> }
 ) {
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+  const authResult = await requireExternalApiAuth(req);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = await getApiAuth(apiKey);
+    const { driveService } = authResult.auth;
     const { tableId } = await params;
 
     // Fetch table content
@@ -29,10 +29,7 @@ export async function GET(
 
     return NextResponse.json(table.documents || []);
   } catch (error) {
-    console.error("API Error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json({ error: errorMessage }, { status: 500 });
+    return externalApiErrorResponse(error);
   }
 }
 
@@ -40,14 +37,11 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ databaseId: string; tableId: string }> }
 ) {
-  const apiKey =
-    req.headers.get("x-api-key") || req.nextUrl.searchParams.get("x-api-key");
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+  const authResult = await requireExternalApiAuth(req);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = await getApiAuth(apiKey);
+    const { driveService } = authResult.auth;
     const { tableId } = await params;
     const body = await req.json();
 
@@ -138,13 +132,6 @@ export async function POST(
 
     return NextResponse.json(newDoc, { status: 201 });
   } catch (error) {
-    console.error("API Error:", error);
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Internal Server Error",
-        details: error instanceof Error ? error.stack : undefined,
-      },
-      { status: 500 }
-    );
+    return externalApiErrorResponse(error);
   }
 }

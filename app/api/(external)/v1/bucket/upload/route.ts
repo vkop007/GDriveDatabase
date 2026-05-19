@@ -1,21 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiAuth } from "@/app/actions";
+import {
+  externalApiErrorResponse,
+  requireExternalApiAuth,
+} from "@/lib/external-api";
 import { getOrCreateBucketFolder } from "@/lib/gdrive/bucket-service";
 import { writeFile, unlink, mkdir } from "fs/promises";
 import path from "path";
 import os from "os";
 
-export async function POST(request: NextRequest) {
-  const apiKey =
-    request.headers.get("x-api-key") ||
-    request.nextUrl.searchParams.get("x-api-key");
+type UploadedBucketFile = {
+  id?: string;
+  mimeType?: string;
+  name?: string;
+};
 
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+export async function POST(request: NextRequest) {
+  const authResult = await requireExternalApiAuth(request);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const apiAuth = await getApiAuth(apiKey);
+    const apiAuth = authResult.auth;
 
     // Build auth object that getOrCreateBucketFolder expects
     const auth = {
@@ -46,7 +50,7 @@ export async function POST(request: NextRequest) {
     await mkdir(tempDir, { recursive: true });
 
     const filePaths: string[] = [];
-    const uploadedFiles: any[] = [];
+    const uploadedFiles: UploadedBucketFile[] = [];
 
     try {
       // Write files to temp directory
@@ -85,16 +89,12 @@ export async function POST(request: NextRequest) {
       for (const p of filePaths) {
         try {
           await unlink(p);
-        } catch (e) {
+        } catch {
           /* ignore */
         }
       }
     }
   } catch (error) {
-    console.error("API Upload Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return externalApiErrorResponse(error);
   }
 }

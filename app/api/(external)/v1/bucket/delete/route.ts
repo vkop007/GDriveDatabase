@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiAuth } from "@/app/actions";
+import {
+  externalApiErrorResponse,
+  requireExternalApiAuth,
+} from "@/lib/external-api";
 
 export async function DELETE(request: NextRequest) {
-  const apiKey =
-    request.headers.get("x-api-key") ||
-    request.nextUrl.searchParams.get("x-api-key");
-
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing API Key" }, { status: 401 });
-  }
+  const authResult = await requireExternalApiAuth(request);
+  if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = await getApiAuth(apiKey);
+    const { driveService } = authResult.auth;
     const body = await request.json();
     const { fileId } = body;
 
@@ -29,10 +27,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("API Delete Bucket File Error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    return externalApiErrorResponse(error);
   }
 }
