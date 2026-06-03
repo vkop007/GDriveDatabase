@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   externalApiErrorResponse,
   requireExternalApiAuth,
+  requireExternalTable,
 } from "@/lib/external-api";
-import { TableFile, RowData } from "@/types";
+import { RowData } from "@/types";
 
 // GET - Get single document by ID
 export async function GET(
@@ -16,14 +17,15 @@ export async function GET(
   if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = authResult.auth;
-    const { tableId, docId } = await params;
+    const { databaseId, tableId, docId } = await params;
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
-    const table = (await driveService.selectJsonContent(tableId)) as TableFile;
-
-    if (!table) {
-      return NextResponse.json({ error: "Table not found" }, { status: 404 });
-    }
+    const { table } = tableResult;
 
     const doc = table.documents.find((d) => d.$id === docId);
 
@@ -52,14 +54,16 @@ export async function PATCH(
 
   try {
     const { driveService } = authResult.auth;
-    const { tableId, docId } = await params;
+    const { databaseId, tableId, docId } = await params;
     const body = await req.json();
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
-    const table = (await driveService.selectJsonContent(tableId)) as TableFile;
-
-    if (!table) {
-      return NextResponse.json({ error: "Table not found" }, { status: 404 });
-    }
+    const { table } = tableResult;
 
     const docIndex = table.documents.findIndex((d) => d.$id === docId);
 
@@ -98,8 +102,6 @@ export async function PATCH(
     const { checkUniqueConstraint, updateIndex } = await import(
       "@/lib/indexing"
     );
-    const { databaseId } = await params;
-
     const uniqueColumns = table.schema.filter((col) => col.unique);
     const oldDoc = table.documents[docIndex];
 
@@ -188,12 +190,14 @@ export async function DELETE(
   try {
     const { driveService } = authResult.auth;
     const { databaseId, tableId, docId } = await params;
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
-    const table = (await driveService.selectJsonContent(tableId)) as TableFile;
-
-    if (!table) {
-      return NextResponse.json({ error: "Table not found" }, { status: 404 });
-    }
+    const { table } = tableResult;
 
     const docIndex = table.documents.findIndex((d) => d.$id === docId);
 

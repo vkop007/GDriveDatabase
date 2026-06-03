@@ -27,7 +27,7 @@ export default function ApiAccess({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-6 max-w-md w-full shadow-2xl">
+      <div className="max-h-[calc(100vh-2rem)] w-full max-w-md overflow-y-auto rounded-xl border border-neutral-800 bg-neutral-900 p-5 shadow-2xl sm:p-6">
         <h2 className="text-xl font-bold mb-4">API Access</h2>
         <p className="text-neutral-400 text-sm mb-6">
           Use your API Key to access your database programmatically. Include it

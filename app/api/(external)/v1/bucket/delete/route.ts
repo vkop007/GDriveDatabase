@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   externalApiErrorResponse,
   requireExternalApiAuth,
+  requireExternalBucketFile,
 } from "@/lib/external-api";
 
 export async function DELETE(request: NextRequest) {
@@ -19,6 +20,9 @@ export async function DELETE(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    const fileResult = await requireExternalBucketFile(authResult.auth, fileId);
+    if ("response" in fileResult) return fileResult.response;
 
     await driveService.deleteFile(fileId);
 

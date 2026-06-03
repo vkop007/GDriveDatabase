@@ -130,7 +130,7 @@ export default function FunctionsClient({
       } else {
         toast.error(result.error || "Failed to enable auto-run");
       }
-    } catch (err) {
+    } catch {
       toast.error("An error occurred");
     } finally {
       if (!enablingAutoRun) return; // Already handled by popup polling
@@ -161,12 +161,12 @@ export default function FunctionsClient({
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 p-6 md:p-8">
+    <div className="min-h-screen bg-neutral-950 px-4 pb-4 pt-20 md:p-8 md:pt-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-linear-to-br from-primary-from/20 to-primary-to/20 border border-primary/30">
+            <div className="shrink-0 p-2 rounded-xl bg-linear-to-br from-primary-from/20 to-primary-to/20 border border-primary/30">
               <FunctionSquare className="w-6 h-6 text-primary" />
             </div>
             Functions
@@ -177,7 +177,7 @@ export default function FunctionsClient({
         </div>
         <button
           onClick={() => setIsCreateOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-primary-from to-primary-to text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30"
+          className="flex w-full items-center justify-center gap-2 px-4 py-2.5 bg-linear-to-r from-primary-from to-primary-to text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 sm:w-auto"
         >
           <Plus className="w-4 h-4" />
           Create Function
@@ -194,7 +194,7 @@ export default function FunctionsClient({
             No functions yet
           </h3>
           <p className="text-neutral-400 text-center max-w-sm mb-6">
-            Create your first function to run custom code on Google's servers
+            Create your first function to run custom code on Google&apos;s servers
           </p>
           <button
             onClick={() => setIsCreateOpen(true)}
@@ -207,8 +207,6 @@ export default function FunctionsClient({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {functions.map((func) => {
-            const hasActiveAutoRun =
-              func.schedule && func.schedule !== "none" && func.triggerEnabled;
             return (
               <div
                 key={func.id}
@@ -250,7 +248,7 @@ export default function FunctionsClient({
                   )}
                   {/* Schedule Info */}
                   {func.schedule && func.schedule !== "none" && (
-                    <div className="flex items-center gap-2 pt-1">
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
                       <div className="flex items-center gap-1.5 text-primary">
                         <Clock className="w-3.5 h-3.5" />
                         <span className="font-medium text-xs">
@@ -260,7 +258,7 @@ export default function FunctionsClient({
                           {func.schedule === "weekly" && "Weekly Mon 9 AM"}
                         </span>
                       </div>
-                      <div className="flex-1" />
+                      <div className="hidden flex-1 sm:block" />
                       {func.triggerEnabled ? (
                         <span className="flex items-center gap-1.5 px-2 py-1 text-xs bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-md">
                           <RefreshCw
@@ -292,7 +290,7 @@ export default function FunctionsClient({
                 </div>
 
                 {/* Actions - always at bottom */}
-                <div className="flex items-center gap-2 mt-auto">
+                <div className="grid grid-cols-[1fr_repeat(3,2.5rem)] items-center gap-2 mt-auto">
                   <button
                     onClick={() => setRunningFunction(func)}
                     disabled={func.status !== "deployed"}

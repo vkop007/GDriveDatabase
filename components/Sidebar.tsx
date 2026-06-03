@@ -36,6 +36,18 @@ interface SidebarProps {
   logoutAction: () => Promise<void>;
 }
 
+function readSavedSidebarCollapsed() {
+  if (typeof window === "undefined") return false;
+
+  try {
+    return Boolean(
+      JSON.parse(localStorage.getItem("sidebar-collapsed") ?? "false")
+    );
+  } catch {
+    return false;
+  }
+}
+
 export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -48,28 +60,20 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
     type: "database" | "collection";
     parentId?: string;
   } | null>(null);
+  const activeDatabaseId =
+    pathname.match(/\/dashboard\/database\/([^\/]+)/)?.[1] ?? null;
 
-  // Persist collapse state
   useEffect(() => {
-    const saved = localStorage.getItem("sidebar-collapsed");
-    if (saved) setIsCollapsed(JSON.parse(saved));
+    const frame = requestAnimationFrame(() => {
+      setIsCollapsed(readSavedSidebarCollapsed());
+    });
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
     localStorage.setItem("sidebar-collapsed", JSON.stringify(isCollapsed));
+    window.dispatchEvent(new Event("sidebar-collapsed-change"));
   }, [isCollapsed]);
-
-  // Auto-expand parent database when viewing a table or collection page
-  useEffect(() => {
-    // Check if we're on a database or table page
-    const databaseMatch = pathname.match(/\/dashboard\/database\/([^\/]+)/);
-    if (databaseMatch) {
-      const dbId = databaseMatch[1];
-      if (!expandedDbs.has(dbId)) {
-        setExpandedDbs((prev) => new Set(prev).add(dbId));
-      }
-    }
-  }, [pathname]);
 
   const toggleDb = (e: React.MouseEvent, dbId: string) => {
     e.preventDefault();
@@ -83,7 +87,12 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
     setExpandedDbs(newExpanded);
   };
 
-  const toggleSidebar = () => setIsOpen(!isOpen);
+  const toggleSidebar = () => {
+    if (!isOpen) {
+      setIsCollapsed(false);
+    }
+    setIsOpen(!isOpen);
+  };
   const toggleCollapse = () => setIsCollapsed(!isCollapsed);
 
   const handleDatabaseClick = (dbId: string) => {
@@ -226,7 +235,8 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
               )
             ) : (
               treeData.map((db) => {
-                const isExpanded = expandedDbs.has(db.id);
+                const isExpanded =
+                  expandedDbs.has(db.id) || activeDatabaseId === db.id;
                 const isExactDb = pathname === `/dashboard/database/${db.id}`;
 
                 if (isCollapsed) {

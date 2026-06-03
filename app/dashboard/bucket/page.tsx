@@ -7,7 +7,7 @@ export default async function BucketPage() {
   const files = await listBucketFiles();
 
   return (
-    <div className="p-4 md:p-8 max-w-full mx-auto min-h-screen text-slate-950 dark:text-white">
+    <div className="max-w-full mx-auto min-h-screen px-4 pb-4 pt-20 text-slate-950 md:p-8 md:pt-8 dark:text-white">
       <FileManager initialFiles={files} />
     </div>
   );

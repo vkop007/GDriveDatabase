@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   externalApiErrorResponse,
   requireExternalApiAuth,
+  requireExternalTable,
 } from "@/lib/external-api";
-import { TableFile } from "@/types";
 
 // PATCH - Update a specific column
 export async function PATCH(
@@ -19,8 +19,14 @@ export async function PATCH(
 
   try {
     const { driveService } = authResult.auth;
-    const { tableId, columnKey } = await params;
+    const { databaseId, tableId, columnKey } = await params;
     const body = await req.json();
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
     // Can't modify system columns
     if (columnKey.startsWith("$")) {
@@ -30,7 +36,7 @@ export async function PATCH(
       );
     }
 
-    const table = (await driveService.selectJsonContent(tableId)) as TableFile;
+    const { table } = tableResult;
 
     const columnIndex = table.schema.findIndex((c) => c.key === columnKey);
     if (columnIndex === -1) {
@@ -69,7 +75,13 @@ export async function DELETE(
 
   try {
     const { driveService } = authResult.auth;
-    const { tableId, columnKey } = await params;
+    const { databaseId, tableId, columnKey } = await params;
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
     // Can't delete system columns
     if (columnKey.startsWith("$")) {
@@ -79,7 +91,7 @@ export async function DELETE(
       );
     }
 
-    const table = (await driveService.selectJsonContent(tableId)) as TableFile;
+    const { table } = tableResult;
 
     const columnIndex = table.schema.findIndex((c) => c.key === columnKey);
     if (columnIndex === -1) {
