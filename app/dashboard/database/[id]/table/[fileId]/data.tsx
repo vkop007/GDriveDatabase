@@ -4,9 +4,13 @@ import { useState } from "react";
 import { TableFile, QueryState } from "../../../../../../types";
 import AddRowForm from "../../../../../../components/AddRowForm";
 import DataTable from "../../../../../../components/DataTable";
+import OnboardingGuide, {
+  type OnboardingStep,
+} from "../../../../../../components/OnboardingGuide";
 import { QueryBuilder } from "../../../../../../components/query";
 import { defaultQueryState, applyQuery } from "../../../../../../lib/query";
 import { Table2 } from "lucide-react";
+import Link from "next/link";
 
 export default function DataView({
   table,
@@ -23,6 +27,42 @@ export default function DataView({
 
   // Apply query to get filtered/sorted/paginated data
   const queryResult = applyQuery(table.documents, query);
+  const userColumns = table.schema.filter((column) => !column.key.startsWith("$"));
+  const hasUserColumns = userColumns.length > 0;
+  const hasRows = table.documents.length > 0;
+  const tableUrl = `/dashboard/database/${databaseId}/table/${fileId}`;
+  const onboardingSteps: OnboardingStep[] = [
+    {
+      title: "Model fields",
+      description: "Add a few columns before collecting records.",
+      status: hasUserColumns ? "complete" : "current",
+      icon: "database",
+      href: `${tableUrl}?tab=columns`,
+      actionLabel: "Open columns",
+    },
+    {
+      title: "Add first row",
+      description: "Create a sample record using the table schema.",
+      status: !hasUserColumns ? "locked" : hasRows ? "complete" : "current",
+      icon: "rows",
+      action:
+        hasUserColumns && !hasRows ? (
+          <AddRowForm
+            fileId={fileId}
+            databaseId={databaseId}
+            schema={table.schema}
+          />
+        ) : undefined,
+    },
+    {
+      title: "Use the API",
+      description: "Generate an API key and try this table from your app.",
+      status: hasRows ? "current" : "locked",
+      icon: "key",
+      href: "/dashboard/settings",
+      actionLabel: "Open settings",
+    },
+  ];
 
   return (
     <div className="space-y-6">
@@ -45,6 +85,28 @@ export default function DataView({
           schema={table.schema}
         />
       </div>
+
+      {(!hasUserColumns || !hasRows) && (
+        <OnboardingGuide
+          title="Finish this table setup"
+          description="Add usable fields, create a first row, then enable API access for integrations."
+          steps={onboardingSteps}
+          compact
+          variant="dark"
+        />
+      )}
+
+      {!hasUserColumns && (
+        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-4 text-sm text-blue-100">
+          Add at least one custom column before creating rows.{" "}
+          <Link
+            href={`${tableUrl}?tab=columns`}
+            className="font-semibold text-blue-200 underline underline-offset-4 hover:text-white"
+          >
+            Open columns
+          </Link>
+        </div>
+      )}
 
       {/* Query Builder */}
       <QueryBuilder

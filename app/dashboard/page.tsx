@@ -1,6 +1,11 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { connectDriveWithGoogle, listDatabases } from "../actions";
+import {
+  connectDriveWithGoogle,
+  getApiKey,
+  getDatabaseNavTree,
+  listDatabases,
+} from "../actions";
 import DashboardView from "../../components/DashboardView";
 import { APP_SESSION_COOKIE } from "@/lib/gdrive/google-oauth";
 import { hasCurrentDriveConnection } from "@/lib/gdrive/drive-connection-store";
@@ -24,7 +29,17 @@ export default async function Dashboard() {
   }
 
   // ✅ Now returns cached data (after first call)
-  const files = await listDatabases();
+  const [files, databaseTree, apiKey] = await Promise.all([
+    listDatabases(),
+    getDatabaseNavTree(),
+    getApiKey(),
+  ]);
 
-  return <DashboardView initialDatabases={files} />;
+  return (
+    <DashboardView
+      initialDatabases={files}
+      databaseTree={databaseTree}
+      hasApiKey={Boolean(apiKey)}
+    />
+  );
 }
