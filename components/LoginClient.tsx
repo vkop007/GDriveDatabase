@@ -26,9 +26,13 @@ import {
 } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 
-interface LoginClientProps {
+interface AuthFormProps {
   onSubmit: (formData: FormData) => void;
   isGoogleLoginConfigured: boolean;
+}
+
+interface LoginClientProps extends AuthFormProps {
+  sdkCodeHtml: string;
 }
 
 const heroPillars = [
@@ -37,21 +41,36 @@ const heroPillars = [
   "SDK and API access",
 ];
 
+const heroStats = [
+  ["6", "product surfaces"],
+  ["6", "schema types"],
+  ["0", "database servers"],
+];
+
 const workflowSteps = [
   {
     title: "Connect Google Drive",
     description:
       "Sign in with OAuth, then connect the Drive workspace that should hold your data.",
+    icon: Cloud,
+    accent: "text-emerald-600 dark:text-emerald-300",
+    surface: "bg-emerald-50 dark:bg-emerald-400/10",
   },
   {
     title: "Model your data",
     description:
       "Create databases, tables, columns, relations, storage fields, and defaults from the dashboard.",
+    icon: Database,
+    accent: "text-sky-600 dark:text-sky-300",
+    surface: "bg-sky-50 dark:bg-sky-400/10",
   },
   {
     title: "Build with APIs",
     description:
       "Use the TypeScript SDK, generated API docs, file bucket, and server functions to ship apps faster.",
+    icon: Code2,
+    accent: "text-pink-600 dark:text-pink-200",
+    surface: "bg-pink-50 dark:bg-pink-400/10",
   },
 ];
 
@@ -86,6 +105,15 @@ const platformModules = [
     description: "Control account, API keys, backups, and Google Drive connection details.",
     icon: Settings2,
   },
+];
+
+const platformRoutes = [
+  ["Dashboard", "/dashboard", "records, usage, resources"],
+  ["Bucket", "/dashboard/bucket", "Drive file storage"],
+  ["Functions", "/dashboard/functions", "server workflows"],
+  ["API docs", "/dashboard/apidocs", "SDK examples"],
+  ["Usage", "/dashboard/usage", "limits and activity"],
+  ["Settings", "/dashboard/settings", "keys and Drive"],
 ];
 
 const featureRows = [
@@ -131,6 +159,8 @@ const useCases = [
   "File-heavy portals that need records and bucket storage together",
 ];
 
+const sdkBadges = ["CRUD", "schema", "relations", "bucket", "functions"];
+
 function GoogleMark() {
   return (
     <span className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-950">
@@ -160,7 +190,7 @@ function SignInForm({
   onSubmit,
   isGoogleLoginConfigured,
   compact = false,
-}: LoginClientProps & { compact?: boolean }) {
+}: AuthFormProps & { compact?: boolean }) {
   return (
     <form
       action={onSubmit}
@@ -202,7 +232,7 @@ function HeaderSignInButton({ disabled }: { disabled: boolean }) {
 function HeaderSignInForm({
   onSubmit,
   isGoogleLoginConfigured,
-}: LoginClientProps) {
+}: AuthFormProps) {
   return (
     <form action={onSubmit}>
       <HeaderSignInButton disabled={!isGoogleLoginConfigured} />
@@ -232,6 +262,7 @@ function LandingThemeToggle() {
 export default function LoginClient({
   onSubmit,
   isGoogleLoginConfigured,
+  sdkCodeHtml,
 }: LoginClientProps) {
   return (
     <main className="min-h-screen overflow-x-hidden bg-slate-50 text-slate-950 transition-colors duration-300 dark:bg-[#07080d] dark:text-white">
@@ -342,42 +373,84 @@ export default function LoginClient({
                 </div>
               ))}
             </div>
-          </div>
 
-          <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-200/70 transition-colors duration-300 dark:border-white/10 dark:bg-white/[0.04] dark:shadow-black/30">
-            <div className="mb-8 flex items-start gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-pink-50 text-pink-600 dark:bg-pink-400/12 dark:text-pink-200">
-                <Database className="h-5 w-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
-                  Platform map
-                </p>
-                <h2 className="mt-2 text-2xl font-semibold">
-                  Everything on the public page points to code already in this
-                  app.
-                </h2>
-              </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {[
-                ["Dashboard", "/dashboard"],
-                ["Bucket", "/dashboard/bucket"],
-                ["Functions", "/dashboard/functions"],
-                ["API docs", "/dashboard/apidocs"],
-                ["Usage", "/dashboard/usage"],
-                ["Settings", "/dashboard/settings"],
-              ].map(([label, route]) => (
-                <div
-                  key={label}
-                  className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-[#0b0d14]"
-                >
-                  <p className="text-sm font-semibold">{label}</p>
-                  <p className="mt-1 font-mono text-xs text-slate-500 dark:text-white/38">
-                    {route}
+            <div className="mt-8 grid grid-cols-3 divide-x divide-slate-200 rounded-lg border border-slate-200 bg-white shadow-sm dark:divide-white/10 dark:border-white/10 dark:bg-white/[0.04]">
+              {heroStats.map(([value, label]) => (
+                <div key={label} className="px-4 py-3">
+                  <p className="text-2xl font-semibold tracking-tight">
+                    {value}
+                  </p>
+                  <p className="mt-1 text-xs leading-4 text-slate-500 dark:text-white/42">
+                    {label}
                   </p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-200/70 transition-colors duration-300 dark:border-white/10 dark:bg-[#0b0d14] dark:shadow-black/30">
+            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-white/[0.035]">
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              </div>
+              <span className="font-mono text-xs text-slate-500 dark:text-white/40">
+                drive://workspace/crm
+              </span>
+            </div>
+
+            <div className="p-5">
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-300">
+                    Live workspace
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold">
+                    Drive files shaped into tables, APIs, and functions.
+                  </h2>
+                </div>
+                <div className="hidden rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 sm:block dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-200">
+                  Synced
+                </div>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                {platformRoutes.slice(0, 4).map(([label, route, detail]) => (
+                  <div
+                    key={label}
+                    className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.035]"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold">{label}</p>
+                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                    </div>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-white/42">
+                      {detail}
+                    </p>
+                    <p className="mt-3 truncate font-mono text-xs text-slate-500 dark:text-white/38">
+                      {route}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 rounded-lg border border-slate-200 bg-slate-950 p-4 text-slate-100 dark:border-white/10">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold">customers</p>
+                  <span className="rounded-md bg-pink-400/15 px-2 py-1 text-xs font-semibold text-pink-200">
+                    API ready
+                  </span>
+                </div>
+                <div className="grid grid-cols-[1.1fr_0.8fr_0.7fr] gap-2 font-mono text-xs text-slate-400">
+                  <span>name</span>
+                  <span>status</span>
+                  <span>files</span>
+                  <span className="text-white">Ada Lovelace</span>
+                  <span className="text-emerald-300">active</span>
+                  <span>3</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -428,23 +501,38 @@ export default function LoginClient({
         className="scroll-mt-24 border-b border-slate-200 bg-white transition-colors duration-300 dark:border-white/10 dark:bg-[#090b12]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
-              Workflow
+          <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
+            <div className="max-w-2xl">
+              <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
+                Workflow
+              </p>
+              <h2 className="mt-3 text-4xl font-semibold leading-tight">
+                From Drive folder to usable data platform in minutes.
+              </h2>
+            </div>
+            <p className="max-w-2xl text-base leading-7 text-slate-600 lg:ml-auto dark:text-white/56">
+              Every step maps to a real area of the dashboard: OAuth, Drive
+              workspace setup, schema modeling, bucket files, functions, and
+              generated SDK examples.
             </p>
-            <h2 className="mt-3 text-4xl font-semibold leading-tight">
-              From Drive folder to usable data platform in minutes.
-            </h2>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-3">
+          <div className="relative mt-10 grid gap-4 md:grid-cols-3">
+            <div className="absolute left-[16%] right-[16%] top-10 hidden h-px bg-slate-200 md:block dark:bg-white/10" />
             {workflowSteps.map((step, index) => (
               <div
                 key={step.title}
-                className="rounded-lg border border-slate-200 bg-slate-50 p-6 shadow-sm shadow-slate-200/70 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none"
+                className="relative rounded-lg border border-slate-200 bg-slate-50 p-6 shadow-sm shadow-slate-200/70 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none"
               >
-                <div className="mb-8 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-950 text-sm font-semibold text-white dark:bg-white dark:text-slate-950">
-                  {index + 1}
+                <div className="mb-8 flex items-center justify-between">
+                  <div
+                    className={`flex h-12 w-12 items-center justify-center rounded-lg ${step.surface} ${step.accent}`}
+                  >
+                    <step.icon className="h-5 w-5" />
+                  </div>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-950 text-sm font-semibold text-white dark:bg-white dark:text-slate-950">
+                    {index + 1}
+                  </span>
                 </div>
                 <h3 className="text-xl font-semibold">{step.title}</h3>
                 <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/52">
@@ -478,18 +566,36 @@ export default function LoginClient({
           </div>
 
           <div className="mt-10 grid gap-4 md:grid-cols-2">
-            {featureRows.map((feature) => (
+            {featureRows.map((feature, index) => (
               <article
                 key={feature.title}
-                className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/70 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none"
+                className={`rounded-lg border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/70 transition hover:-translate-y-0.5 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none dark:hover:border-white/20 ${
+                  index === 0 ? "md:bg-slate-950 md:text-white dark:md:bg-white/[0.06]" : ""
+                }`}
               >
-                <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-lg bg-pink-50 text-pink-600 dark:bg-pink-400/12 dark:text-pink-200">
-                  <feature.icon className="h-5 w-5" />
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${
+                      index === 0
+                        ? "bg-emerald-50 text-emerald-600 md:bg-white/10 md:text-emerald-300 dark:bg-emerald-400/10 dark:text-emerald-300"
+                        : "bg-pink-50 text-pink-600 dark:bg-pink-400/12 dark:text-pink-200"
+                    }`}
+                  >
+                    <feature.icon className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold">{feature.title}</h3>
+                    <p
+                      className={`mt-3 text-sm leading-6 ${
+                        index === 0
+                          ? "text-slate-600 md:text-white/68 dark:text-white/54"
+                          : "text-slate-600 dark:text-white/54"
+                      }`}
+                    >
+                      {feature.description}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold">{feature.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/54">
-                  {feature.description}
-                </p>
               </article>
             ))}
           </div>
@@ -534,7 +640,7 @@ export default function LoginClient({
         id="sdk"
         className="scroll-mt-24 border-b border-slate-200 bg-slate-50 transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
       >
-        <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:px-10">
+        <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start lg:px-10">
           <div>
             <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
               SDK
@@ -546,21 +652,34 @@ export default function LoginClient({
               The README documents the `gdatabase` package with chainable calls
               for tables, records, schema management, relations, and storage.
             </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {sdkBadges.map((badge) => (
+                <span
+                  key={badge}
+                  className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 dark:border-white/10 dark:bg-white/[0.04] dark:text-white/58"
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <pre className="overflow-x-auto rounded-lg border border-slate-200 bg-slate-950 p-5 text-sm leading-7 text-slate-100 shadow-sm dark:border-white/10 dark:bg-[#0b0d14] dark:text-white/72">
-            <code>{`const db = new GDatabase(apiKey, appUrl);
-
-await db.database("crm").table("customers").create({
-  name: "Ada Lovelace",
-  status: "active",
-});
-
-const rows = await db
-  .database("crm")
-  .table("customers")
-  .list();`}</code>
-          </pre>
+          <div className="overflow-hidden rounded-lg border border-slate-200 bg-[#101010] shadow-2xl shadow-slate-200/70 dark:border-white/10 dark:shadow-black/35">
+            <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.035] px-4 py-3">
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              </div>
+              <span className="font-mono text-xs text-white/42">
+                sdk-example.ts
+              </span>
+            </div>
+            <div
+              className="[&_pre]:m-0 [&_pre]:max-h-[34rem] [&_pre]:overflow-x-auto [&_pre]:p-5 [&_pre]:text-sm [&_pre]:leading-7 [&_pre_code]:font-mono"
+              dangerouslySetInnerHTML={{ __html: sdkCodeHtml }}
+            />
+          </div>
         </div>
       </section>
 
