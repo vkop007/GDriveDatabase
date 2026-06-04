@@ -265,11 +265,11 @@ export default function LoginClient({
   sdkCodeHtml,
 }: LoginClientProps) {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-slate-50 text-slate-950 transition-colors duration-300 dark:bg-[#07080d] dark:text-white">
+    <main className="min-h-screen overflow-x-hidden bg-[linear-gradient(180deg,#f8fafc_0%,#fdf2f8_24%,#ecfdf5_54%,#eef2ff_78%,#f8fafc_100%)] text-slate-950 transition-colors duration-300 dark:bg-[linear-gradient(180deg,#07080d_0%,#120c16_28%,#07110f_58%,#0d1020_78%,#05060a_100%)] dark:text-white">
       <section className="relative isolate overflow-hidden border-b border-slate-200 transition-colors duration-300 dark:border-white/10">
         <div className="absolute inset-0 -z-10">
           <div className="h-full w-full bg-[url('/logo.png')] bg-[length:34rem_34rem] bg-[position:78%_12%] bg-no-repeat opacity-[0.045] dark:opacity-[0.035]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(248,250,252,0.74)_0%,rgba(248,250,252,0.96)_72%,#f8fafc_100%)] dark:bg-[linear-gradient(180deg,rgba(7,8,13,0.70)_0%,rgba(7,8,13,0.94)_72%,#07080d_100%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(248,250,252,0.78)_0%,rgba(253,242,248,0.82)_38%,rgba(236,253,245,0.72)_70%,rgba(239,246,255,0.90)_100%)] dark:bg-[linear-gradient(135deg,rgba(7,8,13,0.78)_0%,rgba(18,12,22,0.82)_42%,rgba(7,17,15,0.76)_72%,rgba(13,16,32,0.90)_100%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.055)_1px,transparent_1px)] bg-[size:72px_72px] opacity-70 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.055)_1px,transparent_1px)] dark:opacity-30" />
         </div>
 
@@ -458,7 +458,7 @@ export default function LoginClient({
 
       <section
         id="platform"
-        className="scroll-mt-24 border-b border-slate-200 bg-slate-50 transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(253,242,248,0.72)_52%,rgba(236,253,245,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,8,13,0.98)_0%,rgba(18,12,22,0.82)_52%,rgba(7,17,15,0.74)_100%)]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
@@ -498,7 +498,7 @@ export default function LoginClient({
 
       <section
         id="workflow"
-        className="scroll-mt-24 border-b border-slate-200 bg-white transition-colors duration-300 dark:border-white/10 dark:bg-[#090b12]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(240,249,255,0.76)_50%,rgba(255,247,237,0.66)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(9,11,18,0.98)_0%,rgba(8,18,24,0.82)_50%,rgba(22,14,10,0.76)_100%)]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
@@ -546,7 +546,7 @@ export default function LoginClient({
 
       <section
         id="features"
-        className="scroll-mt-24 border-b border-slate-200 bg-slate-50 transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(238,242,255,0.72)_48%,rgba(253,242,248,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,8,13,0.98)_0%,rgba(13,16,32,0.84)_48%,rgba(18,12,22,0.76)_100%)]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
@@ -604,7 +604,7 @@ export default function LoginClient({
 
       <section
         id="schema"
-        className="scroll-mt-24 border-b border-slate-200 bg-white transition-colors duration-300 dark:border-white/10 dark:bg-[#090b12]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(236,253,245,0.70)_48%,rgba(240,249,255,0.74)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(9,11,18,0.98)_0%,rgba(7,17,15,0.80)_48%,rgba(8,18,24,0.78)_100%)]"
       >
         <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
           <div>
@@ -638,7 +638,7 @@ export default function LoginClient({
 
       <section
         id="sdk"
-        className="scroll-mt-24 border-b border-slate-200 bg-slate-50 transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(253,242,248,0.72)_46%,rgba(15,23,42,0.06)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,8,13,0.98)_0%,rgba(18,12,22,0.82)_46%,rgba(15,23,42,0.86)_100%)]"
       >
         <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start lg:px-10">
           <div>
@@ -683,7 +683,7 @@ export default function LoginClient({
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-white transition-colors duration-300 dark:border-white/10 dark:bg-[#090b12]">
+      <section className="border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(255,247,237,0.66)_50%,rgba(236,253,245,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(9,11,18,0.98)_0%,rgba(22,14,10,0.76)_50%,rgba(7,17,15,0.78)_100%)]">
         <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
@@ -711,7 +711,7 @@ export default function LoginClient({
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 bg-white transition-colors duration-300 dark:border-white/10 dark:bg-[#05060a]">
+      <footer className="border-t border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(248,250,252,0.98)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(5,6,10,0.94)_0%,rgba(3,4,8,0.98)_100%)]">
         <div className="mx-auto grid max-w-[22rem] gap-10 px-5 py-12 text-sm text-slate-600 sm:max-w-7xl sm:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr] sm:px-8 lg:px-10 dark:text-white/54">
           <div>
             <div className="flex items-center gap-3">
