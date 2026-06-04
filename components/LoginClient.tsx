@@ -47,6 +47,12 @@ const heroStats = [
   ["0", "database servers"],
 ];
 
+const heroFlow = [
+  ["Drive folder", "Connect OAuth workspace"],
+  ["Schema", "Model tables and relations"],
+  ["SDK", "Ship through typed APIs"],
+];
+
 const workflowSteps = [
   {
     title: "Connect Google Drive",
@@ -273,7 +279,8 @@ export default function LoginClient({
           <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(15,23,42,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(15,23,42,0.055)_1px,transparent_1px)] bg-[size:72px_72px] opacity-70 dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.055)_1px,transparent_1px)] dark:opacity-30" />
         </div>
 
-        <header className="mx-auto flex w-full max-w-[22rem] items-center justify-between px-5 py-5 sm:max-w-7xl sm:px-8 lg:px-10">
+        <header className="sticky top-0 z-30 border-b border-slate-200/70 bg-white/70 backdrop-blur-xl dark:border-white/10 dark:bg-[#07080d]/70">
+          <div className="mx-auto flex w-full max-w-[22rem] items-center justify-between px-5 py-4 sm:max-w-7xl sm:px-8 lg:px-10">
           <div className="flex items-center gap-3">
             <Image
               src="/logo.png"
@@ -328,9 +335,10 @@ export default function LoginClient({
               isGoogleLoginConfigured={isGoogleLoginConfigured}
             />
           </div>
+          </div>
         </header>
 
-        <div className="mx-auto grid w-full min-w-0 max-w-[22rem] items-center gap-12 px-5 pb-20 pt-12 sm:max-w-7xl sm:px-8 md:pt-20 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.82fr)] lg:px-10">
+        <div className="mx-auto grid w-full min-w-0 max-w-[22rem] items-center gap-10 px-5 pb-16 pt-10 sm:max-w-7xl sm:px-8 md:pb-20 md:pt-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.82fr)] lg:px-10">
           <div className="min-w-0 max-w-3xl">
             <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1.5 text-xs font-semibold text-pink-700 dark:border-pink-400/24 dark:bg-pink-400/10 dark:text-pink-200">
               <Sparkles className="h-3.5 w-3.5" />
@@ -382,6 +390,27 @@ export default function LoginClient({
                   </p>
                   <p className="mt-1 text-xs leading-4 text-slate-500 dark:text-white/42">
                     {label}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 grid gap-2 sm:grid-cols-3">
+              {heroFlow.map(([title, description], index) => (
+                <div
+                  key={title}
+                  className="rounded-lg border border-white/70 bg-white/55 p-3 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.035]"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-50 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200">
+                      {index + 1}
+                    </span>
+                    <p className="text-xs font-semibold text-slate-900 dark:text-white">
+                      {title}
+                    </p>
+                  </div>
+                  <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-white/42">
+                    {description}
                   </p>
                 </div>
               ))}
@@ -464,7 +493,7 @@ export default function LoginClient({
         id="platform"
         className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(253,242,248,0.72)_52%,rgba(236,253,245,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,8,13,0.98)_0%,rgba(18,12,22,0.82)_52%,rgba(7,17,15,0.74)_100%)]"
       >
-        <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
             <div>
               <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
@@ -504,7 +533,7 @@ export default function LoginClient({
         id="workflow"
         className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(240,249,255,0.76)_50%,rgba(255,247,237,0.66)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(9,11,18,0.98)_0%,rgba(8,18,24,0.82)_50%,rgba(22,14,10,0.76)_100%)]"
       >
-        <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
             <div className="max-w-2xl">
               <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
@@ -552,7 +581,7 @@ export default function LoginClient({
         id="features"
         className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(238,242,255,0.72)_48%,rgba(253,242,248,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,8,13,0.98)_0%,rgba(13,16,32,0.84)_48%,rgba(18,12,22,0.76)_100%)]"
       >
-        <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
               <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
@@ -612,7 +641,7 @@ export default function LoginClient({
         id="schema"
         className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(236,253,245,0.70)_48%,rgba(240,249,255,0.74)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(9,11,18,0.98)_0%,rgba(7,17,15,0.80)_48%,rgba(8,18,24,0.78)_100%)]"
       >
-        <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
+        <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:grid-cols-[0.9fr_1.1fr] lg:px-10">
           <div>
             <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
               Data model
@@ -646,7 +675,7 @@ export default function LoginClient({
         id="sdk"
         className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(253,242,248,0.72)_46%,rgba(15,23,42,0.06)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,8,13,0.98)_0%,rgba(18,12,22,0.82)_46%,rgba(15,23,42,0.86)_100%)]"
       >
-        <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-20 sm:max-w-7xl sm:px-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start lg:px-10">
+        <div className="mx-auto grid max-w-[22rem] gap-8 px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:grid-cols-[0.78fr_1.22fr] lg:items-start lg:px-10">
           <div>
             <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
               SDK
@@ -690,7 +719,7 @@ export default function LoginClient({
       </section>
 
       <section className="border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(255,247,237,0.66)_50%,rgba(236,253,245,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(9,11,18,0.98)_0%,rgba(22,14,10,0.76)_50%,rgba(7,17,15,0.78)_100%)]">
-        <div className="mx-auto max-w-[22rem] px-5 py-20 sm:max-w-7xl sm:px-8 lg:px-10">
+        <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="max-w-2xl">
             <p className="text-sm font-semibold text-pink-600 dark:text-pink-200">
               Use cases
@@ -714,6 +743,28 @@ export default function LoginClient({
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-slate-200 bg-[linear-gradient(135deg,rgba(236,253,245,0.82)_0%,rgba(253,242,248,0.72)_52%,rgba(255,255,255,0.96)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,17,15,0.84)_0%,rgba(18,12,22,0.80)_52%,rgba(5,6,10,0.96)_100%)]">
+        <div className="mx-auto grid max-w-[22rem] items-center gap-6 px-5 py-12 sm:max-w-7xl sm:px-8 md:grid-cols-[1fr_auto] lg:px-10">
+          <div>
+            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-200">
+              Ready when your Drive is
+            </p>
+            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl">
+              Turn a team-owned folder into a working data layer.
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-white/56">
+              Sign in, connect Drive, and keep records, files, schema, API keys,
+              and functions in one operational workspace.
+            </p>
+          </div>
+          <SignInForm
+            onSubmit={onSubmit}
+            isGoogleLoginConfigured={isGoogleLoginConfigured}
+            compact
+          />
         </div>
       </section>
 
