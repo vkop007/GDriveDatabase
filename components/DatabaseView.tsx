@@ -14,6 +14,7 @@ import {
   Layers,
 } from "lucide-react";
 import ResourceCard from "./ResourceCard";
+import OnboardingGuide, { type OnboardingStep } from "./OnboardingGuide";
 import type { Table as TableFile } from "../types";
 
 interface DatabaseViewProps {
@@ -36,6 +37,37 @@ export default function DatabaseView({
         file.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : initialTables;
+  const hasTables = initialTables.length > 0;
+  const firstTable = initialTables[0];
+  const onboardingSteps: OnboardingStep[] = [
+    {
+      title: "Create table",
+      description: "Add the first JSON table inside this database.",
+      status: hasTables ? "complete" : "current",
+      icon: "table",
+      action: !hasTables ? <CreateTableModal parentId={databaseId} /> : undefined,
+    },
+    {
+      title: "Model fields",
+      description: "Define columns, required fields, validation, and relations.",
+      status: hasTables ? "current" : "locked",
+      icon: "database",
+      href: firstTable
+        ? `/dashboard/database/${databaseId}/table/${firstTable.id}?tab=columns`
+        : undefined,
+      actionLabel: "Open columns",
+    },
+    {
+      title: "Add first row",
+      description: "Create a sample record so the API has data to return.",
+      status: hasTables ? "current" : "locked",
+      icon: "rows",
+      href: firstTable
+        ? `/dashboard/database/${databaseId}/table/${firstTable.id}?tab=data`
+        : undefined,
+      actionLabel: "Open data",
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-4 md:p-8">
@@ -80,6 +112,16 @@ export default function DatabaseView({
             </div>
           </div>
         </header>
+
+        {!hasTables && (
+          <OnboardingGuide
+            title="Set up this database"
+            description="Create a table first, then define fields and add a sample record."
+            steps={onboardingSteps}
+            compact
+            variant="dark"
+          />
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {files.length === 0 ? (

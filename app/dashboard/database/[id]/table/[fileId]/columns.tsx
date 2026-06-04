@@ -2,6 +2,9 @@ import { deleteColumn, listTables } from "../../../../../actions/table";
 import { TableFile } from "../../../../../../types";
 import { Plus, Key, Type, ToggleLeft, List, Trash2, Link2 } from "lucide-react";
 import AddColumnForm from "../../../../../../components/AddColumnForm";
+import OnboardingGuide, {
+  type OnboardingStep,
+} from "../../../../../../components/OnboardingGuide";
 
 export default async function ColumnsView({
   table,
@@ -17,6 +20,34 @@ export default async function ColumnsView({
     id: t.id,
     name: t.name,
   }));
+  const userColumns = table.schema.filter((column) => !column.key.startsWith("$"));
+  const hasUserColumns = userColumns.length > 0;
+  const onboardingSteps: OnboardingStep[] = [
+    {
+      title: "Add first field",
+      description: "Create a column such as name, email, status, or price.",
+      status: hasUserColumns ? "complete" : "current",
+      icon: "database",
+      href: "#add-column",
+      actionLabel: "Use form below",
+    },
+    {
+      title: "Add first row",
+      description: "Switch to Data and create a sample record.",
+      status: hasUserColumns ? "current" : "locked",
+      icon: "rows",
+      href: `/dashboard/database/${databaseId}/table/${fileId}?tab=data`,
+      actionLabel: "Open data",
+    },
+    {
+      title: "Use the API",
+      description: "Generate a key and call this table from your application.",
+      status: hasUserColumns ? "current" : "locked",
+      icon: "key",
+      href: "/dashboard/settings",
+      actionLabel: "Open settings",
+    },
+  ];
 
   const getTypeColor = (type: string) => {
     switch (type) {
@@ -57,8 +88,21 @@ export default async function ColumnsView({
         </div>
       </div>
 
+      {!hasUserColumns && (
+        <OnboardingGuide
+          title="Define your first fields"
+          description="System fields are protected. Add your own columns to make this table useful for records and APIs."
+          steps={onboardingSteps}
+          compact
+          variant="dark"
+        />
+      )}
+
       {/* Add Column Form */}
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-primary/20">
+      <div
+        id="add-column"
+        className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-primary/20"
+      >
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px] rounded-full pointer-events-none" />
 
         <div className="relative z-10 p-6">
