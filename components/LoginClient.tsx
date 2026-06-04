@@ -435,10 +435,10 @@ export default function LoginClient({
                 ))}
               </div>
 
-              <div className="mt-4 rounded-lg border border-slate-200 bg-slate-950 p-4 text-slate-100 dark:border-white/10">
+              <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4 text-slate-900 shadow-sm dark:border-white/10 dark:bg-slate-950 dark:text-slate-100">
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <p className="text-sm font-semibold">customers</p>
-                  <span className="rounded-md bg-pink-400/15 px-2 py-1 text-xs font-semibold text-pink-200">
+                  <span className="rounded-md bg-pink-50 px-2 py-1 text-xs font-semibold text-pink-700 dark:bg-pink-400/15 dark:text-pink-200">
                     API ready
                   </span>
                 </div>
@@ -446,8 +446,12 @@ export default function LoginClient({
                   <span>name</span>
                   <span>status</span>
                   <span>files</span>
-                  <span className="text-white">Ada Lovelace</span>
-                  <span className="text-emerald-300">active</span>
+                  <span className="text-slate-950 dark:text-white">
+                    Ada Lovelace
+                  </span>
+                  <span className="text-emerald-600 dark:text-emerald-300">
+                    active
+                  </span>
                   <span>3</span>
                 </div>
               </div>
@@ -530,7 +534,7 @@ export default function LoginClient({
                   >
                     <step.icon className="h-5 w-5" />
                   </div>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-950 text-sm font-semibold text-white dark:bg-white dark:text-slate-950">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-sm font-semibold text-slate-700 shadow-sm dark:border-white/12 dark:bg-white/10 dark:text-white">
                     {index + 1}
                   </span>
                 </div>
@@ -570,14 +574,16 @@ export default function LoginClient({
               <article
                 key={feature.title}
                 className={`rounded-lg border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/70 transition hover:-translate-y-0.5 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none dark:hover:border-white/20 ${
-                  index === 0 ? "md:bg-slate-950 md:text-white dark:md:bg-white/[0.06]" : ""
+                  index === 0
+                    ? "border-emerald-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.98)_0%,rgba(236,253,245,0.82)_100%)] dark:border-emerald-400/20 dark:bg-emerald-400/10"
+                    : ""
                 }`}
               >
                 <div className="flex items-start gap-4">
                   <div
                     className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ${
                       index === 0
-                        ? "bg-emerald-50 text-emerald-600 md:bg-white/10 md:text-emerald-300 dark:bg-emerald-400/10 dark:text-emerald-300"
+                        ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-400/10 dark:text-emerald-300"
                         : "bg-pink-50 text-pink-600 dark:bg-pink-400/12 dark:text-pink-200"
                     }`}
                   >
@@ -588,7 +594,7 @@ export default function LoginClient({
                     <p
                       className={`mt-3 text-sm leading-6 ${
                         index === 0
-                          ? "text-slate-600 md:text-white/68 dark:text-white/54"
+                          ? "text-slate-600 dark:text-white/54"
                           : "text-slate-600 dark:text-white/54"
                       }`}
                     >
