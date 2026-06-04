@@ -11,29 +11,27 @@ export default function DashboardLayoutWrapper({
 }: DashboardLayoutWrapperProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Sync with localStorage
   useEffect(() => {
-    const checkCollapsed = () => {
-      const saved = localStorage.getItem("sidebar-collapsed");
-      if (saved) setIsCollapsed(JSON.parse(saved));
-    };
-
-    checkCollapsed();
-
-    // Listen for storage changes from sidebar
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === "sidebar-collapsed" && e.newValue) {
-        setIsCollapsed(JSON.parse(e.newValue));
+    const readCollapsed = () => {
+      try {
+        return JSON.parse(localStorage.getItem("sidebar-collapsed") ?? "false");
+      } catch {
+        return false;
       }
     };
 
-    // Also poll for changes (in case of same-tab updates)
-    const interval = setInterval(checkCollapsed, 100);
+    const syncCollapsed = () => setIsCollapsed(Boolean(readCollapsed()));
+    syncCollapsed();
+
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === "sidebar-collapsed") syncCollapsed();
+    };
 
     window.addEventListener("storage", handleStorage);
+    window.addEventListener("sidebar-collapsed-change", syncCollapsed);
     return () => {
       window.removeEventListener("storage", handleStorage);
-      clearInterval(interval);
+      window.removeEventListener("sidebar-collapsed-change", syncCollapsed);
     };
   }, []);
 

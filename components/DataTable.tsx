@@ -445,20 +445,20 @@ export default function DataTable({
   return (
     <>
       {/* Search Bar & Column Visibility */}
-      <div className="mb-4 flex items-start gap-3">
-        <div className="relative max-w-md flex-1">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start">
+        <div className="relative w-full flex-1 sm:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search across all columns..."
-            className="w-full pl-10 pr-10 py-2.5 bg-neutral-900/80 border border-neutral-800 rounded-xl text-white placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all text-sm"
+            className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-10 text-sm text-slate-950 placeholder:text-slate-400 transition-all focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/30 dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-white dark:placeholder:text-neutral-500"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md hover:bg-neutral-800 text-neutral-500 hover:text-white transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-white"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -469,7 +469,7 @@ export default function DataTable({
         <div className="relative">
           <button
             onClick={() => setShowColumnMenu(!showColumnMenu)}
-            className="flex items-center gap-2 px-3 py-2.5 bg-neutral-900/80 border border-neutral-800 rounded-xl text-neutral-400 hover:text-white hover:border-neutral-700 transition-all text-sm font-medium"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-600 transition-all hover:border-slate-300 hover:text-slate-950 sm:w-auto dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-neutral-400 dark:hover:border-neutral-700 dark:hover:text-white"
             title="Toggle column visibility"
           >
             <Settings className="w-4 h-4" />
@@ -483,9 +483,9 @@ export default function DataTable({
 
           {/* Column Visibility Menu */}
           {showColumnMenu && (
-            <div className="absolute right-0 mt-2 w-56 bg-neutral-900 border border-neutral-800 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-              <div className="p-3 border-b border-neutral-800">
-                <p className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+            <div className="absolute right-0 z-50 mt-2 max-h-[70vh] w-[min(14rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl animate-in fade-in zoom-in-95 duration-200 dark:border-neutral-800 dark:bg-neutral-900">
+              <div className="border-b border-slate-200 p-3 dark:border-neutral-800">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-neutral-400">
                   Show/Hide Columns
                 </p>
               </div>
@@ -494,31 +494,31 @@ export default function DataTable({
                   <button
                     key={col.key}
                     onClick={() => toggleColumnVisibility(col.key)}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-neutral-800/50 transition-colors text-sm text-left"
+                    className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-slate-100 dark:hover:bg-neutral-800/50"
                   >
                     <div className="shrink-0 w-4">
                       {columnVisibility[col.key] !== false ? (
                         <Eye className="w-4 h-4 text-primary" />
                       ) : (
-                        <EyeOff className="w-4 h-4 text-neutral-600" />
+                        <EyeOff className="w-4 h-4 text-slate-400 dark:text-neutral-600" />
                       )}
                     </div>
                     <span
                       className={`flex-1 ${
                         columnVisibility[col.key] !== false
-                          ? "text-white"
-                          : "text-neutral-500"
+                          ? "text-slate-950 dark:text-white"
+                          : "text-slate-400 dark:text-neutral-500"
                       }`}
                     >
                       {col.key.replace(/^\$/, "")}
                     </span>
                     {col.key.startsWith("$") && (
-                      <span className="text-xs text-neutral-600">System</span>
+                      <span className="text-xs text-slate-400 dark:text-neutral-600">System</span>
                     )}
                   </button>
                 ))}
               </div>
-              <div className="px-4 py-2 border-t border-neutral-800 bg-neutral-900/50 text-xs text-neutral-500">
+              <div className="border-t border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-500 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-500">
                 {Object.values(columnVisibility).filter((v) => v).length} of{" "}
                 {table.schema.length} visible
               </div>
@@ -543,7 +543,7 @@ export default function DataTable({
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="min-w-[760px] w-full text-left text-sm">
             <thead className="sticky top-0 z-10">
               <tr className="border-b border-neutral-800 bg-neutral-900/95 backdrop-blur-sm">
                 <th className="w-12 px-4 py-4">

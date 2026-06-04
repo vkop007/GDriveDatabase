@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   externalApiErrorResponse,
   requireExternalApiAuth,
+  requireExternalTable,
 } from "@/lib/external-api";
-import { TableFile, RowData } from "@/types";
+import { RowData } from "@/types";
 
 export async function GET(
   req: NextRequest,
@@ -13,19 +14,15 @@ export async function GET(
   if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = authResult.auth;
-    const { tableId } = await params;
+    const { databaseId, tableId } = await params;
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
-    // Fetch table content
-    // We use selectJsonContent which returns the parsed JSON
-    const table = (await driveService.selectJsonContent(tableId)) as TableFile;
-
-    if (!table) {
-      return NextResponse.json(
-        { error: "Table not found or empty" },
-        { status: 404 }
-      );
-    }
+    const { table } = tableResult;
 
     return NextResponse.json(table.documents || []);
   } catch (error) {
@@ -42,10 +39,16 @@ export async function POST(
 
   try {
     const { driveService } = authResult.auth;
-    const { tableId } = await params;
+    const { databaseId, tableId } = await params;
     const body = await req.json();
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
-    const table = (await driveService.selectJsonContent(tableId)) as TableFile;
+    const { table } = tableResult;
 
     // Validate request body
     const { validateDocument } = await import("@/lib/validation");
@@ -65,11 +68,6 @@ export async function POST(
     const { checkUniqueConstraint, updateIndex } = await import(
       "@/lib/indexing"
     );
-    const { databaseId } = await params;
-
-    // Check if passed explicitly or infer logic (API might need databaseId)
-    // Actually we have databaseId in params!
-
     // Check Unique Constraints (Optimized with indexFileId)
     const uniqueColumns = table.schema.filter((col) => col.unique);
     for (const col of uniqueColumns) {

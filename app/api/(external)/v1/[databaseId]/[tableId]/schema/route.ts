@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   externalApiErrorResponse,
   requireExternalApiAuth,
+  requireExternalTable,
 } from "@/lib/external-api";
-import { TableFile, ColumnDefinition } from "@/types";
+import { ColumnDefinition } from "@/types";
 import { rebuildIndex } from "@/lib/indexing";
 
 // GET - Get table schema
@@ -15,17 +16,15 @@ export async function GET(
   if ("response" in authResult) return authResult.response;
 
   try {
-    const { driveService } = authResult.auth;
-    const { tableId } = await params;
+    const { databaseId, tableId } = await params;
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
-    const table = (await driveService.selectJsonContent(tableId)) as TableFile;
-
-    if (!table) {
-      return NextResponse.json(
-        { error: "Table not found or empty" },
-        { status: 404 }
-      );
-    }
+    const { table } = tableResult;
 
     return NextResponse.json({
       schema: table.schema || [],
@@ -47,6 +46,12 @@ export async function POST(
     const { driveService } = authResult.auth;
     const { databaseId, tableId } = await params;
     const body = await req.json();
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
     const {
       key,
@@ -75,7 +80,7 @@ export async function POST(
       );
     }
 
-    const table = (await driveService.selectJsonContent(tableId)) as TableFile;
+    const { table } = tableResult;
 
     // Check if column already exists
     if (table.schema.some((c) => c.key === key)) {
@@ -147,8 +152,14 @@ export async function PUT(
 
   try {
     const { driveService } = authResult.auth;
-    const { tableId } = await params;
+    const { databaseId, tableId } = await params;
     const body = await req.json();
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
 
     const { columns } = body;
 
@@ -169,29 +180,9 @@ export async function PUT(
       }
     }
 
-    let table = (await driveService.selectJsonContent(
-      tableId
-    )) as TableFile | null;
-
-    // If table is null or doesn't have proper structure, initialize it
-    if (!table || !table.schema) {
-      // Initialize with default system columns
-      const defaultSchema: ColumnDefinition[] = [
-        { key: "$id", type: "string", required: true },
-        { key: "$createdAt", type: "datetime", required: true },
-        { key: "$updatedAt", type: "datetime", required: true },
-      ];
-
-      table = {
-        name: "Table",
-        schema: [...defaultSchema, ...columns],
-        documents: [],
-      };
-    } else {
-      // Keep system columns, replace user columns
-      const systemColumns = table.schema.filter((c) => c.key.startsWith("$"));
-      table.schema = [...systemColumns, ...columns];
-    }
+    const { table } = tableResult;
+    const systemColumns = table.schema.filter((c) => c.key.startsWith("$"));
+    table.schema = [...systemColumns, ...columns];
 
     const updateResult = await driveService.updateJsonContent(tableId, table);
 

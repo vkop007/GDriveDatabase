@@ -35,7 +35,7 @@ console.log("Items:", items);
 // JSON syntax highlighting function
 function highlightJSON(text: string): React.ReactNode {
   // Try to find and highlight JSON in the text
-  let key = 0;
+  const key = 0;
 
   // Check if the entire text is JSON
   const trimmed = text.trim();
@@ -193,7 +193,7 @@ function highlightJSONString(json: string, startKey: number): React.ReactNode {
 interface DatabaseTreeItem {
   id: string;
   name: string;
-  tables: { id: string; name: string; schema?: any[] }[];
+  tables: { id: string; name: string; schema?: unknown[] }[];
 }
 
 interface PlaygroundClientProps {
@@ -235,8 +235,8 @@ export default function PlaygroundClient({
       if (!result.success && result.error) {
         setError(result.error);
       }
-    } catch (err: any) {
-      setError(err.message || "Execution failed");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Execution failed");
       setSuccess(false);
     } finally {
       setIsRunning(false);
@@ -256,15 +256,15 @@ export default function PlaygroundClient({
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 p-6 md:p-8 space-y-6">
+    <div className="min-h-screen bg-neutral-950 px-4 pb-4 pt-20 md:p-8 md:pt-8 space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="p-2.5 rounded-xl bg-linear-to-br from-primary-from/20 to-primary-to/20 border border-primary/30">
+        <div className="flex items-start gap-3 sm:items-center sm:gap-4">
+          <div className="shrink-0 p-2.5 rounded-xl bg-linear-to-br from-primary-from/20 to-primary-to/20 border border-primary/30">
             <Code2 className="w-6 h-6 text-primary" />
           </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl md:text-3xl font-bold text-white flex flex-wrap items-center gap-2 sm:gap-3">
               SDK Playground
               <span className="text-xs bg-linear-to-r from-primary-from/10 to-primary-to/10 text-primary px-2.5 py-1 rounded-full border border-primary/20 font-medium">
                 gdatabase
@@ -277,8 +277,8 @@ export default function PlaygroundClient({
         </div>
 
         {/* API Key Input */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-neutral-900/80 border border-neutral-800 rounded-xl px-4 py-2.5">
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center md:w-auto">
+          <div className="flex w-full min-w-0 items-center gap-2 bg-neutral-900/80 border border-neutral-800 rounded-xl px-4 py-2.5 sm:w-auto">
             <Sparkles size={16} className="text-amber-400" />
             <span className="text-sm text-neutral-400 font-medium">
               API Key
@@ -289,13 +289,13 @@ export default function PlaygroundClient({
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="sk_..."
-              className="bg-transparent border-none text-sm w-40 focus:outline-none text-neutral-200 placeholder:text-neutral-600"
+              className="min-w-0 flex-1 bg-transparent border-none text-sm focus:outline-none text-neutral-200 placeholder:text-neutral-600 sm:w-40"
             />
           </div>
           <button
             onClick={handleRun}
             disabled={isRunning}
-            className="flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-primary-from to-primary-to text-white font-medium rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
+            className="flex w-full items-center justify-center gap-2 px-5 py-2.5 bg-linear-to-r from-primary-from to-primary-to text-white font-medium rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20 sm:w-auto"
           >
             {isRunning ? (
               <Loader2 size={18} className="animate-spin" />
@@ -308,14 +308,14 @@ export default function PlaygroundClient({
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[calc(100vh-200px)]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6 lg:h-[calc(100vh-200px)]">
         {/* Code Editor Panel */}
-        <div className="group relative rounded-2xl bg-[#0a0a0a] border border-neutral-800/50 hover:border-primary/40 transition-all duration-300 overflow-hidden flex flex-col shadow-2xl shadow-black/50">
+        <div className="group relative min-h-[420px] rounded-2xl bg-[#0a0a0a] border border-neutral-800/50 hover:border-primary/40 transition-all duration-300 overflow-hidden flex flex-col shadow-2xl shadow-black/50 lg:min-h-0">
           {/* Glow effect */}
           <div className="absolute -inset-px bg-linear-to-b from-primary/10 via-transparent to-transparent pointer-events-none rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-          <div className="relative flex items-center justify-between px-4 py-3 border-b border-neutral-800/50 bg-neutral-900/30 backdrop-blur-sm">
-            <div className="flex items-center gap-2">
+          <div className="relative flex items-center justify-between gap-3 px-4 py-3 border-b border-neutral-800/50 bg-neutral-900/30 backdrop-blur-sm">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <Code2 size={16} className="text-primary" />
               <span className="text-sm font-medium text-neutral-300">
                 Code Editor
@@ -620,12 +620,12 @@ export default function PlaygroundClient({
         </div>
 
         {/* Console Output Panel */}
-        <div className="group relative rounded-2xl bg-[#0a0a0a] border border-neutral-800/50 hover:border-emerald-500/40 transition-all duration-300 overflow-hidden flex flex-col shadow-2xl shadow-black/50">
+        <div className="group relative min-h-[360px] rounded-2xl bg-[#0a0a0a] border border-neutral-800/50 hover:border-emerald-500/40 transition-all duration-300 overflow-hidden flex flex-col shadow-2xl shadow-black/50 lg:min-h-0">
           {/* Glow effect */}
           <div className="absolute -inset-px bg-linear-to-b from-emerald-500/10 via-transparent to-transparent pointer-events-none rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-          <div className="relative flex items-center justify-between px-4 py-3 border-b border-neutral-800/50 bg-neutral-900/30 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
+          <div className="relative flex flex-col gap-3 px-4 py-3 border-b border-neutral-800/50 bg-neutral-900/30 backdrop-blur-sm sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 flex-wrap items-center gap-3">
               <div className="flex items-center gap-2">
                 <Terminal size={16} className="text-emerald-400" />
                 <span className="text-sm font-medium text-neutral-300">
@@ -651,7 +651,7 @@ export default function PlaygroundClient({
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 self-end sm:self-auto">
               <button
                 onClick={handleCopy}
                 disabled={output.length === 0}
@@ -698,13 +698,13 @@ export default function PlaygroundClient({
                 {output.map((line, i) => (
                   <div
                     key={i}
-                    className="text-neutral-200 whitespace-pre-wrap leading-relaxed flex group/line"
+                    className="text-neutral-200 whitespace-pre-wrap leading-relaxed flex min-w-0 group/line"
                   >
                     <span className="text-primary/50 select-none mr-3 font-bold shrink-0 group-hover/line:text-primary/80 transition-colors">
                       {line.startsWith("→") ? "→" : ">"}
                     </span>
                     <span
-                      className={
+                      className={`min-w-0 break-words ${
                         line.startsWith("[ERROR]")
                           ? "text-red-400"
                           : line.startsWith("[WARN]")
@@ -712,7 +712,7 @@ export default function PlaygroundClient({
                           : line.startsWith("[INFO]")
                           ? "text-blue-400"
                           : ""
-                      }
+                      }`}
                     >
                       {highlightJSON(
                         line.startsWith("→") ? line.slice(1).trim() : line

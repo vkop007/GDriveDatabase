@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
+import { operations } from "gdrivekit";
 import { getApiAuth } from "@/app/actions";
+import { getOrCreateBucketFolder } from "@/lib/gdrive/bucket-service";
+import type { DriveFile, TableFile } from "@/types";
 
 export type ExternalApiAuth = Awaited<ReturnType<typeof getApiAuth>>;
 
 type ExternalApiAuthResult =
   | { auth: ExternalApiAuth }
+  | { response: NextResponse };
+
+type ExternalTableResult =
+  | { table: TableFile }
+  | { response: NextResponse };
+
+type ExternalFileAccessResult =
+  | { file: DriveFile }
   | { response: NextResponse };
 
 export function externalApiError(
@@ -19,6 +30,15 @@ export function externalApiError(
     },
     { status }
   );
+}
+
+function isTableFile(value: unknown): value is TableFile {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+
+  const record = value as Partial<TableFile>;
+  return Array.isArray(record.schema) && Array.isArray(record.documents);
 }
 
 function bearerToken(request: NextRequest): string | null {
@@ -79,6 +99,76 @@ export async function requireExternalApiAuth(
       ),
     };
   }
+}
+
+export async function requireExternalTable(
+  auth: ExternalApiAuth,
+  databaseId: string,
+  tableId: string
+): Promise<ExternalTableResult> {
+  const listResponse = await operations.listOperations.listFilesInFolder(
+    databaseId
+  );
+  const files = (listResponse.data?.files ?? []) as DriveFile[];
+  const tableFile = files.find(
+    (file) =>
+      file.id === tableId &&
+      !file.trashed &&
+      file.mimeType === "application/json"
+  );
+
+  if (!tableFile) {
+    return {
+      response: externalApiError(
+        "Table not found.",
+        404,
+        "table_not_found"
+      ),
+    };
+  }
+
+  const table = await auth.driveService.selectJsonContent(tableId);
+  if (!isTableFile(table)) {
+    return {
+      response: externalApiError(
+        "Table file is invalid or empty.",
+        422,
+        "invalid_table_file"
+      ),
+    };
+  }
+
+  return { table };
+}
+
+export async function requireExternalBucketFile(
+  auth: ExternalApiAuth,
+  fileId: string
+): Promise<ExternalFileAccessResult> {
+  const bucketId = await getOrCreateBucketFolder({
+    clientId: auth.clientId,
+    clientSecret: auth.clientSecret,
+    projectId: auth.projectId,
+    tokens: auth.tokens,
+  });
+  const listResponse = await operations.listOperations.listFilesInFolder(
+    bucketId
+  );
+  const files = (listResponse.data?.files ?? []) as DriveFile[];
+  const file = files.find(
+    (candidate) =>
+      candidate.id === fileId &&
+      !candidate.trashed &&
+      candidate.mimeType !== "application/vnd.google-apps.folder"
+  );
+
+  if (!file) {
+    return {
+      response: externalApiError("File not found.", 404, "file_not_found"),
+    };
+  }
+
+  return { file };
 }
 
 export function externalApiErrorResponse(

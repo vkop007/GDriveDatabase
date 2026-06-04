@@ -1,13 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
-  X,
   RefreshCw,
   Terminal,
-  Clock,
   AlertCircle,
   Info,
   CheckCircle,
-  Download,
 } from "lucide-react";
 import Modal from "../Modal";
 import { getFunctionLogs } from "@/app/actions/function";
@@ -33,7 +30,7 @@ interface LogSession {
   logs: LogEntry[];
   status: "SUCCESS" | "ERROR";
   error?: string;
-  result?: any;
+  result?: unknown;
 }
 
 export default function LogViewerModal({
@@ -48,24 +45,24 @@ export default function LogViewerModal({
     null
   );
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     setLoading(true);
     try {
       const result = await getFunctionLogs(functionId);
       if (result.success && result.logs) {
         setSessions(result.logs);
-        if (result.logs.length > 0 && !selectedSession) {
-          setSelectedSession(result.logs[0]);
-        }
+        setSelectedSession((current) =>
+          current?.functionId === functionId ? current : result.logs?.[0] ?? null
+        );
       } else {
         toast.error(result.error || "Failed to fetch logs");
       }
-    } catch (error) {
+    } catch {
       toast.error("An error occurred while fetching logs");
     } finally {
       setLoading(false);
     }
-  };
+  }, [functionId]);
 
   useEffect(() => {
     if (isOpen) {
@@ -74,7 +71,7 @@ export default function LogViewerModal({
       setSessions([]);
       setSelectedSession(null);
     }
-  }, [isOpen, functionId]);
+  }, [fetchLogs, isOpen, functionId]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString("en-IN", {
@@ -94,10 +91,10 @@ export default function LogViewerModal({
       title={`Logs: ${functionName}`}
       maxWidth="max-w-5xl"
     >
-      <div className="flex flex-col h-[70vh] md:h-[600px] w-full">
-        <div className="flex flex-1 overflow-hidden">
+      <div className="flex h-[75vh] w-full flex-col md:h-[600px]">
+        <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
           {/* Sidebar - Session List */}
-          <div className="w-1/3 min-w-[200px] border-r border-neutral-800 flex flex-col bg-neutral-900/30">
+          <div className="flex min-h-[9rem] w-full flex-col border-b border-neutral-800 bg-neutral-900/30 md:min-h-0 md:w-1/3 md:min-w-[200px] md:border-b-0 md:border-r">
             <div className="p-3 border-b border-neutral-800 flex items-center justify-between">
               <span className="text-sm font-medium text-neutral-400">
                 Executions
@@ -163,11 +160,11 @@ export default function LogViewerModal({
           </div>
 
           {/* Main Content - Log Details */}
-          <div className="flex-1 flex flex-col bg-neutral-950">
+          <div className="flex-1 flex flex-col bg-neutral-950 min-h-0">
             {selectedSession ? (
               <>
-                <div className="p-4 border-b border-neutral-800 bg-neutral-900/50 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-3 border-b border-neutral-800 bg-neutral-900/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex min-w-0 items-center gap-3">
                     <div
                       className={`p-2 rounded-lg ${
                         selectedSession.status === "ERROR"
@@ -177,17 +174,17 @@ export default function LogViewerModal({
                     >
                       <Terminal className="w-4 h-4" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="text-sm font-medium text-white">
                         Execution Details
                       </h3>
-                      <p className="text-xs text-neutral-400">
+                      <p className="truncate text-xs text-neutral-400">
                         {formatDate(selectedSession.startTime)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="text-xs text-neutral-500 flex flex-col items-end">
+                  <div className="text-xs text-neutral-500 flex flex-col items-start sm:items-end">
                     <span>
                       Duration:{" "}
                       {(
@@ -204,9 +201,9 @@ export default function LogViewerModal({
                   {selectedSession.logs.map((log, idx) => (
                     <div
                       key={idx}
-                      className="flex gap-3 hover:bg-white/5 p-0.5 rounded px-2"
+                      className="flex flex-col gap-1 hover:bg-white/5 p-0.5 rounded px-2 sm:flex-row sm:gap-3"
                     >
-                      <span className="text-neutral-500 shrink-0 w-24">
+                      <span className="text-neutral-500 shrink-0 sm:w-24">
                         {new Date(log.timestamp).toLocaleTimeString()}
                       </span>
                       <span
@@ -259,7 +256,7 @@ export default function LogViewerModal({
                         <CheckCircle className="w-3 h-3" /> Return Value:
                       </div>
                       <div className="p-3 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 font-mono overflow-x-auto">
-                        <pre>
+                        <pre className="min-w-max">
                           {typeof selectedSession.result === "object"
                             ? JSON.stringify(selectedSession.result, null, 2)
                             : String(selectedSession.result)}

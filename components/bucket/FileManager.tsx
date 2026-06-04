@@ -302,27 +302,27 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
       )}
 
       {/* Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6 mb-8">
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-4 mb-8 sm:p-6">
         {/* Glow effect */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
+              <div className="w-10 h-10 shrink-0 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
                 <Upload className="w-5 h-5 text-white" />
               </div>
-              <h2 className="text-2xl font-bold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+              <h2 className="text-xl font-bold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent sm:text-2xl">
                 Storage Bucket
               </h2>
             </div>
-            <p className="text-neutral-400 text-sm ml-13">
+            <p className="text-neutral-400 text-sm sm:pl-[3.25rem]">
               Upload assets and get permanent API links. Drag & drop supported.
             </p>
           </div>
 
-          <div className="relative">
+          <div className="relative w-full md:w-auto">
             <input
               type="file"
               multiple
@@ -333,7 +333,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="group flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white rounded-xl font-medium transition-all disabled:opacity-50 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98]"
+              className="group flex w-full items-center justify-center gap-2 px-5 py-2.5 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white rounded-xl font-medium transition-all disabled:opacity-50 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] md:w-auto"
             >
               {isUploading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -347,10 +347,10 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
       </div>
 
       {/* View Toggle */}
-      <div className="flex items-center gap-2 mb-6 p-1.5 bg-neutral-900/50 rounded-xl border border-neutral-800 w-fit">
+      <div className="flex w-full items-center gap-2 mb-6 p-1.5 bg-neutral-900/50 rounded-xl border border-neutral-800 sm:w-fit">
         <button
           onClick={() => setViewMode("grid")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex flex-1 items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all sm:flex-none ${
             viewMode === "grid"
               ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
               : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
@@ -361,7 +361,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
         </button>
         <button
           onClick={() => setViewMode("table")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+          className={`flex flex-1 items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all sm:flex-none ${
             viewMode === "table"
               ? "bg-primary/10 text-primary border border-primary/20 shadow-sm"
               : "text-neutral-400 hover:text-white hover:bg-neutral-800/50"
@@ -373,7 +373,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
       </div>
 
       {viewMode === "grid" ? (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-5">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6">
           {files.map((file) => (
             <div
               key={file.id}
@@ -474,8 +474,8 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
           )}
         </div>
       ) : (
-        <div className="border border-neutral-800 rounded-2xl overflow-hidden bg-linear-to-br from-neutral-900 to-neutral-900/50">
-          <table className="w-full text-left">
+        <div className="overflow-x-auto rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 to-neutral-900/50">
+          <table className="w-full min-w-[640px] text-left">
             <thead>
               <tr className="border-b border-neutral-800 text-xs font-semibold text-neutral-400 uppercase tracking-wider bg-neutral-900/80">
                 <th className="px-6 py-4">File</th>
@@ -521,7 +521,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
                           />
                         ) : (
                           <span
-                            className="font-medium text-white truncate max-w-xs cursor-pointer hover:text-primary transition-colors"
+                            className="font-medium text-white truncate max-w-[12rem] cursor-pointer hover:text-primary transition-colors md:max-w-xs"
                             onClick={() => startRename(file)}
                           >
                             {file.name}
@@ -598,7 +598,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
         typeof document !== "undefined" &&
         createPortal(
           <div
-            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center"
+            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
             onClick={() => {
               setPreviewFile(null);
               setZoomLevel(1);
@@ -610,13 +610,13 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
                 setPreviewFile(null);
                 setZoomLevel(1);
               }}
-              className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all border border-white/20 z-10"
+              className="absolute top-4 right-4 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all border border-white/20 z-10 sm:top-6 sm:right-6"
             >
               <X className="w-6 h-6" />
             </button>
 
             {/* Controls */}
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-3 rounded-xl bg-neutral-900/90 backdrop-blur-xl border border-neutral-700/50 z-10">
+            <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-center gap-3 overflow-x-auto rounded-xl border border-neutral-700/50 bg-neutral-900/90 px-4 py-3 backdrop-blur-xl sm:bottom-6 sm:left-1/2 sm:right-auto sm:-translate-x-1/2">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -664,7 +664,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
 
             {/* Image */}
             <div
-              className="relative max-w-[90vw] max-h-[85vh] transition-transform duration-200"
+              className="relative max-w-[90vw] max-h-[75vh] transition-transform duration-200 sm:max-h-[85vh]"
               style={{ transform: `scale(${zoomLevel})` }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -673,14 +673,16 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
                 alt={previewFile.name}
                 width={1200}
                 height={800}
-                className="object-contain max-h-[85vh] rounded-lg shadow-2xl"
+                className="object-contain max-h-[75vh] rounded-lg shadow-2xl sm:max-h-[85vh]"
                 unoptimized
               />
             </div>
 
             {/* File name */}
-            <div className="absolute top-6 left-6 text-white">
-              <p className="text-lg font-medium">{previewFile.name}</p>
+            <div className="absolute left-4 right-20 top-4 text-white sm:left-6 sm:top-6">
+              <p className="truncate text-base font-medium sm:text-lg">
+                {previewFile.name}
+              </p>
             </div>
           </div>,
           document.body
