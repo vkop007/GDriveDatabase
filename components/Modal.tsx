@@ -52,20 +52,20 @@ export default function Modal({
       {/* Modal Container */}
       <div className={`relative w-full ${maxWidth} max-h-[calc(100vh-2rem)] animate-slide-up`}>
         {/* Outer glow */}
-        <div className="absolute -inset-1 rounded-[20px] bg-linear-to-r from-primary/20 via-purple-500/10 to-primary/20 opacity-60 blur-xl dark:from-primary/30 dark:via-purple-500/20 dark:to-primary/30" />
+        <div className="absolute -inset-1 rounded-[20px] bg-primary/10 opacity-60 blur-xl dark:hidden" />
 
         {/* Modal */}
-        <div className="relative flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20 backdrop-blur-xl dark:border-neutral-700/60 dark:bg-neutral-900/95 dark:shadow-black/40">
+        <div className="relative flex max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20 backdrop-blur-xl dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-black/40">
           {/* Corner glows */}
-          <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-primary/10 blur-[60px] dark:bg-primary/15" />
-          <div className="pointer-events-none absolute bottom-0 left-0 h-32 w-32 rounded-full bg-purple-500/5 blur-[50px] dark:bg-purple-500/10" />
+          <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-primary/10 blur-[60px] dark:hidden" />
+          <div className="pointer-events-none absolute bottom-0 left-0 h-32 w-32 rounded-full bg-purple-500/5 blur-[50px] dark:hidden" />
 
           {/* Header */}
           <div className="relative flex shrink-0 items-center justify-between border-b border-slate-200 px-4 py-4 dark:border-neutral-800/80 sm:px-6 sm:py-5">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="absolute inset-0 rounded-xl bg-primary/30 blur-md" />
-                <div className="relative w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20">
+                <div className="absolute inset-0 rounded-xl bg-primary/30 blur-md dark:hidden" />
+                <div className="relative w-10 h-10 rounded-xl border border-primary/25 bg-primary flex items-center justify-center shadow-sm shadow-primary/10 dark:bg-neutral-950 dark:shadow-none">
                   <div className="w-2.5 h-2.5 rounded-full bg-white shadow-md" />
                 </div>
               </div>

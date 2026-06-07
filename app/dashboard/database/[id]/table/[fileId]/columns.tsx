@@ -60,9 +60,9 @@ export default async function ColumnsView({
       {/* Add Column Form */}
       <div
         id="add-column"
-        className="relative overflow-hidden rounded-2xl border border-slate-200 bg-linear-to-br from-white via-white to-primary/10 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:from-neutral-900 dark:via-neutral-900 dark:to-primary/20 dark:shadow-none"
+        className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none"
       >
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[60px] rounded-full pointer-events-none dark:hidden" />
 
         <div className="relative z-10 p-6">
           <div className="flex items-center gap-2 mb-5">
@@ -79,11 +79,11 @@ export default async function ColumnsView({
       </div>
 
       {/* Columns Table */}
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900/80 dark:via-neutral-900 dark:to-neutral-800/50 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50 dark:border-neutral-800 dark:bg-transparent">
+              <tr className="border-b border-slate-200 bg-slate-50 dark:border-neutral-800 dark:bg-neutral-900">
                 <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-neutral-500">
                   <div className="flex items-center gap-2">
                     <Key className="w-3.5 h-3.5" />

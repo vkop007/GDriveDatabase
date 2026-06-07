@@ -70,7 +70,7 @@ export default function PaginationControls({
   if (total === 0) return null;
 
   return (
-    <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3 dark:border-neutral-800/50 dark:bg-neutral-900/30">
+    <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-4 py-3 dark:border-neutral-800/50 dark:bg-neutral-950">
       {/* Info and page size */}
       <div className="flex items-center gap-4">
         <p className="text-sm text-slate-500 dark:text-neutral-400">

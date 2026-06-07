@@ -35,13 +35,13 @@ export default async function SettingsPage() {
     <div className="min-h-screen bg-slate-50 px-4 pb-4 pt-20 text-slate-950 md:px-8 md:pb-8 dark:bg-neutral-950 dark:text-white">
       <div className="max-w-full mx-auto space-y-8">
         {/* Header Section */}
-        <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
+        <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
           <div className="relative flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
-              <Settings className="w-6 h-6 text-white" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/25 bg-primary shadow-sm shadow-primary/10 dark:bg-neutral-950 dark:shadow-none">
+              <Settings className="w-6 h-6 text-white dark:text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-950 dark:bg-linear-to-r dark:from-white dark:to-neutral-400 dark:bg-clip-text dark:text-transparent">
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-950 dark:text-white">
                 Settings
               </h1>
               <p className="text-slate-500 text-sm mt-1 dark:text-neutral-400">

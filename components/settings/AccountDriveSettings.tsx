@@ -122,10 +122,10 @@ export default function AccountDriveSettings({
   return (
     <>
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 dark:bg-neutral-950">
                 <User className="h-5 w-5 text-primary" />
               </div>
               <div>
@@ -187,10 +187,10 @@ export default function AccountDriveSettings({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
+        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/25 bg-blue-500/10 dark:bg-neutral-950">
                 <Database className="h-5 w-5 text-blue-300" />
               </div>
               <div>
@@ -260,7 +260,7 @@ export default function AccountDriveSettings({
           </div>
         </section>
 
-        <section className="rounded-2xl border border-sky-500/20 bg-sky-50 p-6 xl:col-span-2 dark:bg-sky-500/5">
+        <section className="rounded-2xl border border-sky-500/20 bg-sky-50 p-6 xl:col-span-2 dark:bg-neutral-950">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
               <div className="flex items-center gap-2 text-sm font-semibold text-sky-700 dark:text-sky-200">

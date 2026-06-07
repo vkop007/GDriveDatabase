@@ -69,7 +69,7 @@ export default function ItemSettingsModal({
       );
 
       router.refresh();
-    } catch (error) {
+    } catch {
       toast.error(`Failed to delete ${type}`);
       setIsDeleting(false);
     }
@@ -83,10 +83,10 @@ export default function ItemSettingsModal({
     >
       <div className="space-y-5">
         {/* Selected Item Card */}
-        <div className="relative overflow-hidden p-5 rounded-xl bg-linear-to-br from-slate-50 via-white to-primary/10 border border-slate-200 dark:from-neutral-800/60 dark:via-neutral-800/40 dark:to-neutral-900/60 dark:border-neutral-700/50">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 blur-2xl rounded-full pointer-events-none" />
+        <div className="relative overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-neutral-800 dark:bg-neutral-950">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 blur-2xl rounded-full pointer-events-none dark:hidden" />
           <div className="relative flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary/20 to-purple-500/10 border border-primary/20 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center dark:bg-neutral-950">
               {type === "database" ? (
                 <Database className="w-5 h-5 text-primary" />
               ) : (

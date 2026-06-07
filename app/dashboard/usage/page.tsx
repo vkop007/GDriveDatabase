@@ -69,18 +69,18 @@ export default async function UsagePage() {
   return (
     <div className="space-y-8 max-w-full mx-auto py-8 px-4">
       {/* Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-primary/10 border border-slate-200 p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
         {/* Glow effect */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none dark:hidden" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none dark:hidden" />
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
-              <HardDrive className="w-6 h-6 text-white" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/25 bg-primary shadow-sm shadow-primary/10 dark:bg-neutral-950 dark:shadow-none">
+              <HardDrive className="w-6 h-6 text-white dark:text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold bg-linear-to-r from-slate-950 to-slate-500 bg-clip-text text-transparent dark:from-white dark:to-neutral-400">
+              <h1 className="text-2xl md:text-3xl font-bold text-slate-950 dark:text-white">
                 Storage Usage
               </h1>
               <p className="text-slate-500 text-sm mt-1 dark:text-neutral-400">
@@ -119,16 +119,16 @@ export default async function UsagePage() {
       </div>
 
       {/* Main Chart Card */}
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950/80 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
         {/* Glow effects */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none dark:hidden" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none dark:hidden" />
 
         <div className="relative z-10">
           <div className="p-6 border-b border-slate-200 dark:border-neutral-800">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center">
-                <Cloud className="w-5 h-5 text-white" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 dark:bg-neutral-950">
+                <Cloud className="w-5 h-5 text-primary" />
               </div>
               <div>
                 <h2 className="font-semibold text-slate-950 dark:text-white">Storage Overview</h2>
@@ -146,11 +146,11 @@ export default async function UsagePage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Storage */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-primary/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-primary/5 dark:shadow-none">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 blur-2xl rounded-full pointer-events-none group-hover:bg-primary/20 transition-colors" />
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-primary/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 blur-2xl rounded-full pointer-events-none group-hover:bg-primary/20 transition-colors dark:hidden" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary/30 to-primary/10 flex items-center justify-center border border-primary/20 group-hover:border-primary/40 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:border-primary/40 transition-colors dark:bg-neutral-950">
                 <HardDrive className="w-6 h-6 text-primary" />
               </div>
               <div className="w-10 h-10 relative">
@@ -191,11 +191,11 @@ export default async function UsagePage() {
         </div>
 
         {/* GDriveDB Usage */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-pink-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-pink-950/30 dark:shadow-none">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-pink-500/20 transition-colors" />
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-pink-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-pink-500/20 transition-colors dark:hidden" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-pink-500/30 to-pink-600/10 flex items-center justify-center border border-pink-500/20 group-hover:border-pink-500/40 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-pink-500/10 flex items-center justify-center border border-pink-500/20 group-hover:border-pink-500/40 transition-colors dark:bg-neutral-950">
                 <Database className="w-6 h-6 text-pink-400" />
               </div>
               <div className="w-10 h-10 relative">
@@ -238,11 +238,11 @@ export default async function UsagePage() {
         </div>
 
         {/* Active Files */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-blue-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-blue-950/30 dark:shadow-none">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-blue-500/20 transition-colors" />
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-blue-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-blue-500/20 transition-colors dark:hidden" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-blue-500/30 to-blue-600/10 flex items-center justify-center border border-blue-500/20 group-hover:border-blue-500/40 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20 group-hover:border-blue-500/40 transition-colors dark:bg-neutral-950">
                 <FolderOpen className="w-6 h-6 text-blue-400" />
               </div>
               <div className="w-10 h-10 relative">
@@ -283,11 +283,11 @@ export default async function UsagePage() {
         </div>
 
         {/* Trash */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-red-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-red-950/30 dark:shadow-none">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-red-500/20 transition-colors" />
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-red-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-red-500/20 transition-colors dark:hidden" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-linear-to-br from-red-500/30 to-red-600/10 flex items-center justify-center border border-red-500/20 group-hover:border-red-500/40 transition-colors">
+              <div className="w-12 h-12 rounded-xl bg-red-500/10 flex items-center justify-center border border-red-500/20 group-hover:border-red-500/40 transition-colors dark:bg-neutral-950">
                 <Trash2 className="w-6 h-6 text-red-400" />
               </div>
               <div className="w-10 h-10 relative">
@@ -329,14 +329,14 @@ export default async function UsagePage() {
       </div>
 
       {/* App Usage Breakdown */}
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-primary/5 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
         {/* Glow effects */}
-        <div className="absolute bottom-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full pointer-events-none dark:hidden" />
 
         <div className="relative z-10 p-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center">
-              <Database className="w-5 h-5 text-white" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 dark:bg-neutral-950">
+              <Database className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h3 className="font-semibold text-slate-950 dark:text-white">
@@ -351,10 +351,10 @@ export default async function UsagePage() {
 
           <div className="space-y-4">
             {/* Bucket Section - Primary theme to match */}
-            <div className="group p-4 rounded-xl bg-linear-to-r from-primary/10 to-transparent border border-primary/20 hover:border-primary/40 transition-all duration-300">
+            <div className="group p-4 rounded-xl bg-linear-to-r from-primary/10 to-transparent border border-primary/20 hover:border-primary/40 transition-all duration-300 dark:bg-none dark:bg-neutral-900">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-linear-to-br from-primary/30 to-primary/20 flex items-center justify-center border border-primary/30">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/30 dark:bg-neutral-950">
                     <FolderOpen className="w-5 h-5 text-primary" />
                   </div>
                   <div>

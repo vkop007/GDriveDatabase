@@ -127,7 +127,7 @@ export default function QueryBuilder({
           }}
           className={`group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
             query.filters.length > 0
-              ? "border border-blue-500/20 bg-linear-to-r from-blue-500/15 to-cyan-500/15 text-blue-700 shadow-sm shadow-blue-500/10 dark:from-blue-500/20 dark:to-cyan-500/20 dark:text-blue-300 dark:shadow-lg"
+              ? "border border-blue-500/20 bg-blue-500/10 text-blue-700 shadow-sm shadow-blue-500/10 dark:bg-neutral-900 dark:text-blue-300 dark:shadow-none"
               : "border border-slate-200 bg-white text-slate-600 shadow-sm hover:border-slate-300 hover:bg-slate-100 hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-white"
           }`}
         >
@@ -148,7 +148,7 @@ export default function QueryBuilder({
           }}
           className={`group relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
             query.sort.length > 0
-              ? "border border-purple-500/20 bg-linear-to-r from-purple-500/15 to-pink-500/15 text-purple-700 shadow-sm shadow-purple-500/10 dark:from-purple-500/20 dark:to-pink-500/20 dark:text-purple-300 dark:shadow-lg"
+              ? "border border-purple-500/20 bg-purple-500/10 text-purple-700 shadow-sm shadow-purple-500/10 dark:bg-neutral-900 dark:text-purple-300 dark:shadow-none"
               : "border border-slate-200 bg-white text-slate-600 shadow-sm hover:border-slate-300 hover:bg-slate-100 hover:text-slate-950 dark:border-white/10 dark:bg-white/5 dark:text-neutral-400 dark:hover:bg-white/10 dark:hover:text-white"
           }`}
         >
@@ -185,11 +185,11 @@ export default function QueryBuilder({
       {/* Floating panel */}
       {activePanel && (
         <div className="absolute top-full left-0 mt-2 z-50 min-w-[400px] animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-2xl shadow-slate-900/15 backdrop-blur-xl dark:border-white/10 dark:bg-neutral-900/95 dark:shadow-black/50">
+          <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white/95 shadow-2xl shadow-slate-900/15 backdrop-blur-xl dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-black/50">
             {/* Glow effect */}
             <div
               className={`absolute -top-20 -right-20 w-40 h-40 rounded-full blur-3xl pointer-events-none ${
-                activePanel === "filter" ? "bg-blue-500/20" : "bg-purple-500/20"
+                activePanel === "filter" ? "bg-blue-500/20 dark:hidden" : "bg-purple-500/20 dark:hidden"
               }`}
             />
 
@@ -198,14 +198,14 @@ export default function QueryBuilder({
               <div className="flex items-center gap-2">
                 {activePanel === "filter" ? (
                   <>
-                    <div className="w-8 h-8 rounded-lg bg-linear-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
                       <Filter className="w-4 h-4 text-white" />
                     </div>
                     <span className="font-semibold text-slate-950 dark:text-white">Filters</span>
                   </>
                 ) : (
                   <>
-                    <div className="w-8 h-8 rounded-lg bg-linear-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center">
                       <ArrowUpDown className="w-4 h-4 text-white" />
                     </div>
                     <span className="font-semibold text-slate-950 dark:text-white">Sort Order</span>
@@ -357,8 +357,8 @@ export default function QueryBuilder({
                         }
                         className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                           config.direction === "asc"
-                            ? "bg-linear-to-r from-emerald-500/15 to-teal-500/15 text-emerald-700 border border-emerald-500/20 dark:from-emerald-500/20 dark:to-teal-500/20 dark:text-emerald-300"
-                            : "bg-linear-to-r from-orange-500/15 to-red-500/15 text-orange-700 border border-orange-500/20 dark:from-orange-500/20 dark:to-red-500/20 dark:text-orange-300"
+                            ? "bg-emerald-500/10 text-emerald-700 border border-emerald-500/20 dark:bg-neutral-900 dark:text-emerald-300"
+                            : "bg-orange-500/10 text-orange-700 border border-orange-500/20 dark:bg-neutral-900 dark:text-orange-300"
                         }`}
                       >
                         {config.direction === "asc"

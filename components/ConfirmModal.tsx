@@ -51,40 +51,36 @@ export default function ConfirmModal({
     switch (variant) {
       case "danger":
         return {
-          iconBg: "bg-gradient-to-br from-red-600 to-red-700",
+          iconBg: "bg-red-600",
           iconBorder: "border-red-500/40",
-          iconShadow: "shadow-red-500/30",
+          iconShadow: "shadow-red-500/10 dark:shadow-none",
           iconColor: "text-white",
-          buttonBg:
-            "bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400",
-          buttonShadow: "shadow-lg shadow-red-500/25 hover:shadow-red-500/40",
+          buttonBg: "bg-red-600 hover:bg-red-500",
+          buttonShadow: "shadow-sm shadow-red-500/10 dark:shadow-none",
           glowPrimary: "bg-red-500/20",
           glowSecondary: "bg-red-600/10",
           accentBorder: "border-red-500/20",
         };
       case "warning":
         return {
-          iconBg: "bg-gradient-to-br from-amber-500 to-amber-600",
+          iconBg: "bg-amber-600",
           iconBorder: "border-amber-400/40",
-          iconShadow: "shadow-amber-500/30",
+          iconShadow: "shadow-amber-500/10 dark:shadow-none",
           iconColor: "text-white",
-          buttonBg:
-            "bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300",
-          buttonShadow:
-            "shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40",
+          buttonBg: "bg-amber-600 hover:bg-amber-500",
+          buttonShadow: "shadow-sm shadow-amber-500/10 dark:shadow-none",
           glowPrimary: "bg-amber-500/15",
           glowSecondary: "bg-amber-600/10",
           accentBorder: "border-amber-500/20",
         };
       default:
         return {
-          iconBg: "bg-gradient-to-br from-primary to-primary/80",
+          iconBg: "bg-primary",
           iconBorder: "border-primary/40",
-          iconShadow: "shadow-primary/30",
+          iconShadow: "shadow-primary/10 dark:shadow-none",
           iconColor: "text-white",
-          buttonBg:
-            "bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70",
-          buttonShadow: "shadow-lg shadow-primary/25 hover:shadow-primary/40",
+          buttonBg: "bg-primary hover:bg-primary/90",
+          buttonShadow: "shadow-sm shadow-primary/10 dark:shadow-none",
           glowPrimary: "bg-primary/15",
           glowSecondary: "bg-primary/10",
           accentBorder: "border-primary/20",
@@ -108,28 +104,28 @@ export default function ConfirmModal({
       <div className="relative min-w-[320px] w-full max-w-[420px] sm:max-w-md animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         {/* Outer glow effects */}
         <div
-          className={`absolute -inset-1 ${styles.glowPrimary} blur-2xl rounded-3xl opacity-60 pointer-events-none`}
+          className={`absolute -inset-1 ${styles.glowPrimary} blur-2xl rounded-3xl opacity-60 pointer-events-none dark:hidden`}
         />
 
         {/* Main modal card */}
         <div
-          className={`relative overflow-hidden rounded-2xl border ${styles.accentBorder} bg-white backdrop-blur-xl shadow-2xl shadow-slate-900/20 dark:bg-neutral-900/95 dark:shadow-black/40`}
+          className={`relative overflow-hidden rounded-2xl border ${styles.accentBorder} bg-white backdrop-blur-xl shadow-2xl shadow-slate-900/20 dark:bg-neutral-950 dark:shadow-black/40`}
         >
           {/* Animated gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-50/80 via-transparent to-slate-100/80 pointer-events-none dark:from-neutral-800/50 dark:to-neutral-900/80" />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-50/80 via-transparent to-slate-100/80 pointer-events-none dark:hidden" />
 
           {/* Inner glow effects */}
           <div
-            className={`absolute top-0 right-0 w-40 h-40 ${styles.glowPrimary} blur-3xl rounded-full pointer-events-none animate-pulse`}
+            className={`absolute top-0 right-0 w-40 h-40 ${styles.glowPrimary} blur-3xl rounded-full pointer-events-none animate-pulse dark:hidden`}
             style={{ animationDuration: "3s" }}
           />
           <div
-            className={`absolute bottom-0 left-0 w-32 h-32 ${styles.glowSecondary} blur-2xl rounded-full pointer-events-none`}
+            className={`absolute bottom-0 left-0 w-32 h-32 ${styles.glowSecondary} blur-2xl rounded-full pointer-events-none dark:hidden`}
           />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-950/[0.02] blur-3xl rounded-full pointer-events-none dark:bg-white/[0.02]" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-950/[0.02] blur-3xl rounded-full pointer-events-none dark:hidden" />
 
           {/* Glass inner layer */}
-          <div className="relative bg-gradient-to-b from-white/40 to-transparent dark:from-white/[0.03]">
+          <div className="relative bg-gradient-to-b from-white/40 to-transparent dark:bg-none">
             {/* Header */}
             <div className="relative flex justify-between items-center p-5 sm:p-6 border-b border-slate-200 dark:border-white/[0.06]">
               <div className="flex items-center gap-4">
@@ -137,7 +133,7 @@ export default function ConfirmModal({
                 <div
                   className={`relative w-12 h-12 rounded-xl ${styles.iconBg} flex items-center justify-center border ${styles.iconBorder} shadow-lg ${styles.iconShadow}`}
                 >
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-t from-black/20 to-transparent" />
+                  <div className="absolute inset-0 rounded-xl bg-black/10 dark:hidden" />
                   {icon || (
                     <DefaultIcon
                       className={`relative w-5 h-5 ${styles.iconColor} drop-shadow-sm`}

@@ -12,14 +12,11 @@ interface GradientButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantStyles = {
-  purple:
-    "bg-linear-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 shadow-purple-500/20 hover:shadow-purple-500/30",
-  emerald:
-    "bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-500/20 hover:shadow-emerald-500/30",
-  amber:
-    "bg-linear-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 shadow-amber-500/20 hover:shadow-amber-500/30",
-  blue: "bg-linear-to-r from-blue-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 shadow-blue-500/20 hover:shadow-blue-500/30",
-  pink: "bg-linear-to-r from-primary-from to-primary-to hover:brightness-110 shadow-primary/20 hover:shadow-primary/30",
+  purple: "bg-purple-600 hover:bg-purple-500",
+  emerald: "bg-emerald-600 hover:bg-emerald-500",
+  amber: "bg-amber-600 hover:bg-amber-500",
+  blue: "bg-blue-600 hover:bg-blue-500",
+  pink: "bg-primary hover:bg-primary/90",
 };
 
 const sizeStyles = {
@@ -49,8 +46,8 @@ const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>(
         className={`
           inline-flex items-center justify-center font-semibold text-white
           rounded-xl transition-all duration-200
-          shadow-lg hover:shadow-xl
-          disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg
+          shadow-sm dark:shadow-none
+          disabled:opacity-50 disabled:cursor-not-allowed
           ${variantStyles[variant]}
           ${sizeStyles[size]}
           ${className}

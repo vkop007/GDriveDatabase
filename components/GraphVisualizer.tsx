@@ -58,39 +58,26 @@ function RootNode({ data }: NodeProps<RootGraphNode>) {
     <div className="relative group cursor-pointer">
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
 
-      {/* Multi-layer animated glow */}
-      <div
-        className="absolute -inset-8 rounded-[32px] bg-linear-to-r 
-        from-pink-500/30 via-purple-500/30 to-pink-500/30 
-        blur-3xl animate-pulse"
-      />
-      <div
-        className="absolute -inset-4 rounded-[28px] bg-linear-to-br 
-        from-pink-600/20 to-purple-600/20 
-        blur-2xl opacity-80"
-      />
-
-      {/* Animated border gradient */}
-      <div className="absolute -inset-[2px] rounded-[26px] bg-linear-to-r from-pink-500 via-purple-500 to-pink-500 opacity-60 animate-gradient-x" />
+      {/* Subtle border accent */}
+      <div className="absolute -inset-[2px] rounded-[26px] border border-pink-500/35" />
 
       <div
         className="relative px-10 py-7 min-w-[300px] rounded-3xl 
-        bg-linear-to-br from-neutral-900/98 via-neutral-900/95 to-neutral-800/90 
-        backdrop-blur-3xl 
-        shadow-[0_8px_32px_rgba(236,72,153,0.3),0_0_80px_rgba(168,85,247,0.15)]
+        bg-neutral-950
+        border border-neutral-800
+        shadow-sm shadow-black/30
         transition-all duration-500
-        group-hover:shadow-[0_12px_48px_rgba(236,72,153,0.4),0_0_100px_rgba(168,85,247,0.25)]"
+        group-hover:border-pink-500/35"
       >
         <div className="flex items-center justify-center gap-5">
           {/* Premium icon container with inner glow */}
           <div className="relative">
-            <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-pink-500 to-purple-600 blur-lg opacity-60" />
-            <div className="relative w-14 h-14 rounded-2xl bg-linear-to-br from-pink-500 via-pink-600 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-500/30">
-              <Network size={28} className="text-white drop-shadow-lg" />
+            <div className="relative w-14 h-14 rounded-2xl border border-pink-500/30 bg-neutral-900 flex items-center justify-center">
+              <Network size={28} className="text-pink-400" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-bold bg-linear-to-r from-white via-pink-100 to-white bg-clip-text text-transparent">
+            <div className="text-2xl font-bold text-white">
               {data.label}
             </div>
             <div className="flex items-center gap-1.5 text-sm text-pink-300/90 mt-1.5 font-medium">
@@ -110,27 +97,21 @@ function DatabaseNode({ data }: NodeProps<DatabaseGraphNode>) {
       <Handle type="target" position={Position.Top} style={{ opacity: 0 }} />
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0 }} />
 
-      {/* Animated glow on hover */}
-      <div className="absolute -inset-4 rounded-[22px] bg-linear-to-br from-pink-500/15 via-fuchsia-500/10 to-purple-500/15 blur-2xl opacity-0 group-hover:opacity-100 transition-all duration-500" />
-
       {/* Subtle border glow */}
-      <div className="absolute -inset-px rounded-[18px] bg-linear-to-br from-pink-500/40 via-transparent to-purple-500/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute -inset-px rounded-[18px] border border-pink-500/0 transition-colors duration-500 group-hover:border-pink-500/30" />
 
       <div
         className="relative min-w-[240px] px-7 py-6 rounded-2xl 
-        bg-linear-to-br from-neutral-900/95 via-neutral-900/90 to-neutral-800/85
-        backdrop-blur-2xl 
+        bg-neutral-950
         border border-neutral-700/50 
-        shadow-[0_4px_24px_rgba(0,0,0,0.5),0_0_40px_rgba(236,72,153,0.05)]
+        shadow-sm shadow-black/30
         transition-all duration-500
-        group-hover:border-pink-500/30 
-        group-hover:shadow-[0_8px_40px_rgba(0,0,0,0.6),0_0_60px_rgba(236,72,153,0.15)]"
+        group-hover:border-pink-500/30"
       >
         <div className="flex items-center gap-4">
           {/* Icon with gradient background */}
           <div className="relative">
-            <div className="absolute inset-0 rounded-xl bg-linear-to-br from-pink-500/30 to-fuchsia-600/30 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative w-11 h-11 rounded-xl bg-linear-to-br from-pink-500/25 via-pink-500/15 to-fuchsia-500/20 border border-pink-500/20 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:border-pink-500/40">
+            <div className="relative w-11 h-11 rounded-xl bg-neutral-900 border border-pink-500/20 flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:border-pink-500/40">
               <Database
                 size={20}
                 className="text-pink-400 transition-colors duration-300 group-hover:text-pink-300"
@@ -184,27 +165,21 @@ function TableNode({ data }: NodeProps<TableGraphNode>) {
         style={{ opacity: 0, top: "50%" }}
       />
 
-      {/* Glow effect */}
-      <div className="absolute -inset-3 rounded-[16px] bg-linear-to-br from-cyan-500/10 via-teal-500/10 to-cyan-500/10 blur-xl opacity-0 group-hover:opacity-100 transition-all duration-400" />
-
       {/* Border highlight */}
-      <div className="absolute -inset-px rounded-[14px] bg-linear-to-br from-cyan-500/30 via-transparent to-teal-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+      <div className="absolute -inset-px rounded-[14px] border border-cyan-500/0 transition-colors duration-400 group-hover:border-cyan-500/30" />
 
       <div
         className="relative min-w-[200px] px-5 py-4 rounded-xl 
-        bg-linear-to-br from-neutral-900/90 via-neutral-900/85 to-neutral-850/80
-        backdrop-blur-xl
+        bg-neutral-950
         border border-neutral-700/40 
-        shadow-[0_2px_16px_rgba(0,0,0,0.4)]
+        shadow-sm shadow-black/30
         transition-all duration-400
-        group-hover:border-cyan-500/25 
-        group-hover:shadow-[0_6px_28px_rgba(0,0,0,0.5),0_0_40px_rgba(34,211,238,0.1)]"
+        group-hover:border-cyan-500/25"
       >
         <div className="flex items-center gap-3 mb-3 pb-3 border-b border-neutral-800">
           {/* Icon with subtle gradient */}
           <div className="relative">
-            <div className="absolute inset-0 rounded-lg bg-cyan-500/20 blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
-            <div className="relative w-8 h-8 rounded-lg bg-linear-to-br from-cyan-500/20 via-cyan-500/10 to-teal-500/15 border border-cyan-500/15 flex items-center justify-center transition-all duration-400 group-hover:scale-110 group-hover:border-cyan-500/30">
+            <div className="relative w-8 h-8 rounded-lg bg-neutral-900 border border-cyan-500/15 flex items-center justify-center transition-all duration-400 group-hover:scale-110 group-hover:border-cyan-500/30">
               <FileJson
                 size={15}
                 className="text-cyan-400 transition-colors duration-300 group-hover:text-cyan-300"
@@ -534,11 +509,11 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
           color="var(--surface-border-strong)"
           style={{ backgroundColor: "transparent" }}
         />
-        <Controls className="bg-white/90! border-slate-200! rounded-xl! shadow-xl! backdrop-blur-xl! dark:bg-neutral-900/90! dark:border-neutral-700/50!" />
+        <Controls className="bg-white/90! border-slate-200! rounded-xl! shadow-xl! backdrop-blur-xl! dark:bg-neutral-950! dark:border-neutral-800!" />
         <MiniMap
           zoomable
           pannable
-          className="bg-white/80! border-slate-200! rounded-xl! shadow-xl! backdrop-blur-xl! dark:bg-neutral-900/80! dark:border-neutral-700/40!"
+          className="bg-white/80! border-slate-200! rounded-xl! shadow-xl! backdrop-blur-xl! dark:bg-neutral-950! dark:border-neutral-800!"
           maskColor="color-mix(in srgb, var(--background) 72%, transparent)"
           nodeColor={(n) =>
             n.type === "root"
