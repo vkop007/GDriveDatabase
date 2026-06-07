@@ -9,9 +9,20 @@ import { parseAppSessionCookie } from "@/lib/auth/app-session";
 import { APP_SESSION_COOKIE } from "@/lib/gdrive/google-oauth";
 import { isTursoConfigured } from "@/lib/storage/turso";
 
-export default async function SignInPage() {
+type SignInPageProps = {
+  searchParams?: Promise<{
+    email?: string;
+    mode?: string;
+  }>;
+};
+
+export default async function SignInPage({ searchParams }: SignInPageProps) {
   const cookieStore = await cookies();
   const session = parseAppSessionCookie(cookieStore.get(APP_SESSION_COOKIE)?.value);
+  const params = await searchParams;
+  const defaultEmail =
+    typeof params?.email === "string" ? params.email.trim() : "";
+  const defaultMode = params?.mode === "signup" ? "signup" : "signin";
 
   if (session) {
     redirect("/dashboard");
@@ -49,6 +60,8 @@ export default async function SignInPage() {
           loginAction={signInWithEmail}
           signupAction={signUpWithEmail}
           isEmailAuthConfigured={isTursoConfigured()}
+          defaultEmail={defaultEmail}
+          defaultMode={defaultMode}
         />
       </div>
     </main>
