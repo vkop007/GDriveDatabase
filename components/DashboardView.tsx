@@ -9,21 +9,16 @@ import SearchInput from "./SearchInput";
 import { Database, Link2 } from "lucide-react";
 import ResourceCard from "./ResourceCard";
 import DriveSetupClient from "./DriveSetupClient";
-import OnboardingGuide, { type OnboardingStep } from "./OnboardingGuide";
-import type { Database as DatabaseFile, DatabaseNavItem } from "../types";
+import type { Database as DatabaseFile } from "../types";
 
 interface DashboardViewProps {
   initialDatabases: DatabaseFile[];
-  databaseTree?: DatabaseNavItem[];
-  hasApiKey?: boolean;
   needsDriveConnection?: boolean;
   driveSetupAction?: (formData: FormData) => void;
 }
 
 export default function DashboardView({
   initialDatabases,
-  databaseTree = [],
-  hasApiKey = false,
   needsDriveConnection = false,
   driveSetupAction,
 }: DashboardViewProps) {
@@ -40,75 +35,6 @@ export default function DashboardView({
         file.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : initialDatabases;
-  const hasDriveConnection = !needsDriveConnection;
-  const hasDatabases = initialDatabases.length > 0;
-  const firstDatabase = initialDatabases[0] ?? databaseTree[0];
-  const allTables = databaseTree.flatMap((database) =>
-    database.tables.map((table) => ({
-      ...table,
-      databaseId: database.id,
-    }))
-  );
-  const firstTable = allTables[0];
-  const hasTables = allTables.length > 0;
-  const onboardingSteps: OnboardingStep[] = [
-    {
-      title: "Connect Drive",
-      description: "Authorize the Google Drive workspace that stores data.",
-      status: hasDriveConnection ? "complete" : "current",
-      icon: "drive",
-      action: !hasDriveConnection ? (
-        <button
-          type="button"
-          onClick={() => setIsDriveSetupOpen(true)}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-white px-3 py-2 text-sm font-semibold text-primary shadow-sm transition hover:bg-primary/10 dark:bg-neutral-950"
-        >
-          <Link2 className="h-4 w-4" />
-          Connect Drive
-        </button>
-      ) : undefined,
-    },
-    {
-      title: "Create database",
-      description: "Create the first Drive folder that behaves like a database.",
-      status: !hasDriveConnection
-        ? "locked"
-        : hasDatabases
-        ? "complete"
-        : "current",
-      icon: "database",
-      action:
-        hasDriveConnection && !hasDatabases ? (
-          <CreateDatabaseModal triggerClassName="w-full" />
-        ) : undefined,
-    },
-    {
-      title: "Create table",
-      description: "Add a JSON table where records and schema can live.",
-      status: !hasDatabases ? "locked" : hasTables ? "complete" : "current",
-      icon: "table",
-      href: firstDatabase ? `/dashboard/database/${firstDatabase.id}` : undefined,
-      actionLabel: "Open database",
-    },
-    {
-      title: "Add first row",
-      description: "Open a table, add fields, then create a real record.",
-      status: !hasTables ? "locked" : "current",
-      icon: "rows",
-      href: firstTable
-        ? `/dashboard/database/${firstTable.databaseId}/table/${firstTable.id}`
-        : undefined,
-      actionLabel: "Open table",
-    },
-    {
-      title: "Generate API key",
-      description: "Enable secure API access for apps and integrations.",
-      status: !hasDriveConnection ? "locked" : hasApiKey ? "complete" : "current",
-      icon: "key",
-      href: "/dashboard/settings",
-      actionLabel: "Go to settings",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-slate-50 px-4 pb-4 pt-20 text-slate-950 transition-colors dark:bg-neutral-950 dark:text-white md:p-8">
@@ -160,12 +86,6 @@ export default function DashboardView({
             </div>
           </div>
         )}
-
-        <OnboardingGuide
-          title="Get your first database online"
-          description="Follow the shortest path from an empty account to a working Drive-backed API."
-          steps={onboardingSteps}
-        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {files.length === 0 ? (

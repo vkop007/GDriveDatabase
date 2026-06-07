@@ -2,8 +2,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   connectDriveWithGoogle,
-  getApiKey,
-  getDatabaseNavTree,
   listDatabases,
 } from "../actions";
 import DashboardView from "../../components/DashboardView";
@@ -28,18 +26,7 @@ export default async function Dashboard() {
     );
   }
 
-  // ✅ Now returns cached data (after first call)
-  const [files, databaseTree, apiKey] = await Promise.all([
-    listDatabases(),
-    getDatabaseNavTree(),
-    getApiKey(),
-  ]);
+  const files = await listDatabases();
 
-  return (
-    <DashboardView
-      initialDatabases={files}
-      databaseTree={databaseTree}
-      hasApiKey={Boolean(apiKey)}
-    />
-  );
+  return <DashboardView initialDatabases={files} />;
 }
