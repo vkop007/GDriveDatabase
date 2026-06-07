@@ -377,7 +377,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
           {files.map((file) => (
             <div
               key={file.id}
-              className="group relative bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm shadow-slate-900/5 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1 dark:bg-linear-to-br dark:from-neutral-900 dark:to-neutral-900/50 dark:border-neutral-800 dark:shadow-none"
+              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:to-neutral-950/80 dark:shadow-none"
             >
               {/* Preview */}
               <div
@@ -410,7 +410,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
               </div>
 
               {/* Info */}
-              <div className="p-4 bg-white dark:bg-linear-to-t dark:from-neutral-900 dark:to-transparent">
+              <div className="bg-white p-4 dark:bg-neutral-900 dark:bg-linear-to-t dark:from-neutral-900 dark:to-neutral-900/80">
                 {renamingId === file.id ? (
                   <input
                     type="text"
@@ -456,8 +456,8 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
           ))}
 
           {files.length === 0 && (
-            <div className="col-span-full py-16 flex flex-col items-center justify-center text-slate-500 border-2 border-dashed border-slate-200 rounded-2xl bg-white dark:text-neutral-400 dark:border-neutral-700/50 dark:bg-linear-to-br dark:from-neutral-900/50 dark:to-transparent">
-              <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4 dark:bg-neutral-800/50">
+            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white py-16 text-slate-500 dark:border-neutral-700/60 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-950 dark:text-neutral-300">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 dark:border dark:border-neutral-700/60 dark:bg-neutral-800/80">
                 <Upload className="w-8 h-8 text-slate-400 dark:text-neutral-500" />
               </div>
               <p className="text-lg font-medium mb-1">No files in bucket</p>
@@ -466,7 +466,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
               </p>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 text-sm bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors border border-primary/20"
+                className="rounded-lg border border-primary/20 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20 dark:bg-primary/15 dark:hover:bg-primary/25"
               >
                 Upload some files
               </button>
@@ -474,7 +474,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:to-neutral-900/50 dark:shadow-none">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:to-neutral-950/80 dark:shadow-none">
           <table className="w-full min-w-[640px] text-left">
             <thead>
               <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50 dark:border-neutral-800 dark:text-neutral-400 dark:bg-neutral-900/80">
