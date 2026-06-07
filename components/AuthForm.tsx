@@ -16,6 +16,8 @@ export interface AuthFormProps {
   loginAction: AuthAction;
   signupAction: AuthAction;
   isEmailAuthConfigured: boolean;
+  defaultEmail?: string;
+  defaultMode?: "signin" | "signup";
 }
 
 function AuthSubmitButton({
@@ -51,9 +53,11 @@ export function EmailPasswordForm({
   loginAction,
   signupAction,
   isEmailAuthConfigured,
+  defaultEmail = "",
+  defaultMode = "signin",
   compact = false,
 }: AuthFormProps & { compact?: boolean }) {
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup">(defaultMode);
   const [signinState, signinFormAction, signinPending] = useActionState(
     loginAction,
     {}
@@ -122,6 +126,7 @@ export function EmailPasswordForm({
                 name="email"
                 type="email"
                 autoComplete="email"
+                defaultValue={defaultEmail}
                 className="w-full bg-transparent text-sm text-slate-950 outline-none placeholder:text-slate-400 dark:text-white"
                 placeholder="you@example.com"
               />

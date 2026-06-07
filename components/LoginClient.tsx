@@ -13,12 +13,12 @@ import {
   FolderKanban,
   GitBranch,
   KeyRound,
+  Mail,
   Moon,
   Network,
   Rows3,
   Search,
   Settings2,
-  Sparkles,
   Sun,
   UploadCloud,
   Workflow,
@@ -28,24 +28,6 @@ import { useTheme } from "./ThemeProvider";
 interface LoginClientProps {
   sdkCodeHtml: string;
 }
-
-const heroPillars = [
-  "Google Drive backend",
-  "Schema-aware tables",
-  "SDK and API access",
-];
-
-const heroStats = [
-  ["6", "product surfaces"],
-  ["6", "schema types"],
-  ["0", "database servers"],
-];
-
-const heroFlow = [
-  ["Drive folder", "Connect OAuth workspace"],
-  ["Schema", "Model tables and relations"],
-  ["SDK", "Ship through typed APIs"],
-];
 
 const workflowSteps = [
   {
@@ -105,15 +87,6 @@ const platformModules = [
     description: "Control account, API keys, backups, and Google Drive connection details.",
     icon: Settings2,
   },
-];
-
-const platformRoutes = [
-  ["Dashboard", "/dashboard", "records, usage, resources"],
-  ["Bucket", "/dashboard/bucket", "Drive file storage"],
-  ["Functions", "/dashboard/functions", "server workflows"],
-  ["API docs", "/dashboard/apidocs", "SDK examples"],
-  ["Usage", "/dashboard/usage", "limits and activity"],
-  ["Settings", "/dashboard/settings", "keys and Drive"],
 ];
 
 const featureRows = [
@@ -259,153 +232,62 @@ export default function LoginClient({
           </div>
         </header>
 
-        <div className="mx-auto grid w-full min-w-0 max-w-[22rem] items-center gap-10 px-5 pb-16 pt-10 sm:max-w-7xl sm:px-8 md:pb-20 md:pt-16 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.82fr)] lg:px-10">
-          <div className="min-w-0 max-w-3xl">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-pink-200 bg-pink-50 px-3 py-1.5 text-xs font-semibold text-pink-700 dark:border-pink-400/24 dark:bg-pink-400/10 dark:text-pink-200">
-              <Sparkles className="h-3.5 w-3.5" />
-              Google Drive as an operational database
-            </div>
+        <div className="mx-auto flex min-h-[calc(100vh-4.5rem)] w-full max-w-[22rem] flex-col items-center justify-center px-5 py-16 text-center sm:max-w-4xl sm:px-8 md:py-20 lg:px-10">
+          <Image
+            src="/logo.png"
+            alt=""
+            width={72}
+            height={72}
+            className="mb-8 h-16 w-16 rounded-2xl"
+            priority
+          />
 
-            <h1 className="max-w-3xl text-4xl font-semibold leading-[1.05] sm:text-6xl lg:text-7xl">
-              Build database apps on top of Google Drive.
-            </h1>
+          <h1 className="max-w-4xl text-4xl font-semibold leading-[1.05] sm:text-6xl lg:text-7xl">
+            Build database apps on Google Drive.
+          </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 dark:text-white/64">
-              GDrive Database turns Drive into a structured NoSQL workspace with
-              tables, schema, storage, server functions, SDK access, and API docs
-              in one dashboard.
-            </p>
+          <p className="mt-6 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8 dark:text-white/64">
+            GDrive Database gives your Drive files a structured dashboard,
+            tables, storage, functions, SDK access, and API docs without running
+            a separate database server.
+          </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <a
-                href="/signin"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100"
-              >
-                Sign in or create account
-                <ArrowRight className="h-4 w-4" />
-              </a>
-              <a
-                href="#platform"
-                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-pink-300 hover:text-pink-600 dark:border-white/12 dark:bg-transparent dark:text-white/82 dark:hover:border-white/25 dark:hover:bg-white/8 dark:hover:text-white"
-              >
-                Explore platform
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            </div>
+          <form
+            action="/signin"
+            method="get"
+            className="mt-9 flex w-full max-w-xl flex-col gap-3 rounded-2xl border border-slate-200 bg-white/82 p-2 shadow-2xl shadow-slate-200/70 backdrop-blur sm:flex-row dark:border-white/10 dark:bg-white/[0.055] dark:shadow-black/25"
+          >
+            <input type="hidden" name="mode" value="signup" />
+            <label className="flex min-w-0 flex-1 items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 text-left text-slate-500 ring-1 ring-inset ring-slate-200 focus-within:ring-pink-300 dark:bg-black/20 dark:text-white/45 dark:ring-white/10 dark:focus-within:ring-pink-400/40">
+              <Mail className="h-4 w-4 shrink-0" />
+              <span className="sr-only">Email address</span>
+              <input
+                required
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="you@example.com"
+                className="min-w-0 flex-1 bg-transparent text-sm text-slate-950 outline-none placeholder:text-slate-400 dark:text-white"
+              />
+            </label>
+            <button
+              type="submit"
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white shadow-lg shadow-black/15 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100"
+            >
+              Sign up with email
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </form>
 
-            <div className="mt-8 grid gap-3 text-sm text-slate-600 sm:grid-cols-3 dark:text-white/54">
-              {heroPillars.map((item) => (
-                <div key={item} className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600 dark:text-emerald-300" />
-                  <span>{item}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-8 grid grid-cols-3 divide-x divide-slate-200 rounded-lg border border-slate-200 bg-white shadow-sm dark:divide-white/10 dark:border-white/10 dark:bg-white/[0.04]">
-              {heroStats.map(([value, label]) => (
-                <div key={label} className="px-4 py-3">
-                  <p className="text-2xl font-semibold tracking-tight">
-                    {value}
-                  </p>
-                  <p className="mt-1 text-xs leading-4 text-slate-500 dark:text-white/42">
-                    {label}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-4 grid gap-2 sm:grid-cols-3">
-              {heroFlow.map(([title, description], index) => (
-                <div
-                  key={title}
-                  className="rounded-lg border border-white/70 bg-white/55 p-3 shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/[0.035]"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-md bg-emerald-50 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-200">
-                      {index + 1}
-                    </span>
-                    <p className="text-xs font-semibold text-slate-900 dark:text-white">
-                      {title}
-                    </p>
-                  </div>
-                  <p className="mt-2 text-xs leading-5 text-slate-500 dark:text-white/42">
-                    {description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-2xl shadow-slate-200/70 transition-colors duration-300 dark:border-white/10 dark:bg-[#0b0d14] dark:shadow-black/30">
-            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-3 dark:border-white/10 dark:bg-white/[0.035]">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-              </div>
-              <span className="font-mono text-xs text-slate-500 dark:text-white/40">
-                drive://workspace/crm
-              </span>
-            </div>
-
-            <div className="p-5">
-              <div className="mb-5 flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-300">
-                    Live workspace
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold">
-                    Drive files shaped into tables, APIs, and functions.
-                  </h2>
-                </div>
-                <div className="hidden rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 sm:block dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-200">
-                  Synced
-                </div>
-              </div>
-
-              <div className="grid gap-3 sm:grid-cols-2">
-                {platformRoutes.slice(0, 4).map(([label, route, detail]) => (
-                  <div
-                    key={label}
-                    className="rounded-lg border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/[0.035]"
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold">{label}</p>
-                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                    </div>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-white/42">
-                      {detail}
-                    </p>
-                    <p className="mt-3 truncate font-mono text-xs text-slate-500 dark:text-white/38">
-                      {route}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4 text-slate-900 shadow-sm dark:border-white/10 dark:bg-slate-950 dark:text-slate-100">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold">customers</p>
-                  <span className="rounded-md bg-pink-50 px-2 py-1 text-xs font-semibold text-pink-700 dark:bg-pink-400/15 dark:text-pink-200">
-                    API ready
-                  </span>
-                </div>
-                <div className="grid grid-cols-[1.1fr_0.8fr_0.7fr] gap-2 font-mono text-xs text-slate-400">
-                  <span>name</span>
-                  <span>status</span>
-                  <span>files</span>
-                  <span className="text-slate-950 dark:text-white">
-                    Ada Lovelace
-                  </span>
-                  <span className="text-emerald-600 dark:text-emerald-300">
-                    active
-                  </span>
-                  <span>3</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <p className="mt-4 text-sm text-slate-500 dark:text-white/42">
+            Already have an account?{" "}
+            <a
+              href="/signin"
+              className="font-semibold text-slate-900 underline-offset-4 transition hover:text-pink-600 hover:underline dark:text-white dark:hover:text-pink-200"
+            >
+              Sign in
+            </a>
+          </p>
         </div>
       </section>
 
@@ -426,7 +308,7 @@ export default function LoginClient({
             <p className="max-w-2xl text-base leading-7 text-slate-600 lg:ml-auto dark:text-white/56">
               The app already includes pages and components for records, files,
               server functions, SDK docs, account settings, backups, and usage.
-              The landing page now explains that actual product surface.
+              Each surface maps to a practical dashboard workflow.
             </p>
           </div>
 
@@ -666,30 +548,6 @@ export default function LoginClient({
         </div>
       </section>
 
-      <section className="border-b border-slate-200 bg-[linear-gradient(135deg,rgba(236,253,245,0.82)_0%,rgba(253,242,248,0.72)_52%,rgba(255,255,255,0.96)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,17,15,0.84)_0%,rgba(18,12,22,0.80)_52%,rgba(5,6,10,0.96)_100%)]">
-        <div className="mx-auto grid max-w-[22rem] items-center gap-6 px-5 py-12 sm:max-w-7xl sm:px-8 md:grid-cols-[1fr_auto] lg:px-10">
-          <div>
-            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-200">
-              Ready when your Drive is
-            </p>
-            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight sm:text-4xl">
-              Turn a team-owned folder into a working data layer.
-            </h2>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-white/56">
-              Sign in, connect Drive, and keep records, files, schema, API keys,
-              and functions in one operational workspace.
-            </p>
-          </div>
-          <a
-            href="/signin"
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100"
-          >
-            Sign in or create account
-            <ArrowRight className="h-4 w-4" />
-          </a>
-        </div>
-      </section>
-
       <footer className="border-t border-slate-200 bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(248,250,252,0.98)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(180deg,rgba(5,6,10,0.94)_0%,rgba(3,4,8,0.98)_100%)]">
         <div className="mx-auto grid max-w-[22rem] gap-10 px-5 py-12 text-sm text-slate-600 sm:max-w-7xl sm:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr] sm:px-8 lg:px-10 dark:text-white/54">
           <div>
@@ -752,12 +610,6 @@ export default function LoginClient({
                 className="transition hover:text-slate-950 dark:hover:text-white"
               >
                 SDK
-              </a>
-              <a
-                href="/signin"
-                className="transition hover:text-slate-950 dark:hover:text-white"
-              >
-                Sign in
               </a>
             </div>
           </div>
