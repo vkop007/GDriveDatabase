@@ -34,18 +34,31 @@ export default function AddColumnForm({
 
   const validationOptions = getValidationOptions(selectedType);
   const hasValidationOptions = validationOptions.length > 0;
+  const labelClass =
+    "flex items-center gap-1.5 text-xs font-medium text-slate-500 dark:text-neutral-400";
+  const compactLabelClass = "text-xs font-medium text-slate-500 dark:text-neutral-400";
+  const inputClass =
+    "w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-950 placeholder:text-slate-400 transition-all focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-neutral-700 dark:bg-neutral-950/50 dark:text-white dark:placeholder:text-neutral-500";
+  const smallInputClass =
+    "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-950 placeholder:text-slate-400 focus:border-primary/50 focus:outline-none dark:border-neutral-700 dark:bg-neutral-900 dark:text-white dark:placeholder:text-neutral-500";
+  const switchTrackClass =
+    "w-12 h-7 rounded-full border border-slate-300 bg-slate-200 shadow-inner transition-all peer-checked:border-primary/50 peer-checked:bg-linear-to-r peer-checked:from-primary-from peer-checked:to-primary-to dark:border-neutral-700 dark:bg-neutral-800";
+  const smallSwitchTrackClass =
+    "w-10 h-6 rounded-full border border-slate-300 bg-slate-200 transition-all peer-checked:border-emerald-500 peer-checked:bg-emerald-600 dark:border-neutral-700 dark:bg-neutral-800";
+  const switchLabelClass =
+    "text-sm text-slate-500 transition-colors group-hover:text-slate-950 dark:text-neutral-400 dark:group-hover:text-white";
 
   return (
     <form
       action={updateTableSchema}
-      className="p-5 rounded-xl border border-neutral-800 bg-neutral-900/50 space-y-4"
+      className="space-y-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none"
     >
       <input type="hidden" name="fileId" value={fileId} />
       <input type="hidden" name="databaseId" value={databaseId} />
 
       <div className="grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
         <div className="md:col-span-2 space-y-2">
-          <label className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+          <label className={labelClass}>
             <Key className="w-3 h-3" />
             Key
           </label>
@@ -53,13 +66,13 @@ export default function AddColumnForm({
             type="text"
             name="key"
             placeholder="e.g. email"
-            className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+            className={inputClass}
             required
           />
         </div>
 
         <div className="md:col-span-1 space-y-2">
-          <label className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+          <label className={labelClass}>
             <Type className="w-3 h-3" />
             Type
           </label>
@@ -70,7 +83,7 @@ export default function AddColumnForm({
               setSelectedType(e.target.value);
               setShowValidation(false);
             }}
-            className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+            className={`${inputClass} appearance-none cursor-pointer`}
           >
             <option value="string">String</option>
             <option value="integer">Integer</option>
@@ -83,13 +96,13 @@ export default function AddColumnForm({
 
         {selectedType === "relation" ? (
           <div className="md:col-span-1 space-y-2">
-            <label className="text-xs font-medium text-neutral-400 flex items-center gap-1.5">
+            <label className={labelClass}>
               <Type className="w-3 h-3" />
               Relation
             </label>
             <select
               name="relationTableId"
-              className="w-full bg-neutral-950/50 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+              className={`${inputClass} appearance-none cursor-pointer`}
               required
             >
               <option value="">Select Table</option>
@@ -112,10 +125,10 @@ export default function AddColumnForm({
                     id="array"
                     className="sr-only peer"
                   />
-                  <div className="w-12 h-7 bg-neutral-800 rounded-full peer-checked:bg-linear-to-r peer-checked:from-primary-from peer-checked:to-primary-to transition-all border border-neutral-700 peer-checked:border-primary/50 shadow-inner" />
+                  <div className={switchTrackClass} />
                   <div className="absolute left-1 top-1 w-5 h-5 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-5 peer-checked:bg-white shadow-sm" />
                 </div>
-                <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
+                <span className={switchLabelClass}>
                   Array
                 </span>
               </label>
@@ -134,10 +147,10 @@ export default function AddColumnForm({
                   id="required"
                   className="sr-only peer"
                 />
-                <div className="w-12 h-7 bg-neutral-800 rounded-full peer-checked:bg-linear-to-r peer-checked:from-primary-from peer-checked:to-primary-to transition-all border border-neutral-700 peer-checked:border-primary/50 shadow-inner" />
+                <div className={switchTrackClass} />
                 <div className="absolute left-1 top-1 w-5 h-5 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-5 peer-checked:bg-white shadow-sm" />
               </div>
-              <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
+              <span className={switchLabelClass}>
                 Required
               </span>
             </label>
@@ -160,7 +173,7 @@ export default function AddColumnForm({
           <button
             type="button"
             onClick={() => setShowValidation(!showValidation)}
-            className="flex items-center gap-2 text-sm text-neutral-400 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm text-slate-500 transition-colors hover:text-slate-950 dark:text-neutral-400 dark:hover:text-white"
           >
             <Shield className="w-4 h-4" />
             <span>Validation Rules</span>
@@ -172,12 +185,12 @@ export default function AddColumnForm({
           </button>
 
           {showValidation && (
-            <div className="mt-4 p-4 bg-neutral-950/50 rounded-xl border border-neutral-800 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="mt-4 grid grid-cols-1 gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-neutral-800 dark:bg-neutral-950/50 md:grid-cols-3">
               {selectedType === "string" && (
                 <>
                   {/* Min Length */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-neutral-400">
+                    <label className={compactLabelClass}>
                       Min Length
                     </label>
                     <input
@@ -185,13 +198,13 @@ export default function AddColumnForm({
                       name="validation_minLength"
                       min="0"
                       placeholder="e.g. 3"
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary/50"
+                      className={smallInputClass}
                     />
                   </div>
 
                   {/* Max Length */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-neutral-400">
+                    <label className={compactLabelClass}>
                       Max Length
                     </label>
                     <input
@@ -199,20 +212,20 @@ export default function AddColumnForm({
                       name="validation_maxLength"
                       min="1"
                       placeholder="e.g. 100"
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary/50"
+                      className={smallInputClass}
                     />
                   </div>
 
                   {/* Pattern (Regex) */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-neutral-400">
+                    <label className={compactLabelClass}>
                       Pattern (Regex)
                     </label>
                     <input
                       type="text"
                       name="validation_pattern"
                       placeholder="e.g. ^[a-z]+$"
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary/50 font-mono"
+                      className={`${smallInputClass} font-mono`}
                     />
                   </div>
 
@@ -225,10 +238,10 @@ export default function AddColumnForm({
                           name="validation_email"
                           className="sr-only peer"
                         />
-                        <div className="w-10 h-6 bg-neutral-800 rounded-full peer-checked:bg-emerald-600 transition-all border border-neutral-700 peer-checked:border-emerald-500" />
+                        <div className={smallSwitchTrackClass} />
                         <div className="absolute left-1 top-1 w-4 h-4 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-4 peer-checked:bg-white shadow-sm" />
                       </div>
-                      <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
+                      <span className={switchLabelClass}>
                         Email Format
                       </span>
                     </label>
@@ -243,10 +256,10 @@ export default function AddColumnForm({
                           name="validation_url"
                           className="sr-only peer"
                         />
-                        <div className="w-10 h-6 bg-neutral-800 rounded-full peer-checked:bg-emerald-600 transition-all border border-neutral-700 peer-checked:border-emerald-500" />
+                        <div className={smallSwitchTrackClass} />
                         <div className="absolute left-1 top-1 w-4 h-4 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-4 peer-checked:bg-white shadow-sm" />
                       </div>
-                      <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
+                      <span className={switchLabelClass}>
                         URL Format
                       </span>
                     </label>
@@ -261,14 +274,14 @@ export default function AddColumnForm({
                           name="unique"
                           className="sr-only peer"
                         />
-                        <div className="w-10 h-6 bg-neutral-800 rounded-full peer-checked:bg-purple-600 transition-all border border-neutral-700 peer-checked:border-purple-500" />
+                        <div className="w-10 h-6 rounded-full border border-slate-300 bg-slate-200 transition-all peer-checked:border-purple-500 peer-checked:bg-purple-600 dark:border-neutral-700 dark:bg-neutral-800" />
                         <div className="absolute left-1 top-1 w-4 h-4 bg-neutral-400 rounded-full transition-all peer-checked:translate-x-4 peer-checked:bg-white shadow-sm" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-sm text-neutral-400 group-hover:text-white transition-colors">
+                        <span className={switchLabelClass}>
                           Unique Value
                         </span>
-                        <span className="text-[10px] text-neutral-500">
+                        <span className="text-[10px] text-slate-500 dark:text-neutral-500">
                           Enforces ID uniqueness via index
                         </span>
                       </div>
@@ -277,7 +290,7 @@ export default function AddColumnForm({
 
                   {/* Enum Values */}
                   <div className="space-y-2 md:col-span-3">
-                    <label className="text-xs font-medium text-neutral-400">
+                    <label className={compactLabelClass}>
                       Allowed Values (comma-separated)
                     </label>
                     <input
@@ -286,7 +299,7 @@ export default function AddColumnForm({
                       value={enumValues}
                       onChange={(e) => setEnumValues(e.target.value)}
                       placeholder="e.g. active, pending, completed"
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary/50"
+                      className={smallInputClass}
                     />
                     {enumValues && (
                       <div className="flex flex-wrap gap-1.5 mt-2">
@@ -308,27 +321,27 @@ export default function AddColumnForm({
                 <>
                   {/* Min Value */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-neutral-400">
+                    <label className={compactLabelClass}>
                       Min Value
                     </label>
                     <input
                       type="number"
                       name="validation_min"
                       placeholder="e.g. 0"
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary/50"
+                      className={smallInputClass}
                     />
                   </div>
 
                   {/* Max Value */}
                   <div className="space-y-2">
-                    <label className="text-xs font-medium text-neutral-400">
+                    <label className={compactLabelClass}>
                       Max Value
                     </label>
                     <input
                       type="number"
                       name="validation_max"
                       placeholder="e.g. 100"
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary/50"
+                      className={smallInputClass}
                     />
                   </div>
                 </>
@@ -336,14 +349,14 @@ export default function AddColumnForm({
 
               {/* Custom Error Message */}
               <div className="space-y-2 md:col-span-3">
-                <label className="text-xs font-medium text-neutral-400">
+                <label className={compactLabelClass}>
                   Custom Error Message (optional)
                 </label>
                 <input
                   type="text"
                   name="validation_message"
                   placeholder="e.g. Please enter a valid email address"
-                  className="w-full bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:outline-none focus:border-primary/50"
+                  className={smallInputClass}
                 />
               </div>
             </div>

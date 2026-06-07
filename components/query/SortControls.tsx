@@ -46,8 +46,8 @@ export default function SortControls({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 text-sm font-medium text-neutral-300">
-          <ArrowUpDown className="w-4 h-4 text-neutral-500" />
+        <div className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-neutral-300">
+          <ArrowUpDown className="w-4 h-4 text-slate-400 dark:text-neutral-500" />
           Sort By
         </div>
         {availableColumns.length > 0 && (
@@ -62,16 +62,16 @@ export default function SortControls({
       </div>
 
       {sortConfigs.length === 0 ? (
-        <p className="text-sm text-neutral-500 italic">No sorting applied</p>
+        <p className="text-sm text-slate-500 italic dark:text-neutral-500">No sorting applied</p>
       ) : (
         <div className="space-y-2">
           {sortConfigs.map((config, index) => (
             <div
               key={index}
-              className="flex items-center gap-2 p-3 rounded-xl bg-neutral-900/50 border border-neutral-800 group animate-in fade-in slide-in-from-top-2 duration-200"
+              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-900/5 group animate-in fade-in slide-in-from-top-2 duration-200 dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none"
             >
               {/* Priority indicator */}
-              <span className="w-6 h-6 flex items-center justify-center rounded-full bg-neutral-800 text-xs text-neutral-400 font-medium">
+              <span className="w-6 h-6 flex items-center justify-center rounded-full bg-slate-100 text-xs text-slate-500 font-medium dark:bg-neutral-800 dark:text-neutral-400">
                 {index + 1}
               </span>
 
@@ -81,7 +81,7 @@ export default function SortControls({
                 onChange={(e) =>
                   updateSort(index, { ...config, column: e.target.value })
                 }
-                className="flex-1 min-w-[120px] px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                className="flex-1 min-w-[120px] px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
               >
                 <option value={config.column}>{config.column}</option>
                 {columns
@@ -126,7 +126,7 @@ export default function SortControls({
               {/* Remove button */}
               <button
                 onClick={() => removeSort(index)}
-                className="p-2 rounded-lg text-neutral-500 hover:text-red-400 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100"
+                className="p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100 dark:text-neutral-500 dark:hover:text-red-400"
                 title="Remove sort"
               >
                 <X className="w-4 h-4" />

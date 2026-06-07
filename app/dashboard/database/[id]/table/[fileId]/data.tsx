@@ -72,8 +72,8 @@ export default function DataView({
             <Table2 className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-white">Data</h2>
-            <p className="text-sm text-neutral-400">
+            <h2 className="text-xl font-bold text-slate-950 dark:text-white">Data</h2>
+            <p className="text-sm text-slate-500 dark:text-neutral-400">
               {table.documents.length} row
               {table.documents.length !== 1 ? "s" : ""}
             </p>
@@ -92,16 +92,15 @@ export default function DataView({
           description="Add usable fields, create a first row, then enable API access for integrations."
           steps={onboardingSteps}
           compact
-          variant="dark"
         />
       )}
 
       {!hasUserColumns && (
-        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 p-4 text-sm text-blue-100">
+        <div className="rounded-2xl border border-blue-500/20 bg-blue-50 p-4 text-sm text-blue-700 dark:bg-blue-500/10 dark:text-blue-100">
           Add at least one custom column before creating rows.{" "}
           <Link
             href={`${tableUrl}?tab=columns`}
-            className="font-semibold text-blue-200 underline underline-offset-4 hover:text-white"
+            className="font-semibold text-blue-700 underline underline-offset-4 hover:text-blue-900 dark:text-blue-200 dark:hover:text-white"
           >
             Open columns
           </Link>

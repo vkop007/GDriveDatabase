@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, ReactNode } from "react";
+import { useEffect, ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { X, AlertTriangle, Trash2 } from "lucide-react";
 
@@ -29,8 +29,6 @@ export default function ConfirmModal({
   isLoading = false,
   icon,
 }: ConfirmModalProps) {
-  const overlayRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && !isLoading) onClose();
@@ -115,10 +113,10 @@ export default function ConfirmModal({
 
         {/* Main modal card */}
         <div
-          className={`relative overflow-hidden rounded-2xl border ${styles.accentBorder} bg-neutral-900/95 backdrop-blur-xl shadow-2xl`}
+          className={`relative overflow-hidden rounded-2xl border ${styles.accentBorder} bg-white backdrop-blur-xl shadow-2xl shadow-slate-900/20 dark:bg-neutral-900/95 dark:shadow-black/40`}
         >
           {/* Animated gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-neutral-800/50 via-transparent to-neutral-900/80 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-50/80 via-transparent to-slate-100/80 pointer-events-none dark:from-neutral-800/50 dark:to-neutral-900/80" />
 
           {/* Inner glow effects */}
           <div
@@ -128,12 +126,12 @@ export default function ConfirmModal({
           <div
             className={`absolute bottom-0 left-0 w-32 h-32 ${styles.glowSecondary} blur-2xl rounded-full pointer-events-none`}
           />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/[0.02] blur-3xl rounded-full pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-slate-950/[0.02] blur-3xl rounded-full pointer-events-none dark:bg-white/[0.02]" />
 
           {/* Glass inner layer */}
-          <div className="relative bg-gradient-to-b from-white/[0.03] to-transparent">
+          <div className="relative bg-gradient-to-b from-white/40 to-transparent dark:from-white/[0.03]">
             {/* Header */}
-            <div className="relative flex justify-between items-center p-5 sm:p-6 border-b border-white/[0.06]">
+            <div className="relative flex justify-between items-center p-5 sm:p-6 border-b border-slate-200 dark:border-white/[0.06]">
               <div className="flex items-center gap-4">
                 {/* Premium icon container */}
                 <div
@@ -147,7 +145,7 @@ export default function ConfirmModal({
                   )}
                 </div>
                 <div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-white tracking-tight">
+                  <h3 className="text-lg sm:text-xl font-semibold text-slate-950 tracking-tight dark:text-white">
                     {title}
                   </h3>
                 </div>
@@ -155,7 +153,7 @@ export default function ConfirmModal({
               <button
                 onClick={onClose}
                 disabled={isLoading}
-                className="p-2.5 text-neutral-400 hover:text-white hover:bg-white/10 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2.5 text-slate-400 hover:text-slate-950 hover:bg-slate-100 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed dark:text-neutral-400 dark:hover:text-white dark:hover:bg-white/10"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -163,7 +161,7 @@ export default function ConfirmModal({
 
             {/* Content */}
             <div className="relative p-5 sm:p-6">
-              <p className="text-neutral-300 text-sm sm:text-base leading-relaxed">
+              <p className="text-slate-600 text-sm sm:text-base leading-relaxed dark:text-neutral-300">
                 {description}
               </p>
             </div>
@@ -174,7 +172,7 @@ export default function ConfirmModal({
                 type="button"
                 onClick={onClose}
                 disabled={isLoading}
-                className="order-2 sm:order-1 px-5 py-2.5 text-sm font-medium text-neutral-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="order-2 sm:order-1 px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-950 bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed dark:text-neutral-300 dark:hover:text-white dark:bg-white/5 dark:hover:bg-white/10 dark:border-white/10 dark:hover:border-white/20"
               >
                 {cancelText}
               </button>

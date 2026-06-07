@@ -20,10 +20,10 @@ export default function UsageBar({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
-        <span className="text-neutral-300 font-medium">{label}</span>
-        <span className="text-white font-semibold">{formatBytes(value)}</span>
+        <span className="text-slate-600 font-medium dark:text-neutral-300">{label}</span>
+        <span className="text-slate-950 font-semibold dark:text-white">{formatBytes(value)}</span>
       </div>
-      <div className="relative h-2 bg-neutral-800 rounded-full overflow-hidden">
+      <div className="relative h-2 bg-slate-200 rounded-full overflow-hidden dark:bg-neutral-800">
         <div
           className="absolute top-0 left-0 h-full rounded-full transition-all duration-1000 ease-out"
           style={{
@@ -32,7 +32,7 @@ export default function UsageBar({
           }}
         />
       </div>
-      <div className="text-xs text-neutral-500 text-right">
+      <div className="text-xs text-slate-500 text-right dark:text-neutral-500">
         {percentage.toFixed(1)}% of total
       </div>
     </div>

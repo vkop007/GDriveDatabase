@@ -59,18 +59,18 @@ export default function EditFunctionModal({
       />
 
       {/* Modal */}
-      <div className="relative flex max-h-[calc(100vh-2rem)] w-full max-w-2xl flex-col overflow-hidden bg-neutral-900/95 border border-neutral-800/50 rounded-2xl shadow-2xl">
+      <div className="relative flex max-h-[calc(100vh-2rem)] w-full max-w-2xl flex-col overflow-hidden bg-white border border-slate-200 rounded-2xl shadow-2xl shadow-slate-900/20 dark:bg-neutral-900/95 dark:border-neutral-800/50 dark:shadow-black/40">
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 p-4 border-b border-neutral-800/50 sm:p-5">
+        <div className="flex items-center justify-between gap-3 p-4 border-b border-slate-200 sm:p-5 dark:border-neutral-800/50">
           <div className="min-w-0">
-            <h2 className="text-lg font-semibold text-white">Edit Function</h2>
-            <p className="truncate text-sm text-neutral-400">{func.name}</p>
+            <h2 className="text-lg font-semibold text-slate-950 dark:text-white">Edit Function</h2>
+            <p className="truncate text-sm text-slate-500 dark:text-neutral-400">{func.name}</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-neutral-800 transition-colors"
+            className="p-2 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-950 transition-colors dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
           >
-            <X className="w-5 h-5 text-neutral-400" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -78,14 +78,14 @@ export default function EditFunctionModal({
         <div className="flex-1 overflow-y-auto p-4 space-y-4 sm:p-5">
           {/* Code Editor */}
           <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-2">
+            <label className="block text-sm font-medium text-slate-600 mb-2 dark:text-neutral-300">
               Function Code
             </label>
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
               rows={14}
-              className="w-full px-4 py-3 bg-neutral-950/50 border border-neutral-800/50 rounded-xl text-white font-mono text-sm focus:outline-none focus:border-primary/50 transition-colors resize-none"
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-950 font-mono text-sm focus:outline-none focus:border-primary/50 transition-colors resize-none dark:bg-neutral-950/50 dark:border-neutral-800/50 dark:text-white"
             />
           </div>
 
@@ -98,10 +98,10 @@ export default function EditFunctionModal({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col-reverse gap-2 p-4 border-t border-neutral-800/50 sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:p-5">
+        <div className="flex flex-col-reverse gap-2 p-4 border-t border-slate-200 sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:p-5 dark:border-neutral-800/50">
           <button
             onClick={onClose}
-            className="w-full px-4 py-2.5 text-neutral-400 hover:text-white transition-colors sm:w-auto"
+            className="w-full px-4 py-2.5 text-slate-600 hover:text-slate-950 transition-colors sm:w-auto dark:text-neutral-400 dark:hover:text-white"
           >
             Cancel
           </button>

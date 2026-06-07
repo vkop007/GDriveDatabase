@@ -3,8 +3,8 @@ import { createDocument } from "../../actions";
 
 export default function CreateDocument() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-white p-8 flex items-center justify-center">
-      <div className="w-full max-w-2xl bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
+    <div className="min-h-screen bg-slate-50 text-slate-950 p-8 flex items-center justify-center dark:bg-neutral-950 dark:text-white">
+      <div className="w-full max-w-2xl bg-white border border-slate-200 rounded-2xl p-8 backdrop-blur-xl shadow-2xl shadow-slate-900/10 dark:bg-neutral-900/50 dark:border-neutral-800 dark:shadow-black/30">
         <h1 className="text-2xl font-bold mb-6 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
           Create New Document
         </h1>
@@ -13,7 +13,7 @@ export default function CreateDocument() {
           <div className="space-y-2">
             <label
               htmlFor="filename"
-              className="text-sm font-medium text-neutral-300"
+              className="text-sm font-medium text-slate-600 dark:text-neutral-300"
             >
               Filename (e.g., users.json)
             </label>
@@ -23,14 +23,14 @@ export default function CreateDocument() {
               type="text"
               required
               placeholder="data.json"
-              className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-neutral-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
+              className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-sm text-slate-950 focus:ring-2 focus:ring-neutral-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:bg-neutral-950/50 dark:border-neutral-800 dark:text-white dark:placeholder:text-neutral-600"
             />
           </div>
 
           <div className="space-y-2">
             <label
               htmlFor="content"
-              className="text-sm font-medium text-neutral-300"
+              className="text-sm font-medium text-slate-600 dark:text-neutral-300"
             >
               JSON Content
             </label>
@@ -40,7 +40,7 @@ export default function CreateDocument() {
               required
               rows={10}
               placeholder='{"key": "value"}'
-              className="w-full bg-neutral-950/50 border border-neutral-800 rounded-lg px-4 py-3 text-sm font-mono focus:ring-2 focus:ring-neutral-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
+              className="w-full bg-white border border-slate-200 rounded-lg px-4 py-3 text-sm font-mono text-slate-950 focus:ring-2 focus:ring-neutral-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400 dark:bg-neutral-950/50 dark:border-neutral-800 dark:text-white dark:placeholder:text-neutral-600"
               defaultValue="{}"
             />
           </div>
@@ -54,7 +54,7 @@ export default function CreateDocument() {
             </button>
             <Link
               href="/dashboard"
-              className="px-6 py-3 rounded-lg border border-neutral-800 hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-white"
+              className="px-6 py-3 rounded-lg border border-slate-200 hover:bg-slate-100 transition-colors text-slate-600 hover:text-slate-950 dark:border-neutral-800 dark:hover:bg-neutral-800 dark:text-neutral-400 dark:hover:text-white"
             >
               Cancel
             </Link>

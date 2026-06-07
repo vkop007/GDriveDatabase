@@ -156,6 +156,9 @@ export default function InlineEditableCell({
   };
 
   if (isEditing) {
+    const inputClass =
+      "w-full px-3 py-1 rounded border border-primary/50 bg-white text-slate-950 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all duration-200 dark:bg-neutral-800 dark:text-white";
+
     return (
       <div className="flex items-center gap-2 w-full animate-in fade-in zoom-in-95 duration-200">
         <div className="flex-1 relative">
@@ -168,7 +171,7 @@ export default function InlineEditableCell({
               onChange={(e) => setEditValue(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleCancel}
-              className="w-full px-3 py-1 rounded bg-neutral-800 border border-primary/50 text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 appearance-none cursor-pointer transition-all duration-200"
+              className={`${inputClass} appearance-none cursor-pointer`}
               disabled={isSaving}
             >
               <option value="true">true</option>
@@ -186,7 +189,7 @@ export default function InlineEditableCell({
               onKeyDown={handleKeyDown}
               onBlur={handleCancel}
               placeholder={getPlaceholder()}
-              className="w-full px-3 py-1 rounded bg-neutral-800 border border-primary/50 text-white text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 placeholder-neutral-500 transition-all duration-200"
+              className={`${inputClass} placeholder:text-slate-400 dark:placeholder:text-neutral-500`}
               disabled={isSaving}
               step={columnType === "number" ? "any" : undefined}
               min={columnType === "number" ? undefined : undefined}
@@ -220,7 +223,7 @@ export default function InlineEditableCell({
       onClick={handleEditStart}
       className={`${
         disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
-      } hover:text-primary transition-all duration-200 text-white rounded pl-2 pr-6 py-1 relative group/text hover:bg-neutral-700/20 flex items-center active:scale-95 ${maxWidth}`}
+      } hover:text-primary transition-all duration-200 text-slate-800 dark:text-white rounded pl-2 pr-6 py-1 relative group/text hover:bg-slate-100 dark:hover:bg-neutral-700/20 flex items-center active:scale-95 ${maxWidth}`}
       title={displayValue}
       role="button"
       tabIndex={disabled ? -1 : 0}
@@ -235,11 +238,11 @@ export default function InlineEditableCell({
         {displayValue ? (
           highlightText?.(displayValue) ?? displayValue
         ) : (
-          <span className="text-neutral-600">—</span>
+          <span className="text-slate-400 dark:text-neutral-600">—</span>
         )}
       </span>
       <Edit2
-        className="absolute right-1.5 w-3 h-3 text-neutral-500 opacity-0 group-hover/text:opacity-100 transition-all duration-200 shrink-0 group-hover/text:scale-110"
+        className="absolute right-1.5 w-3 h-3 text-slate-400 opacity-0 group-hover/text:opacity-100 transition-all duration-200 shrink-0 group-hover/text:scale-110 dark:text-neutral-500"
         strokeWidth={2.5}
       />
     </div>

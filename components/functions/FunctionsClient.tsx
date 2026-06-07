@@ -161,17 +161,17 @@ export default function FunctionsClient({
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 px-4 pb-4 pt-20 md:p-8 md:pt-8">
+    <div className="min-h-screen bg-slate-50 px-4 pb-4 pt-20 text-slate-950 md:p-8 md:pt-8 dark:bg-neutral-950 dark:text-white">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-950 flex items-center gap-3 dark:text-white">
             <div className="shrink-0 p-2 rounded-xl bg-linear-to-br from-primary-from/20 to-primary-to/20 border border-primary/30">
               <FunctionSquare className="w-6 h-6 text-primary" />
             </div>
             Functions
           </h1>
-          <p className="text-neutral-400 mt-2">
+          <p className="text-slate-500 mt-2 dark:text-neutral-400">
             Create and run Google Apps Script functions
           </p>
         </div>
@@ -187,13 +187,13 @@ export default function FunctionsClient({
       {/* Functions Grid */}
       {functions.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-4">
-          <div className="p-4 rounded-2xl bg-neutral-900/50 border border-neutral-800/50 mb-4">
-            <FunctionSquare className="w-12 h-12 text-neutral-600" />
+          <div className="p-4 rounded-2xl bg-white border border-slate-200 mb-4 shadow-sm shadow-slate-900/5 dark:bg-neutral-900/50 dark:border-neutral-800/50 dark:shadow-none">
+            <FunctionSquare className="w-12 h-12 text-slate-400 dark:text-neutral-600" />
           </div>
-          <h3 className="text-lg font-medium text-white mb-2">
+          <h3 className="text-lg font-medium text-slate-950 mb-2 dark:text-white">
             No functions yet
           </h3>
-          <p className="text-neutral-400 text-center max-w-sm mb-6">
+          <p className="text-slate-500 text-center max-w-sm mb-6 dark:text-neutral-400">
             Create your first function to run custom code on Google&apos;s servers
           </p>
           <button
@@ -210,12 +210,12 @@ export default function FunctionsClient({
             return (
               <div
                 key={func.id}
-                className="group relative p-5 rounded-2xl bg-neutral-900/80 border border-neutral-800/50 hover:border-primary/30 transition-all duration-300 flex flex-col"
+                className="group relative p-5 rounded-2xl bg-white border border-slate-200 shadow-sm shadow-slate-900/5 hover:border-primary/30 transition-all duration-300 flex flex-col dark:bg-neutral-900/80 dark:border-neutral-800/50 dark:shadow-none"
               >
                 {/* Status Badge */}
-                <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neutral-800/80 border border-neutral-700/50">
+                <div className="absolute top-4 right-4 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 border border-slate-200 dark:bg-neutral-800/80 dark:border-neutral-700/50">
                   {getStatusIcon(func.status)}
-                  <span className="text-xs font-medium text-neutral-300">
+                  <span className="text-xs font-medium text-slate-600 dark:text-neutral-300">
                     {getStatusLabel(func.status)}
                   </span>
                 </div>
@@ -225,13 +225,13 @@ export default function FunctionsClient({
                   <div className="p-2 rounded-lg bg-linear-to-br from-primary-from/10 to-primary-to/10 border border-primary/20">
                     <FunctionSquare className="w-5 h-5 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold text-white truncate pr-16">
+                  <h3 className="text-lg font-semibold text-slate-950 truncate pr-16 dark:text-white">
                     {func.name}
                   </h3>
                 </div>
 
                 {/* Function Info - flex-1 to push actions to bottom */}
-                <div className="flex-1 mb-4 space-y-2 text-sm text-neutral-500">
+                <div className="flex-1 mb-4 space-y-2 text-sm text-slate-500 dark:text-neutral-500">
                   <div>
                     Created:{" "}
                     {new Date(func.createdAt).toLocaleDateString("en-IN", {
@@ -301,20 +301,20 @@ export default function FunctionsClient({
                   </button>
                   <button
                     onClick={() => setViewingLogs(func)}
-                    className="p-2 rounded-lg bg-neutral-800/50 border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-600 transition-all"
+                    className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-950 hover:border-slate-300 transition-all dark:bg-neutral-800/50 dark:border-neutral-700/50 dark:text-neutral-400 dark:hover:text-white dark:hover:border-neutral-600"
                     title="View Logs"
                   >
                     <FileText className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setEditingFunction(func)}
-                    className="p-2 rounded-lg bg-neutral-800/50 border border-neutral-700/50 text-neutral-400 hover:text-white hover:border-neutral-600 transition-all"
+                    className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-950 hover:border-slate-300 transition-all dark:bg-neutral-800/50 dark:border-neutral-700/50 dark:text-neutral-400 dark:hover:text-white dark:hover:border-neutral-600"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => setDeletingFunction(func)}
-                    className="p-2 rounded-lg bg-neutral-800/50 border border-neutral-700/50 text-neutral-400 hover:text-red-400 hover:border-red-500/50 transition-all"
+                    className="p-2 rounded-lg bg-slate-100 border border-slate-200 text-slate-500 hover:text-red-500 hover:border-red-500/50 transition-all dark:bg-neutral-800/50 dark:border-neutral-700/50 dark:text-neutral-400 dark:hover:text-red-400"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>

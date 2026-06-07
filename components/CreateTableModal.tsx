@@ -64,7 +64,7 @@ export default function CreateTableModal({ parentId }: CreateTableModalProps) {
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-neutral-400 mb-2"
+              className="block text-sm font-medium text-slate-600 mb-2 dark:text-neutral-400"
             >
               Table Name
             </label>
