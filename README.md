@@ -10,14 +10,15 @@
 
 <p align="center">
   <a href="#-features">Features</a> •
-  <a href="#-quick-start">Quick Start</a> •
-  <a href="#-data-types">Data Types</a> •
-  <a href="#-documentation">Docs</a>
+  <a href="#setup">Setup</a> •
+  <a href="#sdk-usage">SDK Usage</a> •
+  <a href="#available-column-types">Data Types</a> •
+  <a href="#api-reference">API Reference</a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" />
-  <img src="https://img.shields.io/badge/node-%3E%3D18-green.svg" alt="Node" />
+  <img src="https://img.shields.io/badge/node-%3E%3D20-green.svg" alt="Node" />
   <img src="https://img.shields.io/badge/TypeScript-Ready-blue.svg" alt="TypeScript" />
 </p>
 
@@ -34,30 +35,176 @@ A modern NoSQL database solution powered by Google Drive. Store, query, and mana
 - **Storage Bucket** - Upload files linked to your records
 - **Functions** - Server-side code with Google Apps Script
 
-## Installation
+## Setup
+
+This repository is the hosted dashboard/API app. It uses:
+
+- Next.js for the dashboard and API routes.
+- Email/password login for app accounts.
+- Turso/libSQL for users and encrypted Google Drive OAuth credentials.
+- Google Drive as the actual document/file storage for each connected user.
+- User-owned Google OAuth credentials pasted from the dashboard settings page.
+
+### 1. Prerequisites
+
+- Node.js 20+ recommended for Next.js 16.
+- npm or Bun.
+- A Turso account/database.
+- A Google Cloud project for Drive OAuth.
+
+### 2. Install Dependencies
+
+```bash
+npm install
+
+# or
+bun install
+```
+
+### 3. Create Environment File
+
+Copy the example file:
+
+```bash
+cp .env.example .env
+```
+
+Required variables:
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_BASE_URL` | Yes | Public app URL used for OAuth redirects. Use `http://localhost:3000` locally. |
+| `TURSO_DATABASE_URL` | Yes | Turso/libSQL database URL. |
+| `TURSO_AUTH_TOKEN` | Yes | Turso database auth token. |
+| `ENCRYPTION_KEY` | Yes | Encrypts stored Drive credentials and can sign app sessions. Keep stable. |
+| `AUTH_SECRET` | Optional | Separate session signing secret. If omitted, `ENCRYPTION_KEY` is used. |
+
+Generate strong secrets:
+
+```bash
+openssl rand -base64 32
+```
+
+Do not commit `.env`. If `ENCRYPTION_KEY` changes later, previously stored Drive credentials cannot be decrypted.
+
+### 4. Set Up Turso
+
+Create a Turso database from the Turso dashboard or CLI.
+
+CLI example:
+
+```bash
+turso db create gdrive-database
+turso db show gdrive-database --url
+turso db tokens create gdrive-database
+```
+
+Put the returned URL and token into `.env`:
+
+```bash
+TURSO_DATABASE_URL=libsql://your-database.turso.io
+TURSO_AUTH_TOKEN=your-token
+```
+
+No manual migration command is needed. The app creates/updates these tables automatically on first use:
+
+- `users`
+- `drive_oauth_states`
+- `drive_connections`
+
+### 5. Set Up Google Drive OAuth
+
+Google credentials are not global app login credentials. Each app user connects their own Google Drive from `Dashboard -> Settings -> Connect Drive`.
+
+Create the OAuth client:
+
+1. Open [Google Cloud Console](https://console.cloud.google.com/).
+2. Create or select a project.
+3. Enable **Google Drive API**.
+4. Enable **Google Apps Script API** if you will use Functions/Apps Script features.
+5. Configure the OAuth consent screen.
+6. While in testing mode, add your Google account under test users.
+7. Go to **APIs & Services -> Credentials -> Create Credentials -> OAuth client ID**.
+8. Choose **Web application**.
+9. Add authorized redirect URIs:
+
+```text
+http://localhost:3000/oauth2callback
+https://your-production-domain.com/oauth2callback
+```
+
+10. Download the OAuth client JSON.
+11. Start the app, sign in with email/password, open Settings, click **Connect Drive**, paste the JSON, and authorize Google.
+
+The pasted JSON must contain:
+
+- `client_id`
+- `client_secret`
+- `project_id`
+
+The app encrypts the client secret and OAuth tokens in Turso.
+
+### 6. Run Locally
+
+```bash
+npm run dev
+
+# or
+bun run dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+Create an account with email/password, then connect Google Drive in Settings before creating databases, tables, bucket files, or functions.
+
+To use the SDK or external API routes, open **Dashboard -> Settings -> API Access** and generate an API key.
+
+### 7. Production Deployment
+
+For Vercel:
+
+1. Import the repository into Vercel.
+2. Add these environment variables to the Vercel project:
+
+```bash
+NEXT_PUBLIC_BASE_URL=https://your-app.vercel.app
+TURSO_DATABASE_URL=libsql://your-database.turso.io
+TURSO_AUTH_TOKEN=your-turso-auth-token
+ENCRYPTION_KEY=your-long-stable-secret
+AUTH_SECRET=your-long-stable-session-secret
+```
+
+3. Add the production redirect URI to the Google OAuth client:
+
+```text
+https://your-app.vercel.app/oauth2callback
+```
+
+4. Redeploy after changing environment variables or OAuth redirect URLs.
+
+### Troubleshooting
+
+- **Email login disabled:** check `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, and `ENCRYPTION_KEY`.
+- **Google redirect mismatch:** make sure `NEXT_PUBLIC_BASE_URL` exactly matches the domain in Google Cloud and the redirect URI ends with `/oauth2callback`.
+- **Drive credentials cannot decrypt:** `ENCRYPTION_KEY` changed after credentials were saved. Reconnect Drive or restore the old key.
+- **OAuth app still in testing:** add the Google account as a test user in the OAuth consent screen.
+- **Port already in use:** stop the old Next dev server or run on another port with `PORT=3001 npm run dev`.
+- **Wondering about `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`:** they are not needed for the default email/password login flow. Google Drive credentials are supplied by each user inside Settings.
+
+## SDK Usage
+
+Install the client package in an app that will call this hosted dashboard/API:
 
 ```bash
 npm install gdatabase
+
 # or
 bun add gdatabase
 ```
-
-## Dashboard Google Login
-
-The dashboard uses the app's Google OAuth client only for signing users into
-the product. Create a Google OAuth web client, add
-`http://localhost:3000/api/auth/callback/google` as an authorized redirect URI for
-local development, then copy `.env.example` to `.env.local` and fill in:
-
-```bash
-GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-google-oauth-client-secret
-```
-
-After sign-in, users connect their own Google Drive from inside the dashboard by
-pasting their Google Cloud OAuth credentials JSON.
-
-## Usage
 
 ### Initialize
 
@@ -65,8 +212,8 @@ pasting their Google Cloud OAuth credentials JSON.
 import { GDatabase } from "gdatabase";
 
 const db = new GDatabase(
-  "YOUR_API_KEY",
-  "http://localhost:3000" // Your App URL
+  "YOUR_API_KEY", // Generated from Dashboard -> Settings -> API Access
+  "http://localhost:3000" // Your dashboard/API URL
 );
 ```
 
