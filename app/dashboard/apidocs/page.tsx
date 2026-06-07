@@ -6,7 +6,7 @@ export default function ApiDocsPage() {
   return (
     <div className="max-w-full mx-auto p-8 space-y-8 text-slate-950 dark:text-neutral-200">
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
         <div className="relative space-y-4">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-xl border border-blue-500/20 bg-linear-to-br from-blue-500/15 to-purple-500/10">
@@ -49,7 +49,7 @@ export default function ApiDocsPage() {
       </div>
 
       {/* Info Box */}
-      <div className="flex items-start gap-4 rounded-xl border border-emerald-500/20 bg-emerald-50 p-5 dark:bg-linear-to-r dark:from-green-500/10 dark:to-emerald-500/10">
+      <div className="flex items-start gap-4 rounded-xl border border-emerald-500/20 bg-emerald-50 p-5 dark:border-emerald-500/25 dark:bg-emerald-950/20 dark:bg-linear-to-r dark:from-green-500/10 dark:to-emerald-500/10">
         <div className="p-2 rounded-lg bg-green-500/20">
           <Database className="h-5 w-5 text-green-600 dark:text-green-400" />
         </div>

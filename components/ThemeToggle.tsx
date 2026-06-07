@@ -12,6 +12,7 @@ export default function ThemeToggle({ collapsed = false }: ThemeToggleProps) {
 
   if (collapsed) {
     const nextTheme = theme === "dark" ? "light" : "dark";
+    const isDark = theme === "dark";
 
     return (
       <button
@@ -21,15 +22,15 @@ export default function ThemeToggle({ collapsed = false }: ThemeToggleProps) {
         title={`Switch to ${nextTheme} theme`}
         className="flex h-10 min-w-[4.5rem] items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold capitalize text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary dark:border-neutral-800/80 dark:bg-neutral-950/90 dark:text-neutral-300 dark:hover:bg-neutral-900"
       >
-        {theme === "dark" ? (
-          <>
-            <Sun className="h-4 w-4" />
-            Light
-          </>
-        ) : (
+        {isDark ? (
           <>
             <Moon className="h-4 w-4" />
             Dark
+          </>
+        ) : (
+          <>
+            <Sun className="h-4 w-4" />
+            Light
           </>
         )}
       </button>

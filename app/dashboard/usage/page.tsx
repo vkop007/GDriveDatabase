@@ -69,7 +69,7 @@ export default async function UsagePage() {
   return (
     <div className="space-y-8 max-w-full mx-auto py-8 px-4">
       {/* Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-primary/10 border border-slate-200 p-6 shadow-sm shadow-slate-900/5 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:border-neutral-800 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-primary/10 border border-slate-200 p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
         {/* Glow effect */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
@@ -119,7 +119,7 @@ export default async function UsagePage() {
       </div>
 
       {/* Main Chart Card */}
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800/50 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-950/80 dark:shadow-none">
         {/* Glow effects */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
@@ -146,7 +146,7 @@ export default async function UsagePage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Storage */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-primary/30 transition-all duration-500 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-primary/5 dark:shadow-none">
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-primary/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-primary/5 dark:shadow-none">
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 blur-2xl rounded-full pointer-events-none group-hover:bg-primary/20 transition-colors" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
@@ -191,7 +191,7 @@ export default async function UsagePage() {
         </div>
 
         {/* GDriveDB Usage */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-pink-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-pink-950/30 dark:shadow-none">
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-pink-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-pink-950/30 dark:shadow-none">
           <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-pink-500/20 transition-colors" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
@@ -238,7 +238,7 @@ export default async function UsagePage() {
         </div>
 
         {/* Active Files */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-blue-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-blue-950/30 dark:shadow-none">
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-blue-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-blue-950/30 dark:shadow-none">
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-blue-500/20 transition-colors" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
@@ -283,7 +283,7 @@ export default async function UsagePage() {
         </div>
 
         {/* Trash */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-red-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-red-950/30 dark:shadow-none">
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-red-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-red-950/30 dark:shadow-none">
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-red-500/20 transition-colors" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
@@ -329,7 +329,7 @@ export default async function UsagePage() {
       </div>
 
       {/* App Usage Breakdown */}
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-primary/5 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-primary/5 dark:shadow-none">
         {/* Glow effects */}
         <div className="absolute bottom-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
 
