@@ -293,7 +293,7 @@ export default function LoginClient({
 
       <section
         id="platform"
-        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(253,242,248,0.72)_52%,rgba(236,253,245,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,8,13,0.98)_0%,rgba(18,12,22,0.82)_52%,rgba(7,17,15,0.74)_100%)]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(253,242,248,0.72)_52%,rgba(236,253,245,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
@@ -333,7 +333,7 @@ export default function LoginClient({
 
       <section
         id="workflow"
-        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(240,249,255,0.76)_50%,rgba(255,247,237,0.66)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(9,11,18,0.98)_0%,rgba(8,18,24,0.82)_50%,rgba(22,14,10,0.76)_100%)]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(240,249,255,0.76)_50%,rgba(255,247,237,0.66)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[#080a10]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
@@ -357,7 +357,7 @@ export default function LoginClient({
             {workflowSteps.map((step, index) => (
               <div
                 key={step.title}
-                className="relative rounded-lg border border-slate-200 bg-slate-50 p-6 shadow-sm shadow-slate-200/70 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none"
+                className="relative rounded-lg border border-slate-200 bg-slate-50 p-6 shadow-sm shadow-slate-200/70 dark:border-white/10 dark:bg-[#11131a] dark:shadow-none"
               >
                 <div className="mb-8 flex items-center justify-between">
                   <div
@@ -381,7 +381,7 @@ export default function LoginClient({
 
       <section
         id="features"
-        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(238,242,255,0.72)_48%,rgba(253,242,248,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[linear-gradient(135deg,rgba(7,8,13,0.98)_0%,rgba(13,16,32,0.84)_48%,rgba(18,12,22,0.76)_100%)]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(238,242,255,0.72)_48%,rgba(253,242,248,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
@@ -404,10 +404,8 @@ export default function LoginClient({
             {featureRows.map((feature, index) => (
               <article
                 key={feature.title}
-                className={`rounded-lg border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/70 transition hover:-translate-y-0.5 hover:border-slate-300 dark:border-white/10 dark:bg-white/[0.035] dark:shadow-none dark:hover:border-white/20 ${
-                  index === 0
-                    ? "border-emerald-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.98)_0%,rgba(236,253,245,0.82)_100%)] dark:border-emerald-400/20 dark:bg-emerald-400/10"
-                    : ""
+                className={`rounded-lg border border-slate-200 bg-white p-6 shadow-sm shadow-slate-200/70 transition hover:-translate-y-0.5 hover:border-slate-300 dark:border-white/10 dark:bg-[#11131a] dark:shadow-none dark:hover:border-white/20 ${
+                  index === 0 ? "border-emerald-200 bg-emerald-50" : ""
                 }`}
               >
                 <div className="flex items-start gap-4">
@@ -422,13 +420,7 @@ export default function LoginClient({
                   </div>
                   <div>
                     <h3 className="text-xl font-semibold">{feature.title}</h3>
-                    <p
-                      className={`mt-3 text-sm leading-6 ${
-                        index === 0
-                          ? "text-slate-600 dark:text-white/54"
-                          : "text-slate-600 dark:text-white/54"
-                      }`}
-                    >
+                    <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-white/54">
                       {feature.description}
                     </p>
                   </div>
