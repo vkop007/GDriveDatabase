@@ -18,10 +18,13 @@ type SegmentRenderData = StorageChartProps["segments"][number] & {
 
 // Utility function for formatting bytes
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return "0 B";
+  if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
   const k = 1024;
   const sizes = ["B", "KB", "MB", "GB", "TB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const i = Math.min(
+    sizes.length - 1,
+    Math.floor(Math.log(bytes) / Math.log(k))
+  );
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
 }
 
@@ -35,12 +38,17 @@ export default function StorageChart({
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const center = size / 2;
+  const safeTotal = Number.isFinite(total) && total > 0 ? total : 0;
+  const safeUsed = Number.isFinite(used) && used > 0 ? used : 0;
 
   const { segmentData } = segments.reduce<{
     accumulatedOffset: number;
     segmentData: SegmentRenderData[];
   }>((acc, seg) => {
-    const percentage = total > 0 ? (seg.value / total) * 100 : 0;
+    const safeValue =
+      Number.isFinite(seg.value) && seg.value > 0 ? seg.value : 0;
+    const percentage =
+      safeTotal > 0 ? Math.min((safeValue / safeTotal) * 100, 100) : 0;
     const strokeDasharray = (percentage / 100) * circumference;
     const strokeDashoffset = -acc.accumulatedOffset;
 
@@ -50,6 +58,7 @@ export default function StorageChart({
         ...acc.segmentData,
         {
           ...seg,
+          value: safeValue,
           percentage,
           strokeDasharray,
           strokeDashoffset,
@@ -58,8 +67,9 @@ export default function StorageChart({
     };
   }, { accumulatedOffset: 0, segmentData: [] });
 
-  const usedPercentage = total > 0 ? (used / total) * 100 : 0;
-  const freeSpace = total - used;
+  const usedPercentage =
+    safeTotal > 0 ? Math.min((safeUsed / safeTotal) * 100, 100) : 0;
+  const freeSpace = Math.max(0, safeTotal - safeUsed);
 
   return (
     <div className="flex flex-col lg:flex-row items-center gap-8 p-8">

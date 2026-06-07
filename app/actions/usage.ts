@@ -4,6 +4,24 @@ import { operations, initDriveService } from "gdrivekit";
 import { getAuth } from "../../lib/gdrive/auth";
 import { listDatabases } from "./database";
 import { listBucketFiles } from "./bucket";
+import type { DriveFile } from "../../types";
+
+function toBytes(value: unknown) {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : 0;
+}
+
+function toRecord(value: unknown): Record<string, unknown> {
+  return typeof value === "object" && value !== null
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function getQuotaFields(quota: unknown) {
+  const quotaRecord = toRecord(quota);
+  const dataRecord = toRecord(quotaRecord.data ?? quotaRecord);
+  return toRecord(dataRecord.storageQuota ?? dataRecord.quota ?? dataRecord);
+}
 
 export async function getStorageUsage() {
   const auth = await getAuth();
@@ -20,7 +38,6 @@ export async function getStorageUsage() {
 
   try {
     // 1. Get Total Quota
-    // @ts-ignore
     const quota = await operations.utilityOperations.getStorageQuota();
 
     // 2. Calculate App Usage
@@ -36,7 +53,7 @@ export async function getStorageUsage() {
     // Bucket size
     if (bucketFiles && Array.isArray(bucketFiles)) {
       bucketUsageBytes = bucketFiles.reduce(
-        (acc: number, file: any) => acc + parseInt(file.size || "0"),
+        (acc, file) => acc + toBytes(file.size),
         0
       );
       appUsageBytes += bucketUsageBytes;
@@ -53,14 +70,14 @@ export async function getStorageUsage() {
 
     if (dbs && Array.isArray(dbs)) {
       const dbDetails = await Promise.all(
-        dbs.map(async (db: any) => {
+        dbs.map(async (db) => {
           try {
             const res = await operations.listOperations.listFilesInFolder(
               db.id
             );
-            const files = res.data?.files || [];
+            const files = ((res.data?.files || []) as DriveFile[]);
             const size = files.reduce(
-              (acc: number, f: any) => acc + parseInt(f.size || "0"),
+              (acc, file) => acc + toBytes(file.size),
               0
             );
             return {
@@ -80,12 +97,16 @@ export async function getStorageUsage() {
       appUsageBytes += dbDetails.reduce((acc, db) => acc + db.size, 0);
     }
 
-    const quotaData = (quota as any).data || quota;
+    const storageQuota = getQuotaFields(quota);
 
     return {
       success: true,
       data: {
-        ...quotaData,
+        ...storageQuota,
+        limit: toBytes(storageQuota.limit),
+        usage: toBytes(storageQuota.usage),
+        usageInDrive: toBytes(storageQuota.usageInDrive),
+        usageInDriveTrash: toBytes(storageQuota.usageInDriveTrash),
         appUsage: appUsageBytes,
         bucketUsage: bucketUsageBytes,
         bucketFileCount: bucketFiles?.length || 0,

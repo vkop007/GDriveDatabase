@@ -28,21 +28,42 @@ export default async function UsagePage() {
     );
   }
 
-  const total = Number(data.limit);
-  const used = Number(data.usage);
-  const usedInDrive = Number(data.usageInDrive);
-  const usedInTrash = Number(data.usageInDriveTrash);
-  const appUsage = Number(data.appUsage || 0);
+  const toBytes = (value: unknown) => {
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) && numberValue > 0 ? numberValue : 0;
+  };
+
+  const total = toBytes(data.limit);
+  const used = toBytes(data.usage);
+  const usedInDrive = toBytes(data.usageInDrive);
+  const usedInTrash = toBytes(data.usageInDriveTrash);
+  const appUsage = toBytes(data.appUsage);
+  const bucketUsage = toBytes(data.bucketUsage);
   const otherUsage = Math.max(0, used - appUsage - usedInTrash);
-  const databaseUsage = (data.databaseUsage || []) as DatabaseUsageItem[];
+  const databaseUsage = ((data.databaseUsage || []) as DatabaseUsageItem[]).map(
+    (db) => ({
+      ...db,
+      size: toBytes(db.size),
+      tableCount: Number.isFinite(Number(db.tableCount))
+        ? Number(db.tableCount)
+        : 0,
+    })
+  );
 
   const percentage = total > 0 ? (used / total) * 100 : 0;
+  const percentageOfTotal = (value: number) =>
+    total > 0 ? Math.min((value / total) * 100, 100) : 0;
+  const bucketAppPercentage =
+    appUsage > 0 ? Math.min((bucketUsage / appUsage) * 100, 100) : 0;
 
   const formatBytes = (bytes: number) => {
-    if (bytes === 0) return "0 B";
+    if (!Number.isFinite(bytes) || bytes <= 0) return "0 B";
     const k = 1024;
     const sizes = ["B", "KB", "MB", "GB", "TB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const i = Math.min(
+      sizes.length - 1,
+      Math.floor(Math.log(bytes) / Math.log(k))
+    );
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
@@ -216,12 +237,12 @@ export default async function UsagePage() {
                     stroke="rgb(236,72,153)"
                     strokeWidth="3"
                     strokeLinecap="round"
-                    strokeDasharray={`${(appUsage / total) * 100.5} 100.5`}
+                    strokeDasharray={`${percentageOfTotal(appUsage) * 1.005} 100.5`}
                     className="transition-all duration-1000"
                   />
                 </svg>
                 <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-pink-400">
-                  {total > 0 ? ((appUsage / total) * 100).toFixed(0) : 0}%
+                  {percentageOfTotal(appUsage).toFixed(0)}%
                 </span>
               </div>
             </div>
@@ -232,7 +253,7 @@ export default async function UsagePage() {
               {formatBytes(appUsage)}
             </p>
             <p className="text-xs text-pink-400/70 mt-2">
-              {total > 0 ? ((appUsage / total) * 100).toFixed(2) : 0}% of quota
+              {percentageOfTotal(appUsage).toFixed(2)}% of quota
             </p>
           </div>
         </div>
@@ -263,12 +284,12 @@ export default async function UsagePage() {
                     stroke="rgb(59,130,246)"
                     strokeWidth="3"
                     strokeLinecap="round"
-                    strokeDasharray={`${(usedInDrive / total) * 100.5} 100.5`}
+                    strokeDasharray={`${percentageOfTotal(usedInDrive) * 1.005} 100.5`}
                     className="transition-all duration-1000"
                   />
                 </svg>
                 <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-blue-400">
-                  {total > 0 ? ((usedInDrive / total) * 100).toFixed(0) : 0}%
+                  {percentageOfTotal(usedInDrive).toFixed(0)}%
                 </span>
               </div>
             </div>
@@ -308,12 +329,12 @@ export default async function UsagePage() {
                     stroke="rgb(239,68,68)"
                     strokeWidth="3"
                     strokeLinecap="round"
-                    strokeDasharray={`${(usedInTrash / total) * 100.5} 100.5`}
+                    strokeDasharray={`${percentageOfTotal(usedInTrash) * 1.005} 100.5`}
                     className="transition-all duration-1000"
                   />
                 </svg>
                 <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-red-400">
-                  {total > 0 ? ((usedInTrash / total) * 100).toFixed(0) : 0}%
+                  {percentageOfTotal(usedInTrash).toFixed(0)}%
                 </span>
               </div>
             </div>
@@ -368,15 +389,10 @@ export default async function UsagePage() {
                 </div>
                 <div className="text-right">
                   <span className="text-xl font-bold text-slate-950 dark:text-white">
-                    {formatBytes(Number(data.bucketUsage) || 0)}
+                    {formatBytes(bucketUsage)}
                   </span>
                   <p className="text-xs text-primary">
-                    {appUsage > 0
-                      ? (
-                          ((Number(data.bucketUsage) || 0) / appUsage) *
-                          100
-                        ).toFixed(1)
-                      : 0}
+                    {bucketAppPercentage.toFixed(1)}
                     % of app
                   </p>
                 </div>
@@ -384,13 +400,7 @@ export default async function UsagePage() {
               <div className="h-2 bg-slate-200 rounded-full overflow-hidden dark:bg-neutral-800">
                 <div
                   className="h-full bg-linear-to-r from-primary to-primary/70 rounded-full transition-all duration-1000 ease-out"
-                  style={{
-                    width: `${
-                      appUsage > 0
-                        ? ((Number(data.bucketUsage) || 0) / appUsage) * 100
-                        : 0
-                    }%`,
-                  }}
+                  style={{ width: `${bucketAppPercentage}%` }}
                 />
               </div>
             </div>
@@ -415,7 +425,9 @@ export default async function UsagePage() {
                     .sort((a, b) => b.size - a.size)
                     .map((db, index) => {
                       const dbPercentage =
-                        appUsage > 0 ? (db.size / appUsage) * 100 : 0;
+                        appUsage > 0
+                          ? Math.min((db.size / appUsage) * 100, 100)
+                          : 0;
                       const colors = [
                         "from-primary to-primary/70",
                         "from-pink-500 to-pink-400",
