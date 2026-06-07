@@ -130,13 +130,13 @@ export default function AddRowForm({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20 animate-in fade-in zoom-in duration-200 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-black/40">
+      <div className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/20 animate-in fade-in zoom-in duration-200 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-black/40">
         {/* Glow effect */}
-        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-3xl rounded-full pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 blur-2xl rounded-full pointer-events-none" />
+        <div className="absolute top-0 right-0 w-48 h-48 bg-primary/10 blur-3xl rounded-full pointer-events-none dark:hidden" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 blur-2xl rounded-full pointer-events-none dark:hidden" />
 
         {/* Header */}
-        <div className="relative flex justify-between items-center p-6 border-b border-slate-200 bg-slate-50/80 dark:border-neutral-800 dark:bg-linear-to-r dark:from-neutral-900 dark:to-neutral-800/50">
+        <div className="relative flex justify-between items-center p-6 border-b border-slate-200 bg-slate-50/80 dark:border-neutral-800 dark:bg-neutral-950">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary/30 to-primary/20 flex items-center justify-center border border-primary/20">
               <Table2 className="w-5 h-5 text-primary" />

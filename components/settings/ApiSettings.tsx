@@ -54,11 +54,11 @@ export default function ApiSettings({ initialApiKey }: ApiSettingsProps) {
   };
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
+    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
       <div className="relative">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/30 to-blue-600/10 flex items-center justify-center border border-blue-500/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-500/25 bg-blue-500/10 dark:bg-neutral-950">
             <Key className="w-5 h-5 text-blue-400" />
           </div>
           <div>
@@ -120,7 +120,7 @@ export default function ApiSettings({ initialApiKey }: ApiSettingsProps) {
                 </div>
                 <button
                   onClick={handleGenerate}
-                  className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white px-6 py-2.5 rounded-xl transition-all text-sm font-medium shadow-lg shadow-primary/25 hover:shadow-primary/40"
+                  className="flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-medium text-white shadow-sm shadow-primary/10 transition-all hover:bg-primary/90 dark:shadow-none"
                 >
                   <Key className="w-4 h-4" />
                   Generate API Key

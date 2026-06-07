@@ -129,7 +129,7 @@ export default function BackupSettings() {
 
   if (checkingStatus) {
     return (
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
         <div className="flex items-center gap-3">
           <Loader2 className="w-5 h-5 text-primary animate-spin" />
           <span className="text-slate-500 dark:text-neutral-400">
@@ -141,11 +141,11 @@ export default function BackupSettings() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:shadow-none">
+    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
       <div className="relative">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/30 to-emerald-600/10 flex items-center justify-center border border-emerald-500/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-500/25 bg-emerald-500/10 dark:bg-neutral-950">
             <DatabaseBackup className="w-5 h-5 text-emerald-400" />
           </div>
           <div>
@@ -239,7 +239,7 @@ export default function BackupSettings() {
                 <button
                   onClick={handleSetupAutoBackup}
                   disabled={loading}
-                  className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-xl transition-all text-sm font-medium shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40"
+                  className="flex items-center gap-2 rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-medium text-white shadow-sm shadow-emerald-500/10 transition-all hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50 dark:shadow-none"
                 >
                   {loading ? (
                     <>

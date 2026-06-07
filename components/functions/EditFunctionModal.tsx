@@ -108,7 +108,7 @@ export default function EditFunctionModal({
           <button
             onClick={handleUpdate}
             disabled={isUpdating}
-            className="flex w-full items-center justify-center gap-2 px-5 py-2.5 bg-linear-to-r from-primary-from to-primary-to text-white font-medium rounded-xl hover:opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed sm:w-auto"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 font-medium text-white transition-all hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {isUpdating ? (
               <>

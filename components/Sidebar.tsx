@@ -138,7 +138,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 ${sidebarWidth} flex flex-col border-r border-slate-200 bg-white/95 text-slate-900 shadow-xl shadow-slate-900/5 backdrop-blur-xl transition-all duration-300 ease-out md:translate-x-0 dark:border-neutral-800/60 dark:bg-linear-to-b dark:from-[rgb(14,14,14)] dark:via-[rgb(10,10,10)] dark:to-[rgb(8,8,8)] dark:text-white dark:shadow-black/40 ${
+        className={`fixed inset-y-0 left-0 z-40 ${sidebarWidth} flex flex-col border-r border-slate-200 bg-white/95 text-slate-900 shadow-xl shadow-slate-900/5 backdrop-blur-xl transition-all duration-300 ease-out md:translate-x-0 dark:border-neutral-800/60 dark:bg-neutral-950 dark:text-white dark:shadow-none ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{
@@ -146,7 +146,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
         }}
       >
         {/* Subtle gradient overlay */}
-        <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent dark:from-primary/2" />
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/5 via-transparent to-transparent dark:hidden" />
 
         {/* Header */}
         <div
@@ -155,7 +155,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
           }`}
         >
           {/* Header glow */}
-          <div className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-linear-to-b from-primary/8 to-transparent dark:from-primary/5" />
+          <div className="pointer-events-none absolute left-0 right-0 top-0 h-24 bg-linear-to-b from-primary/8 to-transparent dark:hidden" />
 
           <div className="relative">
             <Image
@@ -186,7 +186,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard"
-                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10 dark:shadow-lg dark:shadow-primary/10"
+                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-neutral-900 dark:shadow-none"
                 : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
             }`}
             title={isCollapsed ? "Home" : undefined}
@@ -261,7 +261,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
                     <div
                       className={`group flex items-center gap-1 px-2 py-2 rounded-xl text-sm transition-all duration-200 cursor-pointer ${
                         isExactDb
-                          ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10 dark:text-white dark:shadow-lg dark:shadow-primary/10"
+                          ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-neutral-900 dark:text-primary dark:shadow-none"
                           : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
                       }`}
                       onClick={() => handleDatabaseClick(db.id)}
@@ -334,7 +334,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
                                   href={`/dashboard/database/${db.id}/table/${table.id}`}
                                   className={`group flex items-center gap-2 px-3 py-2 rounded-xl text-sm transition-all duration-200 ${
                                     isTableActive
-                                      ? "border border-primary/25 bg-primary/10 text-primary dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10"
+                                      ? "border border-primary/25 bg-primary/10 text-primary dark:bg-neutral-900"
                                       : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
                                   }`}
                                 >
@@ -395,7 +395,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/apidocs"
-                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10 dark:shadow-lg dark:shadow-primary/10"
+                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-neutral-900 dark:shadow-none"
                 : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
             }`}
             title={isCollapsed ? "API Docs" : undefined}
@@ -417,7 +417,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/analyzer"
-                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10 dark:shadow-lg dark:shadow-primary/10"
+                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-neutral-900 dark:shadow-none"
                 : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
             }`}
             title={isCollapsed ? "Analyzer" : undefined}
@@ -439,7 +439,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/functions"
-                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10 dark:shadow-lg dark:shadow-primary/10"
+                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-neutral-900 dark:shadow-none"
                 : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
             }`}
             title={isCollapsed ? "Functions" : undefined}
@@ -461,7 +461,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/playground"
-                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10 dark:shadow-lg dark:shadow-primary/10"
+                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-neutral-900 dark:shadow-none"
                 : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
             }`}
             title={isCollapsed ? "Playground" : undefined}
@@ -494,7 +494,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/bucket"
-                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10 dark:shadow-lg dark:shadow-primary/10"
+                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-neutral-900 dark:shadow-none"
                 : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
             }`}
             title={isCollapsed ? "Bucket" : undefined}
@@ -528,7 +528,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/usage"
-                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10 dark:shadow-lg dark:shadow-primary/10"
+                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-neutral-900 dark:shadow-none"
                 : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
             }`}
             title={isCollapsed ? "Usage" : undefined}
@@ -561,7 +561,7 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
               isCollapsed ? "justify-center" : "gap-3"
             } px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               pathname === "/dashboard/settings"
-                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-linear-to-r dark:from-primary-from/15 dark:to-primary-to/10 dark:shadow-lg dark:shadow-primary/10"
+                ? "border border-primary/25 bg-primary/10 text-primary shadow-sm dark:bg-neutral-900 dark:shadow-none"
                 : "border border-transparent text-slate-600 hover:border-slate-200 hover:bg-slate-100 hover:text-slate-950 dark:text-neutral-400 dark:hover:border-white/5 dark:hover:bg-white/5 dark:hover:text-white"
             }`}
             title={isCollapsed ? "Settings" : undefined}
@@ -610,12 +610,12 @@ export default function Sidebar({ treeData, user, logoutAction }: SidebarProps) 
         >
           <div className="relative flex items-center justify-center">
             {/* Multiple glow layers */}
-            <div className="absolute inset-0 bg-primary rounded-lg blur-xl opacity-0 group-hover:opacity-30 transition-all duration-300" />
-            <div className="absolute inset-1 bg-primary-from rounded-lg blur-md opacity-0 group-hover:opacity-20 transition-all duration-300" />
+            <div className="absolute inset-0 rounded-lg bg-primary opacity-0 blur-xl transition-all duration-300 group-hover:opacity-30 dark:hidden" />
+            <div className="absolute inset-1 rounded-lg bg-primary-from opacity-0 blur-md transition-all duration-300 group-hover:opacity-20 dark:hidden" />
             
             {/* Icon with enhanced effects */}
             <div
-              className={`sidebar-toggle-icon relative text-slate-500 transition-all duration-400 drop-shadow-[0_0_8px_rgba(236,72,153,0)] group-hover:text-primary group-hover:drop-shadow-[0_0_16px_rgba(236,72,153,0.8)] dark:text-neutral-400 ${
+              className={`sidebar-toggle-icon relative text-slate-500 transition-all duration-400 drop-shadow-[0_0_8px_rgba(236,72,153,0)] group-hover:text-primary group-hover:drop-shadow-[0_0_16px_rgba(236,72,153,0.8)] dark:text-neutral-400 dark:group-hover:drop-shadow-none ${
                 !isCollapsed ? "rotate" : ""
               }`}
             >

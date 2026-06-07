@@ -518,7 +518,7 @@ export default function DataTable({
                   </button>
                 ))}
               </div>
-              <div className="border-t border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-500 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-neutral-500">
+              <div className="border-t border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-500 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-500">
                 {Object.values(columnVisibility).filter((v) => v).length} of{" "}
                 {table.schema.length} visible
               </div>
@@ -538,14 +538,14 @@ export default function DataTable({
         </p>
       )}
 
-      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900/90 dark:via-neutral-900 dark:to-neutral-800/60 dark:shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
         {/* Subtle glow effect */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none dark:hidden" />
 
         <div className="overflow-x-auto">
           <table className="min-w-[760px] w-full text-left text-sm">
             <thead className="sticky top-0 z-10">
-              <tr className="border-b border-slate-200 bg-slate-50/95 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/95">
+              <tr className="border-b border-slate-200 bg-slate-50/95 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-950">
                 <th className="w-12 px-4 py-4">
                   <div className="flex items-center justify-center">
                     <input
@@ -603,7 +603,7 @@ export default function DataTable({
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-neutral-800/50">
+            <tbody className="divide-y divide-slate-200 dark:divide-neutral-800/50 dark:bg-neutral-950">
               {processedDocuments.length === 0 ? (
                 <tr>
                   <td
@@ -611,7 +611,7 @@ export default function DataTable({
                     className="text-center py-16"
                   >
                     <div className="flex flex-col items-center gap-4 py-4">
-                      <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-slate-100 to-white flex items-center justify-center border border-slate-200 dark:from-neutral-800/80 dark:to-neutral-800/30 dark:border-neutral-700/50">
+                      <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-slate-100 to-white flex items-center justify-center border border-slate-200 dark:bg-neutral-900 dark:bg-none dark:border-neutral-700/50">
                         {searchQuery ? (
                           <Search className="w-10 h-10 text-slate-400 dark:text-neutral-500" />
                         ) : (
@@ -640,7 +640,7 @@ export default function DataTable({
                       className={`group transition-colors ${
                         isSelected
                           ? "bg-primary/10 hover:bg-primary/15"
-                          : "hover:bg-slate-50 dark:hover:bg-neutral-800/30"
+                          : "hover:bg-slate-50 dark:hover:bg-neutral-900"
                       }`}
                     >
                       <td className="px-4 py-4">
@@ -842,7 +842,7 @@ export default function DataTable({
             onPageSizeChange={onPageSizeChange}
           />
         ) : processedDocuments.length > 0 ? (
-          <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 dark:border-neutral-800/50 dark:bg-neutral-900/50">
+          <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 dark:border-neutral-800/50 dark:bg-neutral-950">
             <p className="text-xs text-slate-500 dark:text-neutral-500">
               Showing{" "}
               <span className="text-slate-700 font-medium dark:text-neutral-400">

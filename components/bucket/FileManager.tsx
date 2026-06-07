@@ -302,18 +302,18 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
       )}
 
       {/* Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-primary/10 border border-slate-200 p-4 mb-8 shadow-sm shadow-slate-900/5 sm:p-6 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:border-neutral-800 dark:shadow-none">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-4 mb-8 shadow-sm shadow-slate-900/5 sm:p-6 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
         {/* Glow effect */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none dark:hidden" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl pointer-events-none dark:hidden" />
 
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 shrink-0 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/20">
-                <Upload className="w-5 h-5 text-white" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-primary shadow-sm shadow-primary/10 dark:bg-neutral-950 dark:shadow-none">
+                <Upload className="w-5 h-5 text-white dark:text-primary" />
               </div>
-              <h2 className="text-xl font-bold bg-linear-to-r from-slate-950 to-slate-500 bg-clip-text text-transparent sm:text-2xl dark:from-white dark:to-neutral-400">
+              <h2 className="text-xl font-bold text-slate-950 sm:text-2xl dark:text-white">
                 Storage Bucket
               </h2>
             </div>
@@ -333,7 +333,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="group flex w-full items-center justify-center gap-2 px-5 py-2.5 bg-linear-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white rounded-xl font-medium transition-all disabled:opacity-50 shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] md:w-auto"
+              className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-2.5 font-medium text-white shadow-sm shadow-primary/10 transition-all hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 md:w-auto dark:shadow-none"
             >
               {isUploading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -377,11 +377,11 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
           {files.map((file) => (
             <div
               key={file.id}
-              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:to-neutral-950/80 dark:shadow-none"
+              className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none dark:hover:shadow-none"
             >
               {/* Preview */}
               <div
-                className={`aspect-square relative bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4 overflow-hidden dark:from-neutral-950/80 dark:to-neutral-900/50 ${
+                className={`aspect-square relative bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4 overflow-hidden dark:bg-none dark:bg-neutral-900 ${
                   isImage(file.mimeType) ? "cursor-pointer" : ""
                 }`}
                 onClick={() => isImage(file.mimeType) && setPreviewFile(file)}
@@ -410,7 +410,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
               </div>
 
               {/* Info */}
-              <div className="bg-white p-4 dark:bg-neutral-900 dark:bg-linear-to-t dark:from-neutral-900 dark:to-neutral-900/80">
+              <div className="bg-white p-4 dark:bg-neutral-950">
                 {renamingId === file.id ? (
                   <input
                     type="text"
@@ -434,7 +434,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
                 <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => copyLink(file.id)}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-linear-to-r from-primary/20 to-primary/10 hover:from-primary hover:to-primary/80 text-xs text-primary hover:text-white rounded-lg font-medium transition-all border border-primary/20 hover:border-primary shadow-sm hover:shadow-primary/25"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-lg border border-primary/20 bg-primary/10 px-3 py-2 text-xs font-medium text-primary shadow-sm transition-all hover:border-primary hover:bg-primary hover:text-white hover:shadow-primary/10 dark:shadow-none"
                   >
                     <Copy className="w-3.5 h-3.5" />
                     <span className="text-[11px]">Copy</span>
@@ -456,7 +456,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
           ))}
 
           {files.length === 0 && (
-            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white py-16 text-slate-500 dark:border-neutral-700/60 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900/95 dark:to-neutral-950 dark:text-neutral-300">
+            <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white py-16 text-slate-500 dark:border-neutral-700/60 dark:bg-neutral-950 dark:text-neutral-300">
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 dark:border dark:border-neutral-700/60 dark:bg-neutral-800/80">
                 <Upload className="w-8 h-8 text-slate-400 dark:text-neutral-500" />
               </div>
@@ -474,7 +474,7 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
           )}
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-900 dark:bg-linear-to-br dark:from-neutral-900 dark:to-neutral-950/80 dark:shadow-none">
+        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
           <table className="w-full min-w-[640px] text-left">
             <thead>
               <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50 dark:border-neutral-800 dark:text-neutral-400 dark:bg-neutral-900/80">
@@ -487,11 +487,11 @@ export default function FileManager({ initialFiles }: FileManagerProps) {
               {files.map((file) => (
                 <tr
                   key={file.id}
-                  className="group hover:bg-primary/5 transition-all duration-200"
+                  className="group transition-all duration-200 hover:bg-primary/5 dark:hover:bg-neutral-900"
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-linear-to-br from-slate-100 to-slate-50 flex items-center justify-center shrink-0 border border-slate-200 group-hover:border-primary/20 transition-colors overflow-hidden dark:from-neutral-800 dark:to-neutral-800/50 dark:border-neutral-700/50">
+                      <div className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200 group-hover:border-primary/20 transition-colors overflow-hidden dark:bg-neutral-900 dark:border-neutral-700/50">
                         {isImage(file.mimeType) ? (
                           <div className="relative w-full h-full">
                             <Image

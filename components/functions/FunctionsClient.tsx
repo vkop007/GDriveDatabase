@@ -177,7 +177,7 @@ export default function FunctionsClient({
         </div>
         <button
           onClick={() => setIsCreateOpen(true)}
-          className="flex w-full items-center justify-center gap-2 px-4 py-2.5 bg-linear-to-r from-primary-from to-primary-to text-white font-medium rounded-xl hover:opacity-90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30 sm:w-auto"
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-medium text-white shadow-sm shadow-primary/10 transition-all hover:bg-primary/90 sm:w-auto dark:shadow-none"
         >
           <Plus className="w-4 h-4" />
           Create Function
@@ -198,7 +198,7 @@ export default function FunctionsClient({
           </p>
           <button
             onClick={() => setIsCreateOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-linear-to-r from-primary-from to-primary-to text-white font-medium rounded-xl hover:opacity-90 transition-all"
+            className="flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 font-medium text-white transition-all hover:bg-primary/90"
           >
             <Plus className="w-4 h-4" />
             Create Function
