@@ -9,12 +9,19 @@ import {
 } from "lucide-react";
 import StorageChart from "../../../components/StorageChart";
 
+type DatabaseUsageItem = {
+  id: string;
+  name: string;
+  size: number;
+  tableCount: number;
+};
+
 export default async function UsagePage() {
   const { success, data } = await getStorageUsage();
 
   if (!success || !data) {
     return (
-      <div className="flex flex-col items-center justify-center h-[50vh] text-neutral-400">
+      <div className="flex flex-col items-center justify-center h-[50vh] text-slate-500 dark:text-neutral-400">
         <AlertCircle className="w-10 h-10 mb-4 text-red-400" />
         <p>Failed to load usage data.</p>
       </div>
@@ -27,9 +34,9 @@ export default async function UsagePage() {
   const usedInTrash = Number(data.usageInDriveTrash);
   const appUsage = Number(data.appUsage || 0);
   const otherUsage = Math.max(0, used - appUsage - usedInTrash);
+  const databaseUsage = (data.databaseUsage || []) as DatabaseUsageItem[];
 
   const percentage = total > 0 ? (used / total) * 100 : 0;
-  const freeSpace = total - used;
 
   const formatBytes = (bytes: number) => {
     if (bytes === 0) return "0 B";
@@ -62,7 +69,7 @@ export default async function UsagePage() {
   return (
     <div className="space-y-8 max-w-full mx-auto py-8 px-4">
       {/* Header Section */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-neutral-900 via-neutral-900 to-neutral-800 border border-neutral-800 p-6">
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-primary/10 border border-slate-200 p-6 shadow-sm shadow-slate-900/5 dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800 dark:border-neutral-800 dark:shadow-none">
         {/* Glow effect */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl pointer-events-none" />
@@ -73,10 +80,10 @@ export default async function UsagePage() {
               <HardDrive className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold bg-linear-to-r from-white to-neutral-400 bg-clip-text text-transparent">
+              <h1 className="text-2xl md:text-3xl font-bold bg-linear-to-r from-slate-950 to-slate-500 bg-clip-text text-transparent dark:from-white dark:to-neutral-400">
                 Storage Usage
               </h1>
-              <p className="text-neutral-400 text-sm mt-1">
+              <p className="text-slate-500 text-sm mt-1 dark:text-neutral-400">
                 Google Drive storage breakdown and analysis
               </p>
             </div>
@@ -103,8 +110,8 @@ export default async function UsagePage() {
             <span className={`text-sm font-medium ${getStatusColor()}`}>
               {getStatusText()}
             </span>
-            <span className="text-neutral-500 text-sm">•</span>
-            <span className="text-neutral-400 text-sm font-medium">
+            <span className="text-slate-400 text-sm dark:text-neutral-500">•</span>
+            <span className="text-slate-500 text-sm font-medium dark:text-neutral-400">
               {percentage.toFixed(1)}% used
             </span>
           </div>
@@ -112,20 +119,20 @@ export default async function UsagePage() {
       </div>
 
       {/* Main Chart Card */}
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-neutral-800/50">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-neutral-800/50 dark:shadow-none">
         {/* Glow effects */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 blur-[80px] rounded-full pointer-events-none" />
 
         <div className="relative z-10">
-          <div className="p-6 border-b border-neutral-800">
+          <div className="p-6 border-b border-slate-200 dark:border-neutral-800">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-primary/60 flex items-center justify-center">
                 <Cloud className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h2 className="font-semibold text-white">Storage Overview</h2>
-                <p className="text-sm text-neutral-400">
+                <h2 className="font-semibold text-slate-950 dark:text-white">Storage Overview</h2>
+                <p className="text-sm text-slate-500 dark:text-neutral-400">
                   {formatBytes(used)} of {formatBytes(total)} used
                 </p>
               </div>
@@ -139,7 +146,7 @@ export default async function UsagePage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Storage */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-primary/5 hover:border-primary/30 transition-all duration-500">
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-primary/30 transition-all duration-500 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-primary/5 dark:shadow-none">
           <div className="absolute top-0 right-0 w-24 h-24 bg-primary/10 blur-2xl rounded-full pointer-events-none group-hover:bg-primary/20 transition-colors" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
@@ -173,10 +180,10 @@ export default async function UsagePage() {
                 </span>
               </div>
             </div>
-            <h3 className="text-sm font-medium text-neutral-400 mb-1">
+            <h3 className="text-sm font-medium text-slate-500 mb-1 dark:text-neutral-400">
               Total Quota
             </h3>
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-slate-950 dark:text-white">
               {formatBytes(total)}
             </p>
             <p className="text-xs text-primary/70 mt-2">Google Drive limit</p>
@@ -184,7 +191,7 @@ export default async function UsagePage() {
         </div>
 
         {/* GDriveDB Usage */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-pink-950/30 hover:border-pink-500/30 transition-all duration-500">
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-pink-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-pink-950/30 dark:shadow-none">
           <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-pink-500/20 transition-colors" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
@@ -218,10 +225,10 @@ export default async function UsagePage() {
                 </span>
               </div>
             </div>
-            <h3 className="text-sm font-medium text-neutral-400 mb-1">
+            <h3 className="text-sm font-medium text-slate-500 mb-1 dark:text-neutral-400">
               GDriveDB
             </h3>
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-slate-950 dark:text-white">
               {formatBytes(appUsage)}
             </p>
             <p className="text-xs text-pink-400/70 mt-2">
@@ -231,7 +238,7 @@ export default async function UsagePage() {
         </div>
 
         {/* Active Files */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-blue-950/30 hover:border-blue-500/30 transition-all duration-500">
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-blue-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-blue-950/30 dark:shadow-none">
           <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-blue-500/20 transition-colors" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
@@ -265,10 +272,10 @@ export default async function UsagePage() {
                 </span>
               </div>
             </div>
-            <h3 className="text-sm font-medium text-neutral-400 mb-1">
+            <h3 className="text-sm font-medium text-slate-500 mb-1 dark:text-neutral-400">
               Drive Files
             </h3>
-            <p className="text-2xl font-bold text-white">
+            <p className="text-2xl font-bold text-slate-950 dark:text-white">
               {formatBytes(usedInDrive)}
             </p>
             <p className="text-xs text-blue-400/70 mt-2">All active files</p>
@@ -276,7 +283,7 @@ export default async function UsagePage() {
         </div>
 
         {/* Trash */}
-        <div className="group relative overflow-hidden p-6 rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-red-950/30 hover:border-red-500/30 transition-all duration-500">
+        <div className="group relative overflow-hidden p-6 rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 hover:border-red-500/30 transition-all duration-500 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-red-950/30 dark:shadow-none">
           <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/10 blur-2xl rounded-full pointer-events-none group-hover:bg-red-500/20 transition-colors" />
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
@@ -310,8 +317,8 @@ export default async function UsagePage() {
                 </span>
               </div>
             </div>
-            <h3 className="text-sm font-medium text-neutral-400 mb-1">Trash</h3>
-            <p className="text-2xl font-bold text-white">
+            <h3 className="text-sm font-medium text-slate-500 mb-1 dark:text-neutral-400">Trash</h3>
+            <p className="text-2xl font-bold text-slate-950 dark:text-white">
               {formatBytes(usedInTrash)}
             </p>
             <p className="text-xs text-red-400/70 mt-2">
@@ -322,7 +329,7 @@ export default async function UsagePage() {
       </div>
 
       {/* App Usage Breakdown */}
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900 via-neutral-900 to-primary/5">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900 dark:via-neutral-900 dark:to-primary/5 dark:shadow-none">
         {/* Glow effects */}
         <div className="absolute bottom-0 right-0 w-48 h-48 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
 
@@ -332,10 +339,10 @@ export default async function UsagePage() {
               <Database className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-white">
+              <h3 className="font-semibold text-slate-950 dark:text-white">
                 GDriveDB Usage Breakdown
               </h3>
-              <p className="text-sm text-neutral-400">
+              <p className="text-sm text-slate-500 dark:text-neutral-400">
                 {formatBytes(appUsage)} across {(data.databaseCount || 0) + 1}{" "}
                 items
               </p>
@@ -351,16 +358,16 @@ export default async function UsagePage() {
                     <FolderOpen className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-white group-hover:text-primary transition-colors">
+                    <h4 className="font-medium text-slate-950 group-hover:text-primary transition-colors dark:text-white">
                       Storage Bucket
                     </h4>
-                    <p className="text-xs text-neutral-500">
+                    <p className="text-xs text-slate-500 dark:text-neutral-500">
                       {data.bucketFileCount || 0} files uploaded
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-xl font-bold text-white">
+                  <span className="text-xl font-bold text-slate-950 dark:text-white">
                     {formatBytes(Number(data.bucketUsage) || 0)}
                   </span>
                   <p className="text-xs text-primary">
@@ -374,7 +381,7 @@ export default async function UsagePage() {
                   </p>
                 </div>
               </div>
-              <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
+              <div className="h-2 bg-slate-200 rounded-full overflow-hidden dark:bg-neutral-800">
                 <div
                   className="h-full bg-linear-to-r from-primary to-primary/70 rounded-full transition-all duration-1000 ease-out"
                   style={{
@@ -393,20 +400,20 @@ export default async function UsagePage() {
               <div className="flex items-center justify-between px-1">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-primary" />
-                  <span className="text-sm font-medium text-neutral-300">
+                  <span className="text-sm font-medium text-slate-600 dark:text-neutral-300">
                     Databases
                   </span>
                 </div>
-                <span className="text-xs text-neutral-500 bg-neutral-800 px-2 py-1 rounded-full">
+                <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full dark:text-neutral-500 dark:bg-neutral-800">
                   {data.databaseCount || 0} total
                 </span>
               </div>
 
-              {data.databaseUsage && data.databaseUsage.length > 0 ? (
+              {databaseUsage.length > 0 ? (
                 <div className="grid gap-2">
-                  {data.databaseUsage
-                    .sort((a: any, b: any) => b.size - a.size)
-                    .map((db: any, index: number) => {
+                  {[...databaseUsage]
+                    .sort((a, b) => b.size - a.size)
+                    .map((db, index) => {
                       const dbPercentage =
                         appUsage > 0 ? (db.size / appUsage) * 100 : 0;
                       const colors = [
@@ -421,22 +428,22 @@ export default async function UsagePage() {
                       return (
                         <div
                           key={db.id}
-                          className="group flex items-center gap-4 p-3 rounded-xl bg-neutral-800/30 hover:bg-neutral-800/60 border border-neutral-700/30 hover:border-neutral-600/50 transition-all duration-300"
+                          className="group flex items-center gap-4 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 transition-all duration-300 dark:bg-neutral-800/30 dark:hover:bg-neutral-800/60 dark:border-neutral-700/30 dark:hover:border-neutral-600/50"
                         >
                           <div
                             className={`w-1.5 h-8 rounded-full bg-linear-to-b ${colorClass}`}
                           />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="font-medium text-neutral-200 truncate group-hover:text-white transition-colors">
+                              <span className="font-medium text-slate-700 truncate group-hover:text-slate-950 transition-colors dark:text-neutral-200 dark:group-hover:text-white">
                                 {db.name}
                               </span>
-                              <span className="text-xs text-neutral-500 px-1.5 py-0.5 bg-neutral-800 rounded shrink-0">
+                              <span className="text-xs text-slate-500 px-1.5 py-0.5 bg-white rounded shrink-0 dark:text-neutral-500 dark:bg-neutral-800">
                                 {db.tableCount} table
                                 {db.tableCount !== 1 ? "s" : ""}
                               </span>
                             </div>
-                            <div className="h-1 bg-neutral-700 rounded-full overflow-hidden">
+                            <div className="h-1 bg-slate-200 rounded-full overflow-hidden dark:bg-neutral-700">
                               <div
                                 className={`h-full bg-linear-to-r ${colorClass} rounded-full transition-all duration-1000 ease-out`}
                                 style={{
@@ -446,10 +453,10 @@ export default async function UsagePage() {
                             </div>
                           </div>
                           <div className="text-right shrink-0">
-                            <span className="text-white font-semibold">
+                            <span className="text-slate-950 font-semibold dark:text-white">
                               {formatBytes(db.size)}
                             </span>
-                            <p className="text-xs text-neutral-500">
+                            <p className="text-xs text-slate-500 dark:text-neutral-500">
                               {dbPercentage.toFixed(1)}%
                             </p>
                           </div>
@@ -458,10 +465,10 @@ export default async function UsagePage() {
                     })}
                 </div>
               ) : (
-                <div className="text-center py-8 rounded-xl bg-neutral-800/20 border border-dashed border-neutral-700">
-                  <Database className="w-10 h-10 mx-auto mb-3 text-neutral-600" />
-                  <p className="text-neutral-500">No databases yet</p>
-                  <p className="text-xs text-neutral-600 mt-1">
+                <div className="text-center py-8 rounded-xl bg-slate-50 border border-dashed border-slate-200 dark:bg-neutral-800/20 dark:border-neutral-700">
+                  <Database className="w-10 h-10 mx-auto mb-3 text-slate-400 dark:text-neutral-600" />
+                  <p className="text-slate-500 dark:text-neutral-500">No databases yet</p>
+                  <p className="text-xs text-slate-400 mt-1 dark:text-neutral-600">
                     Create a database to see usage
                   </p>
                 </div>
@@ -496,7 +503,7 @@ export default async function UsagePage() {
                   ? "Storage Almost Full!"
                   : "Storage Getting Low"}
               </h4>
-              <p className="text-sm text-neutral-400 mt-1">
+              <p className="text-sm text-slate-600 mt-1 dark:text-neutral-400">
                 {usedInTrash > 0
                   ? `You have ${formatBytes(
                       usedInTrash

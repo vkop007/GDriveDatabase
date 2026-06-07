@@ -410,7 +410,7 @@ export default function DataTable({
     const iconClass = `w-3.5 h-3.5 transition-all ${
       isActive
         ? "text-primary"
-        : "text-neutral-600 group-hover:text-neutral-400"
+        : "text-slate-400 group-hover:text-slate-600 dark:text-neutral-600 dark:group-hover:text-neutral-400"
     }`;
 
     if (!isActive) {
@@ -528,7 +528,7 @@ export default function DataTable({
       </div>
 
       {searchQuery && (
-        <p className="text-xs text-neutral-500 mt-2">
+        <p className="text-xs text-slate-500 mt-2 dark:text-neutral-500">
           Found{" "}
           <span className="text-primary font-medium">
             {processedDocuments.length}
@@ -538,14 +538,14 @@ export default function DataTable({
         </p>
       )}
 
-      <div className="relative overflow-hidden rounded-2xl border border-neutral-800 bg-linear-to-br from-neutral-900/90 via-neutral-900 to-neutral-800/60 shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-linear-to-br dark:from-neutral-900/90 dark:via-neutral-900 dark:to-neutral-800/60 dark:shadow-xl">
         {/* Subtle glow effect */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
         <div className="overflow-x-auto">
           <table className="min-w-[760px] w-full text-left text-sm">
             <thead className="sticky top-0 z-10">
-              <tr className="border-b border-neutral-800 bg-neutral-900/95 backdrop-blur-sm">
+              <tr className="border-b border-slate-200 bg-slate-50/95 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/95">
                 <th className="w-12 px-4 py-4">
                   <div className="flex items-center justify-center">
                     <input
@@ -557,7 +557,7 @@ export default function DataTable({
                         }
                       }}
                       onChange={toggleAll}
-                      className="w-4 h-4 rounded bg-neutral-950 border-neutral-600 text-primary focus:ring-primary/30 focus:ring-offset-0 cursor-pointer transition-all"
+                      className="w-4 h-4 rounded border-slate-300 bg-white text-primary focus:ring-primary/30 focus:ring-offset-0 cursor-pointer transition-all dark:border-neutral-600 dark:bg-neutral-950"
                       disabled={allIds.length === 0}
                     />
                   </div>
@@ -566,20 +566,20 @@ export default function DataTable({
                   <th key={col.key} className="px-6 py-4">
                     <button
                       onClick={() => handleSort(col.key)}
-                      className="group flex items-center gap-2 hover:text-white transition-colors w-full"
+                      className="group flex items-center gap-2 transition-colors w-full hover:text-slate-950 dark:hover:text-white"
                     >
                       <span
                         className={`text-xs font-semibold uppercase tracking-wider ${
                           col.key.startsWith("$")
-                            ? "text-neutral-600 group-hover:text-neutral-400"
-                            : "text-neutral-400 group-hover:text-white"
+                            ? "text-slate-400 group-hover:text-slate-600 dark:text-neutral-600 dark:group-hover:text-neutral-400"
+                            : "text-slate-500 group-hover:text-slate-950 dark:text-neutral-400 dark:group-hover:text-white"
                         }`}
                       >
                         {col.key.replace(/^\$/, "")}
                       </span>
                       {!col.key.startsWith("$") && (
                         <>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-500 font-medium">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-medium dark:bg-neutral-800 dark:text-neutral-500">
                             {col.type}
                           </span>
                           {col.validation && (
@@ -598,12 +598,12 @@ export default function DataTable({
                     </button>
                   </th>
                 ))}
-                <th className="px-6 py-4 text-xs font-semibold text-neutral-500 uppercase tracking-wider text-right">
+                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right dark:text-neutral-500">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-800/50">
+            <tbody className="divide-y divide-slate-200 dark:divide-neutral-800/50">
               {processedDocuments.length === 0 ? (
                 <tr>
                   <td
@@ -611,18 +611,18 @@ export default function DataTable({
                     className="text-center py-16"
                   >
                     <div className="flex flex-col items-center gap-4 py-4">
-                      <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-neutral-800/80 to-neutral-800/30 flex items-center justify-center border border-neutral-700/50">
+                      <div className="w-20 h-20 rounded-2xl bg-linear-to-br from-slate-100 to-white flex items-center justify-center border border-slate-200 dark:from-neutral-800/80 dark:to-neutral-800/30 dark:border-neutral-700/50">
                         {searchQuery ? (
-                          <Search className="w-10 h-10 text-neutral-500" />
+                          <Search className="w-10 h-10 text-slate-400 dark:text-neutral-500" />
                         ) : (
-                          <Database className="w-10 h-10 text-neutral-500" />
+                          <Database className="w-10 h-10 text-slate-400 dark:text-neutral-500" />
                         )}
                       </div>
                       <div className="text-center">
-                        <p className="text-neutral-300 font-medium text-lg">
+                        <p className="text-slate-700 font-medium text-lg dark:text-neutral-300">
                           {searchQuery ? "No results found" : "No data yet"}
                         </p>
-                        <p className="text-sm text-neutral-500 mt-1 max-w-xs">
+                        <p className="text-sm text-slate-500 mt-1 max-w-xs dark:text-neutral-500">
                           {searchQuery
                             ? `No rows match "${searchQuery}"`
                             : "Add your first row to get started with your table"}
@@ -640,7 +640,7 @@ export default function DataTable({
                       className={`group transition-colors ${
                         isSelected
                           ? "bg-primary/10 hover:bg-primary/15"
-                          : "hover:bg-neutral-800/30"
+                          : "hover:bg-slate-50 dark:hover:bg-neutral-800/30"
                       }`}
                     >
                       <td className="px-4 py-4">
@@ -649,7 +649,7 @@ export default function DataTable({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => toggleRow(doc.$id)}
-                            className="w-4 h-4 rounded bg-neutral-950 border-neutral-700 text-primary focus:ring-primary/20 focus:ring-offset-0 cursor-pointer"
+                            className="w-4 h-4 rounded border-slate-300 bg-white text-primary focus:ring-primary/20 focus:ring-offset-0 cursor-pointer dark:border-neutral-700 dark:bg-neutral-950"
                           />
                         </div>
                       </td>
@@ -675,14 +675,14 @@ export default function DataTable({
                                   navigator.clipboard.writeText(displayValue);
                                   toast.success("ID copied to clipboard");
                                 }}
-                                className="text-xs font-mono px-2 py-1 rounded bg-neutral-800/50 text-neutral-400 border border-neutral-700/50 cursor-pointer hover:bg-neutral-700/50 hover:text-white transition-colors"
+                                className="text-xs font-mono px-2 py-1 rounded bg-slate-100 text-slate-600 border border-slate-200 cursor-pointer hover:bg-slate-200 hover:text-slate-950 transition-colors dark:bg-neutral-800/50 dark:text-neutral-400 dark:border-neutral-700/50 dark:hover:bg-neutral-700/50 dark:hover:text-white"
                                 title="Click to copy"
                               >
                                 {displayValue.slice(0, 8)}...
                               </code>
                             ) : isTimestamp ? (
                               <span
-                                className="text-neutral-400 text-sm cursor-help"
+                                className="text-slate-500 text-sm cursor-help dark:text-neutral-400"
                                 title={formatFullDate(displayValue)}
                                 suppressHydrationWarning
                               >
@@ -693,19 +693,19 @@ export default function DataTable({
                                 className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium ${
                                   value
                                     ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                                    : "bg-neutral-700/30 text-neutral-400 border border-neutral-600/20"
+                                    : "bg-slate-100 text-slate-500 border border-slate-200 dark:bg-neutral-700/30 dark:text-neutral-400 dark:border-neutral-600/20"
                                 }`}
                               >
                                 <span
                                   className={`w-1.5 h-1.5 rounded-full ${
-                                    value ? "bg-emerald-400" : "bg-neutral-500"
+                                    value ? "bg-emerald-400" : "bg-slate-400 dark:bg-neutral-500"
                                   }`}
                                 />
                                 {value ? "true" : "false"}
                               </span>
                             ) : isDate ? (
                               <span
-                                className="text-neutral-400 text-sm cursor-help"
+                                className="text-slate-500 text-sm cursor-help dark:text-neutral-400"
                                 title={formatFullDate(displayValue)}
                                 suppressHydrationWarning
                               >
@@ -724,7 +724,7 @@ export default function DataTable({
                                   rel="noopener noreferrer"
                                   className="inline-flex items-center gap-2 text-primary hover:underline"
                                 >
-                                  <div className="w-8 h-8 rounded bg-neutral-800 border border-neutral-700 flex items-center justify-center overflow-hidden">
+                                  <div className="w-8 h-8 rounded bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden dark:bg-neutral-800 dark:border-neutral-700">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                       src={`/api/resources?id=${displayValue}`}
@@ -743,7 +743,7 @@ export default function DataTable({
                                   </span>
                                 </a>
                               ) : (
-                                <span className="text-neutral-600">—</span>
+                                <span className="text-slate-400 dark:text-neutral-600">—</span>
                               )
                             ) : col.array ? (
                               <div className="flex items-center gap-1 max-w-[200px] overflow-hidden">
@@ -760,13 +760,13 @@ export default function DataTable({
                                       </span>
                                     ))}
                                     {value.length > 2 && (
-                                      <span className="text-xs text-neutral-500 whitespace-nowrap">
+                                      <span className="text-xs text-slate-500 whitespace-nowrap dark:text-neutral-500">
                                         +{value.length - 2}
                                       </span>
                                     )}
                                   </>
                                 ) : (
-                                  <span className="text-neutral-500">—</span>
+                                  <span className="text-slate-500 dark:text-neutral-500">—</span>
                                 )}
                               </div>
                             ) : (
@@ -804,7 +804,7 @@ export default function DataTable({
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => setEditingDocument(doc)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-primary hover:text-white hover:bg-primary/20 transition-all text-xs font-medium"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-primary hover:bg-primary/10 transition-all text-xs font-medium dark:hover:text-white dark:hover:bg-primary/20"
                           >
                             <Pencil className="w-3.5 h-3.5" />
                             Edit
@@ -812,7 +812,7 @@ export default function DataTable({
                           <button
                             onClick={() => handleSingleDelete(doc.$id)}
                             disabled={deletingRowId === doc.$id}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 transition-all text-xs font-medium disabled:opacity-50"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-all text-xs font-medium disabled:opacity-50 dark:text-red-400 dark:hover:text-white dark:hover:bg-red-500/20"
                           >
                             {deletingRowId === doc.$id ? (
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -842,10 +842,10 @@ export default function DataTable({
             onPageSizeChange={onPageSizeChange}
           />
         ) : processedDocuments.length > 0 ? (
-          <div className="px-6 py-3 border-t border-neutral-800/50 bg-neutral-900/50">
-            <p className="text-xs text-neutral-500">
+          <div className="px-6 py-3 border-t border-slate-200 bg-slate-50 dark:border-neutral-800/50 dark:bg-neutral-900/50">
+            <p className="text-xs text-slate-500 dark:text-neutral-500">
               Showing{" "}
-              <span className="text-neutral-400 font-medium">
+              <span className="text-slate-700 font-medium dark:text-neutral-400">
                 {processedDocuments.length}
               </span>{" "}
               row{processedDocuments.length !== 1 ? "s" : ""}

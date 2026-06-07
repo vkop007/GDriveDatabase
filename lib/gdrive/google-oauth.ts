@@ -43,7 +43,7 @@ export function getGoogleOAuthConfig(): GoogleLoginConfig {
 
   if (!clientId || !clientSecret) {
     throw new Error(
-      "Google login is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET."
+      "Google OAuth is not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET."
     );
   }
 

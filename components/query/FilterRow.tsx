@@ -43,12 +43,12 @@ export default function FilterRow({
   };
 
   return (
-    <div className="flex items-center gap-2 p-3 rounded-xl bg-neutral-900/50 border border-neutral-800 group animate-in fade-in slide-in-from-top-2 duration-200">
+    <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-3 shadow-sm shadow-slate-900/5 group animate-in fade-in slide-in-from-top-2 duration-200 dark:border-neutral-800 dark:bg-neutral-900/50 dark:shadow-none">
       {/* Column selector */}
       <select
         value={filter.column}
         onChange={(e) => handleColumnChange(e.target.value)}
-        className="flex-1 min-w-[120px] px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+        className="flex-1 min-w-[120px] px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
       >
         <option value="" disabled>
           Select column
@@ -68,7 +68,7 @@ export default function FilterRow({
         onChange={(e) =>
           onChange({ ...filter, operator: e.target.value as FilterOperator })
         }
-        className="min-w-[100px] px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+        className="min-w-[100px] px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
       >
         {availableOperators.map((op) => (
           <option key={op} value={op}>
@@ -82,7 +82,7 @@ export default function FilterRow({
         <select
           value={filter.value}
           onChange={(e) => onChange({ ...filter, value: e.target.value })}
-          className="flex-1 min-w-[100px] px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          className="flex-1 min-w-[100px] px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
         >
           <option value="">Select value</option>
           <option value="true">True</option>
@@ -93,7 +93,7 @@ export default function FilterRow({
           type="datetime-local"
           value={filter.value}
           onChange={(e) => onChange({ ...filter, value: e.target.value })}
-          className="flex-1 min-w-[180px] px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          className="flex-1 min-w-[180px] px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-950 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all dark:border-neutral-700 dark:bg-neutral-800 dark:text-white"
         />
       ) : (
         <input
@@ -101,14 +101,14 @@ export default function FilterRow({
           value={filter.value}
           onChange={(e) => onChange({ ...filter, value: e.target.value })}
           placeholder="Enter value..."
-          className="flex-1 min-w-[150px] px-3 py-2 rounded-lg bg-neutral-800 border border-neutral-700 text-white text-sm placeholder:text-neutral-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+          className="flex-1 min-w-[150px] px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-950 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all dark:border-neutral-700 dark:bg-neutral-800 dark:text-white dark:placeholder:text-neutral-500"
         />
       )}
 
       {/* Remove button */}
       <button
         onClick={onRemove}
-        className="p-2 rounded-lg text-neutral-500 hover:text-red-400 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100"
+        className="p-2 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-500/10 transition-all opacity-0 group-hover:opacity-100 dark:text-neutral-500 dark:hover:text-red-400"
         title="Remove filter"
       >
         <X className="w-4 h-4" />

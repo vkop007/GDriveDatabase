@@ -20,7 +20,7 @@ export default function ProfileMenu({
 }: ProfileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const displayName = user.name || user.email || "Google account";
+  const displayName = user.name || user.email || "Account";
   const initial = displayName.charAt(0).toUpperCase();
   const isSidebar = variant === "sidebar";
 

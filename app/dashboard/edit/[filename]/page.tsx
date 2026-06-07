@@ -48,8 +48,8 @@ export default async function EditDocument({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white p-8 flex items-center justify-center">
-      <div className="w-full max-w-full bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8 backdrop-blur-xl shadow-2xl">
+    <div className="min-h-screen bg-slate-50 text-slate-950 p-8 flex items-center justify-center dark:bg-neutral-950 dark:text-white">
+      <div className="w-full max-w-full bg-white border border-slate-200 rounded-2xl p-8 backdrop-blur-xl shadow-2xl shadow-slate-900/10 dark:bg-neutral-900/50 dark:border-neutral-800 dark:shadow-black/30">
         <h1 className="text-2xl font-bold mb-6 bg-linear-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
           Edit Document: {decodedFilename}
         </h1>

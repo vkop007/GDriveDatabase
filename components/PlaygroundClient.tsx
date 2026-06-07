@@ -256,7 +256,7 @@ export default function PlaygroundClient({
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 px-4 pb-4 pt-20 md:p-8 md:pt-8 space-y-6">
+    <div className="min-h-screen bg-slate-50 px-4 pb-4 pt-20 text-slate-950 md:p-8 md:pt-8 space-y-6 dark:bg-neutral-950 dark:text-white">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-start gap-3 sm:items-center sm:gap-4">
@@ -264,13 +264,13 @@ export default function PlaygroundClient({
             <Code2 className="w-6 h-6 text-primary" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-2xl md:text-3xl font-bold text-white flex flex-wrap items-center gap-2 sm:gap-3">
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-950 flex flex-wrap items-center gap-2 sm:gap-3 dark:text-white">
               SDK Playground
               <span className="text-xs bg-linear-to-r from-primary-from/10 to-primary-to/10 text-primary px-2.5 py-1 rounded-full border border-primary/20 font-medium">
                 gdatabase
               </span>
             </h1>
-            <p className="text-neutral-400 mt-1">
+            <p className="text-slate-500 mt-1 dark:text-neutral-400">
               Write and test SDK code in real-time
             </p>
           </div>
@@ -278,18 +278,18 @@ export default function PlaygroundClient({
 
         {/* API Key Input */}
         <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center md:w-auto">
-          <div className="flex w-full min-w-0 items-center gap-2 bg-neutral-900/80 border border-neutral-800 rounded-xl px-4 py-2.5 sm:w-auto">
+          <div className="flex w-full min-w-0 items-center gap-2 bg-white border border-slate-200 rounded-xl px-4 py-2.5 shadow-sm shadow-slate-900/5 sm:w-auto dark:bg-neutral-900/80 dark:border-neutral-800 dark:shadow-none">
             <Sparkles size={16} className="text-amber-400" />
-            <span className="text-sm text-neutral-400 font-medium">
+            <span className="text-sm text-slate-500 font-medium dark:text-neutral-400">
               API Key
             </span>
-            <div className="w-px h-4 bg-neutral-700" />
+            <div className="w-px h-4 bg-slate-200 dark:bg-neutral-700" />
             <input
               type="password"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="sk_..."
-              className="min-w-0 flex-1 bg-transparent border-none text-sm focus:outline-none text-neutral-200 placeholder:text-neutral-600 sm:w-40"
+              className="min-w-0 flex-1 bg-transparent border-none text-sm focus:outline-none text-slate-950 placeholder:text-slate-400 sm:w-40 dark:text-neutral-200 dark:placeholder:text-neutral-600"
             />
           </div>
           <button

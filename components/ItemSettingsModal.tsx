@@ -83,7 +83,7 @@ export default function ItemSettingsModal({
     >
       <div className="space-y-5">
         {/* Selected Item Card */}
-        <div className="relative overflow-hidden p-5 rounded-xl bg-linear-to-br from-neutral-800/60 via-neutral-800/40 to-neutral-900/60 border border-neutral-700/50">
+        <div className="relative overflow-hidden p-5 rounded-xl bg-linear-to-br from-slate-50 via-white to-primary/10 border border-slate-200 dark:from-neutral-800/60 dark:via-neutral-800/40 dark:to-neutral-900/60 dark:border-neutral-700/50">
           <div className="absolute top-0 right-0 w-20 h-20 bg-primary/10 blur-2xl rounded-full pointer-events-none" />
           <div className="relative flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-linear-to-br from-primary/20 to-purple-500/10 border border-primary/20 flex items-center justify-center">
@@ -94,16 +94,16 @@ export default function ItemSettingsModal({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-1">
+              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1 dark:text-neutral-500">
                 {type}
               </p>
-              <p className="text-lg font-semibold text-white truncate">
+              <p className="text-lg font-semibold text-slate-950 truncate dark:text-white">
                 {item.name}
               </p>
             </div>
           </div>
-          <div className="mt-3 pt-3 border-t border-neutral-700/40">
-            <p className="text-[11px] text-neutral-500 font-mono truncate">
+          <div className="mt-3 pt-3 border-t border-slate-200 dark:border-neutral-700/40">
+            <p className="text-[11px] text-slate-500 font-mono truncate dark:text-neutral-500">
               ID: {item.id}
             </p>
           </div>
@@ -117,7 +117,7 @@ export default function ItemSettingsModal({
               onRename();
               onClose();
             }}
-            className="group w-full flex items-center gap-4 p-4 rounded-xl bg-neutral-800/30 hover:bg-neutral-800/60 border border-neutral-700/40 hover:border-primary/30 transition-all duration-300"
+            className="group w-full flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-primary/30 transition-all duration-300 dark:bg-neutral-800/30 dark:hover:bg-neutral-800/60 dark:border-neutral-700/40"
           >
             <div className="relative">
               <div className="absolute inset-0 rounded-xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -126,10 +126,10 @@ export default function ItemSettingsModal({
               </div>
             </div>
             <div className="flex-1 text-left">
-              <p className="text-sm font-semibold text-white group-hover:text-primary transition-colors duration-300">
+              <p className="text-sm font-semibold text-slate-950 group-hover:text-primary transition-colors duration-300 dark:text-white">
                 Rename
               </p>
-              <p className="text-xs text-neutral-400">
+              <p className="text-xs text-slate-500 dark:text-neutral-400">
                 Change the name of this {type}
               </p>
             </div>

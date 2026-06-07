@@ -7,12 +7,10 @@ import { unstable_cache, revalidateTag } from "next/cache";
 import fs from "fs/promises";
 import path from "path";
 import {
-  buildGoogleOAuthUrl,
   buildDriveOAuthUrl,
   createOAuthState,
   getBaseUrlFromHeaders,
   getSessionCookieOptions,
-  APP_LOGIN_STATE_COOKIE,
   DRIVE_OAUTH_STATE_COOKIE,
   GOOGLE_TOKEN_COOKIE,
 } from "@/lib/gdrive/google-oauth";
@@ -20,6 +18,11 @@ import {
   savePendingDriveCredentials,
   getCurrentDriveConnection,
 } from "@/lib/gdrive/drive-connection-store";
+import {
+  createEmailPasswordUser,
+  verifyEmailPasswordUser,
+} from "@/lib/auth/email-password";
+import { setAppSessionCookie } from "@/lib/auth/app-session";
 import { getAuth as getDriveAuth } from "@/lib/gdrive/auth";
 
 import { createTable } from "./actions/table";
@@ -241,26 +244,42 @@ export async function getApiAuth(apiKey: string) {
   }
 }
 
-export async function authenticateWithGoogle() {
-  let authUrl = "";
+export type AuthActionState = {
+  error?: string;
+};
 
+function authErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Authentication failed.";
+}
+
+export async function signInWithEmail(
+  _previousState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  let session;
   try {
-    const state = createOAuthState();
-    const cookieStore = await cookies();
-    const headerStore = await headers();
-    cookieStore.set(
-      APP_LOGIN_STATE_COOKIE,
-      state,
-      getSessionCookieOptions(10 * 60)
-    );
-
-    authUrl = buildGoogleOAuthUrl(state, getBaseUrlFromHeaders(headerStore));
+    session = await verifyEmailPasswordUser(formData);
   } catch (error) {
-    console.error("Error generating Google auth URL:", error);
-    throw error;
+    return { error: authErrorMessage(error) };
   }
 
-  redirect(authUrl);
+  await setAppSessionCookie(session);
+  redirect("/dashboard");
+}
+
+export async function signUpWithEmail(
+  _previousState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  let session;
+  try {
+    session = await createEmailPasswordUser(formData);
+  } catch (error) {
+    return { error: authErrorMessage(error) };
+  }
+
+  await setAppSessionCookie(session);
+  redirect("/dashboard");
 }
 
 export async function connectDriveWithGoogle(formData: FormData) {

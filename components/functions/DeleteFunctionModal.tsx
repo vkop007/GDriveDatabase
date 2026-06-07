@@ -49,17 +49,17 @@ export default function DeleteFunctionModal({
       />
 
       {/* Modal */}
-      <div className="relative flex max-h-[calc(100vh-2rem)] w-full max-w-md flex-col overflow-hidden bg-neutral-900/95 border border-neutral-800/50 rounded-2xl shadow-2xl">
+      <div className="relative flex max-h-[calc(100vh-2rem)] w-full max-w-md flex-col overflow-hidden bg-white border border-slate-200 rounded-2xl shadow-2xl shadow-slate-900/20 dark:bg-neutral-900/95 dark:border-neutral-800/50 dark:shadow-black/40">
         {/* Header */}
-        <div className="flex items-center gap-3 p-4 border-b border-neutral-800/50 sm:p-5">
+        <div className="flex items-center gap-3 p-4 border-b border-slate-200 sm:p-5 dark:border-neutral-800/50">
           <div className="shrink-0 p-2 rounded-lg bg-red-500/20 border border-red-500/30">
             <AlertTriangle className="w-5 h-5 text-red-400" />
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className="text-lg font-semibold text-slate-950 dark:text-white">
               Delete Function
             </h2>
-            <p className="text-sm text-neutral-400">
+            <p className="text-sm text-slate-500 dark:text-neutral-400">
               This action cannot be undone
             </p>
           </div>
@@ -67,9 +67,9 @@ export default function DeleteFunctionModal({
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5">
-          <p className="text-neutral-300">
+          <p className="text-slate-600 dark:text-neutral-300">
             Are you sure you want to delete{" "}
-            <span className="break-words font-semibold text-white">
+            <span className="break-words font-semibold text-slate-950 dark:text-white">
               {func.name}
             </span>
             ? This will permanently remove the function and its Apps Script from
@@ -85,10 +85,10 @@ export default function DeleteFunctionModal({
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col-reverse gap-2 p-4 border-t border-neutral-800/50 sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:p-5">
+        <div className="flex flex-col-reverse gap-2 p-4 border-t border-slate-200 sm:flex-row sm:items-center sm:justify-end sm:gap-3 sm:p-5 dark:border-neutral-800/50">
           <button
             onClick={onClose}
-            className="w-full px-4 py-2.5 text-neutral-400 hover:text-white transition-colors sm:w-auto"
+            className="w-full px-4 py-2.5 text-slate-600 hover:text-slate-950 transition-colors sm:w-auto dark:text-neutral-400 dark:hover:text-white"
           >
             Cancel
           </button>

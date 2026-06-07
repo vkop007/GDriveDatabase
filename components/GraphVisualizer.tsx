@@ -473,7 +473,7 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
   }, []);
 
   return (
-    <div className="h-screen bg-neutral-950 relative overflow-hidden">
+    <div className="h-screen bg-slate-50 relative overflow-hidden dark:bg-neutral-950">
       {/* Subtle ambient glow */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-pink-500/5 rounded-full blur-[120px]" />
@@ -531,15 +531,15 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
         <Background
           gap={32}
           size={1.5}
-          color="#1a1a1a"
+          color="var(--surface-border-strong)"
           style={{ backgroundColor: "transparent" }}
         />
-        <Controls className="bg-neutral-900/90! border-neutral-700/50! rounded-xl! shadow-xl! backdrop-blur-xl!" />
+        <Controls className="bg-white/90! border-slate-200! rounded-xl! shadow-xl! backdrop-blur-xl! dark:bg-neutral-900/90! dark:border-neutral-700/50!" />
         <MiniMap
           zoomable
           pannable
-          className="bg-neutral-900/80! border-neutral-700/40! rounded-xl! shadow-xl! backdrop-blur-xl!"
-          maskColor="rgba(0, 0, 0, 0.7)"
+          className="bg-white/80! border-slate-200! rounded-xl! shadow-xl! backdrop-blur-xl! dark:bg-neutral-900/80! dark:border-neutral-700/40!"
+          maskColor="color-mix(in srgb, var(--background) 72%, transparent)"
           nodeColor={(n) =>
             n.type === "root"
               ? "#ec4899"
@@ -553,23 +553,23 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
       {/* Custom styles for ReactFlow controls */}
       <style jsx global>{`
         .react-flow__controls {
-          background: rgba(23, 23, 23, 0.9) !important;
-          border: 1px solid rgba(64, 64, 64, 0.5) !important;
+          background: color-mix(in srgb, var(--surface-panel) 90%, transparent) !important;
+          border: 1px solid var(--surface-border) !important;
           border-radius: 12px !important;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+          box-shadow: var(--panel-shadow) !important;
           backdrop-filter: blur(20px) !important;
           overflow: hidden;
         }
         .react-flow__controls-button {
-          background: rgba(38, 38, 38, 0.95) !important;
+          background: var(--surface-panel) !important;
           border: none !important;
-          border-bottom: 1px solid rgba(64, 64, 64, 0.3) !important;
-          color: #a3a3a3 !important;
+          border-bottom: 1px solid var(--surface-border) !important;
+          color: var(--muted-foreground) !important;
           transition: all 0.2s ease !important;
         }
         .react-flow__controls-button:hover {
-          background: rgba(64, 64, 64, 0.8) !important;
-          color: #ffffff !important;
+          background: color-mix(in srgb, var(--primary) 12%, var(--surface-muted)) !important;
+          color: var(--primary) !important;
         }
         .react-flow__controls-button:last-child {
           border-bottom: none !important;
@@ -578,10 +578,10 @@ export default function GraphVisualizer({ treeData }: GraphVisualizerProps) {
           fill: currentColor !important;
         }
         .react-flow__minimap {
-          background: rgba(23, 23, 23, 0.85) !important;
-          border: 1px solid rgba(64, 64, 64, 0.4) !important;
+          background: color-mix(in srgb, var(--surface-panel) 85%, transparent) !important;
+          border: 1px solid var(--surface-border) !important;
           border-radius: 12px !important;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+          box-shadow: var(--panel-shadow) !important;
           backdrop-filter: blur(20px) !important;
         }
         .react-flow__edge-path {

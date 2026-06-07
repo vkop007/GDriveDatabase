@@ -94,15 +94,15 @@ export default function LogViewerModal({
       <div className="flex h-[75vh] w-full flex-col md:h-[600px]">
         <div className="flex flex-1 flex-col overflow-hidden md:flex-row">
           {/* Sidebar - Session List */}
-          <div className="flex min-h-[9rem] w-full flex-col border-b border-neutral-800 bg-neutral-900/30 md:min-h-0 md:w-1/3 md:min-w-[200px] md:border-b-0 md:border-r">
-            <div className="p-3 border-b border-neutral-800 flex items-center justify-between">
-              <span className="text-sm font-medium text-neutral-400">
+          <div className="flex min-h-[9rem] w-full flex-col border-b border-slate-200 bg-slate-50 md:min-h-0 md:w-1/3 md:min-w-[200px] md:border-b-0 md:border-r dark:border-neutral-800 dark:bg-neutral-900/30">
+            <div className="p-3 border-b border-slate-200 flex items-center justify-between dark:border-neutral-800">
+              <span className="text-sm font-medium text-slate-600 dark:text-neutral-400">
                 Executions
               </span>
               <button
                 onClick={fetchLogs}
                 disabled={loading}
-                className="p-1.5 hover:bg-neutral-800 rounded-lg transition-colors text-neutral-400 hover:text-white"
+                className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 hover:text-slate-950 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
                 title="Refresh logs"
               >
                 <RefreshCw
@@ -124,7 +124,7 @@ export default function LogViewerModal({
                     className={`w-full text-left p-3 rounded-xl border transition-all ${
                       selectedSession === session
                         ? "bg-primary/10 border-primary/30 active-session"
-                        : "bg-neutral-800/20 border-transparent hover:bg-neutral-800/40"
+                        : "bg-white border-slate-200 hover:bg-slate-100 dark:bg-neutral-800/20 dark:border-transparent dark:hover:bg-neutral-800/40"
                     }`}
                   >
                     <div className="flex flex-col gap-1">
@@ -145,11 +145,11 @@ export default function LogViewerModal({
                             {session.status}
                           </span>
                         </div>
-                        <span className="text-[10px] text-neutral-500 font-mono">
+                        <span className="text-[10px] text-slate-500 font-mono dark:text-neutral-500">
                           {new Date(session.startTime).toLocaleTimeString()}
                         </span>
                       </div>
-                      <div className="text-[11px] text-neutral-400 truncate pl-5.5">
+                      <div className="text-[11px] text-slate-500 truncate pl-5.5 dark:text-neutral-400">
                         {formatDate(session.startTime)}
                       </div>
                     </div>
@@ -160,10 +160,10 @@ export default function LogViewerModal({
           </div>
 
           {/* Main Content - Log Details */}
-          <div className="flex-1 flex flex-col bg-neutral-950 min-h-0">
+          <div className="flex-1 flex flex-col bg-white min-h-0 dark:bg-neutral-950">
             {selectedSession ? (
               <>
-                <div className="flex flex-col gap-3 border-b border-neutral-800 bg-neutral-900/50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 border-b border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-neutral-800 dark:bg-neutral-900/50">
                   <div className="flex min-w-0 items-center gap-3">
                     <div
                       className={`p-2 rounded-lg ${
@@ -175,16 +175,16 @@ export default function LogViewerModal({
                       <Terminal className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
-                      <h3 className="text-sm font-medium text-white">
+                      <h3 className="text-sm font-medium text-slate-950 dark:text-white">
                         Execution Details
                       </h3>
-                      <p className="truncate text-xs text-neutral-400">
+                      <p className="truncate text-xs text-slate-500 dark:text-neutral-400">
                         {formatDate(selectedSession.startTime)}
                       </p>
                     </div>
                   </div>
 
-                  <div className="text-xs text-neutral-500 flex flex-col items-start sm:items-end">
+                  <div className="text-xs text-slate-500 flex flex-col items-start sm:items-end dark:text-neutral-500">
                     <span>
                       Duration:{" "}
                       {(
@@ -197,13 +197,13 @@ export default function LogViewerModal({
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 font-mono text-xs md:text-sm space-y-1 bg-black/50">
+                <div className="flex-1 overflow-y-auto p-4 font-mono text-xs md:text-sm space-y-1 bg-slate-50 dark:bg-black/50">
                   {selectedSession.logs.map((log, idx) => (
                     <div
                       key={idx}
-                      className="flex flex-col gap-1 hover:bg-white/5 p-0.5 rounded px-2 sm:flex-row sm:gap-3"
+                      className="flex flex-col gap-1 hover:bg-slate-100 p-0.5 rounded px-2 sm:flex-row sm:gap-3 dark:hover:bg-white/5"
                     >
-                      <span className="text-neutral-500 shrink-0 sm:w-24">
+                      <span className="text-slate-500 shrink-0 sm:w-24 dark:text-neutral-500">
                         {new Date(log.timestamp).toLocaleTimeString()}
                       </span>
                       <span
@@ -223,7 +223,7 @@ export default function LogViewerModal({
                             ? "text-red-300"
                             : log.level === "WARN"
                             ? "text-yellow-200"
-                            : "text-neutral-300"
+                            : "text-slate-700 dark:text-neutral-300"
                         }`}
                       >
                         {log.message}
@@ -232,7 +232,7 @@ export default function LogViewerModal({
                   ))}
 
                   {selectedSession.logs.length === 0 && (
-                    <div className="flex items-center gap-2 text-neutral-500 italic p-2 bg-neutral-900/30 rounded-lg border border-neutral-800/50">
+                    <div className="flex items-center gap-2 text-slate-500 italic p-2 bg-white rounded-lg border border-slate-200 dark:text-neutral-500 dark:bg-neutral-900/30 dark:border-neutral-800/50">
                       <Info className="w-4 h-4" />
                       <span>
                         No standard output (console.log) was captured during
@@ -251,11 +251,11 @@ export default function LogViewerModal({
                   )}
 
                   {selectedSession.result !== undefined && (
-                    <div className="mt-4 border-t border-neutral-800 pt-4">
+                    <div className="mt-4 border-t border-slate-200 pt-4 dark:border-neutral-800">
                       <div className="text-xs font-bold text-emerald-400 mb-2 flex items-center gap-2">
                         <CheckCircle className="w-3 h-3" /> Return Value:
                       </div>
-                      <div className="p-3 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 font-mono overflow-x-auto">
+                      <div className="p-3 rounded-lg bg-white border border-slate-200 text-slate-700 font-mono overflow-x-auto dark:bg-neutral-900 dark:border-neutral-800 dark:text-neutral-300">
                         <pre className="min-w-max">
                           {typeof selectedSession.result === "object"
                             ? JSON.stringify(selectedSession.result, null, 2)
@@ -267,7 +267,7 @@ export default function LogViewerModal({
                 </div>
               </>
             ) : (
-              <div className="flex-1 flex flex-col items-center justify-center text-neutral-500">
+              <div className="flex-1 flex flex-col items-center justify-center text-slate-500 dark:text-neutral-500">
                 <Terminal className="w-12 h-12 mb-3 opacity-20" />
                 <p>Select an execution to view logs</p>
               </div>

@@ -97,7 +97,7 @@ export default function AccountDriveSettings({
   user,
 }: AccountDriveSettingsProps) {
   const [isSetupOpen, setIsSetupOpen] = useState(false);
-  const displayName = user?.name || user?.email || "Google account";
+  const displayName = user?.name || user?.email || "Account";
   const initial = displayName.charAt(0).toUpperCase();
   const driveTone = drive.isConnected
     ? "green"
@@ -177,7 +177,7 @@ export default function AccountDriveSettings({
             <DetailRow
               icon={<ShieldCheck className="h-4 w-4" />}
               label="Login Method"
-              value="Google OAuth"
+              value="Email/password"
             />
             <DetailRow
               icon={<KeyRound className="h-4 w-4" />}
