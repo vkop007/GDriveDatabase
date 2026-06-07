@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useFormStatus } from "react-dom";
 import {
   ArrowRight,
   BarChart3,
@@ -26,12 +25,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
 
-interface AuthFormProps {
-  onSubmit: (formData: FormData) => void;
-  isGoogleLoginConfigured: boolean;
-}
-
-interface LoginClientProps extends AuthFormProps {
+interface LoginClientProps {
   sdkCodeHtml: string;
 }
 
@@ -57,7 +51,7 @@ const workflowSteps = [
   {
     title: "Connect Google Drive",
     description:
-      "Sign in with OAuth, then connect the Drive workspace that should hold your data.",
+      "Sign in with email, then connect the Drive workspace that should hold your data.",
     icon: Cloud,
     accent: "text-emerald-600 dark:text-emerald-300",
     surface: "bg-emerald-50 dark:bg-emerald-400/10",
@@ -167,82 +161,14 @@ const useCases = [
 
 const sdkBadges = ["CRUD", "schema", "relations", "bucket", "functions"];
 
-function GoogleMark() {
+function HeaderSignInLink() {
   return (
-    <span className="flex h-5 w-5 items-center justify-center rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-950">
-      G
-    </span>
-  );
-}
-
-function GoogleSignInButton({ disabled }: { disabled: boolean }) {
-  const { pending } = useFormStatus();
-  const isDisabled = disabled || pending;
-
-  return (
-    <button
-      type="submit"
-      disabled={isDisabled}
-      className="group flex h-12 w-full items-center justify-center gap-3 rounded-lg bg-white px-5 text-sm font-semibold text-slate-950 shadow-lg shadow-black/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-100 disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-neutral-800 disabled:text-neutral-500 sm:w-auto sm:min-w-56"
+    <a
+      href="/signin"
+      className="inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-slate-200 bg-white/85 px-3.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-950 dark:border-white/12 dark:bg-white/8 dark:text-white dark:hover:border-white/22 dark:hover:bg-white/12"
     >
-      <GoogleMark />
-      <span>{pending ? "Opening Google..." : "Continue with Google"}</span>
-      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-    </button>
-  );
-}
-
-function SignInForm({
-  onSubmit,
-  isGoogleLoginConfigured,
-  compact = false,
-}: AuthFormProps & { compact?: boolean }) {
-  return (
-    <form
-      action={onSubmit}
-      className={`space-y-4 ${compact ? "w-full sm:w-auto" : ""}`}
-    >
-      <GoogleSignInButton disabled={!isGoogleLoginConfigured} />
-
-      {!isGoogleLoginConfigured && (
-        <div
-          className={`rounded-lg border border-amber-300/60 bg-amber-50 text-sm leading-6 text-amber-800 dark:border-amber-400/25 dark:bg-amber-400/10 dark:text-amber-100 ${
-            compact ? "p-3" : "p-4"
-          }`}
-        >
-          Google login needs server env vars:
-          <span className="mt-1 block font-mono text-xs text-amber-700 dark:text-amber-100/80">
-            GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
-          </span>
-        </div>
-      )}
-    </form>
-  );
-}
-
-function HeaderSignInButton({ disabled }: { disabled: boolean }) {
-  const { pending } = useFormStatus();
-  const isDisabled = disabled || pending;
-
-  return (
-    <button
-      type="submit"
-      disabled={isDisabled}
-      className="inline-flex h-9 shrink-0 items-center justify-center whitespace-nowrap rounded-lg border border-slate-200 bg-white/85 px-3.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-950 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 dark:border-white/12 dark:bg-white/8 dark:text-white dark:hover:border-white/22 dark:hover:bg-white/12 dark:disabled:bg-neutral-800 dark:disabled:text-neutral-500"
-    >
-      {pending ? "Opening..." : "Sign in"}
-    </button>
-  );
-}
-
-function HeaderSignInForm({
-  onSubmit,
-  isGoogleLoginConfigured,
-}: AuthFormProps) {
-  return (
-    <form action={onSubmit}>
-      <HeaderSignInButton disabled={!isGoogleLoginConfigured} />
-    </form>
+      Sign in
+    </a>
   );
 }
 
@@ -266,8 +192,6 @@ function LandingThemeToggle() {
 }
 
 export default function LoginClient({
-  onSubmit,
-  isGoogleLoginConfigured,
   sdkCodeHtml,
 }: LoginClientProps) {
   return (
@@ -330,10 +254,7 @@ export default function LoginClient({
 
           <div className="flex items-center gap-2">
             <LandingThemeToggle />
-            <HeaderSignInForm
-              onSubmit={onSubmit}
-              isGoogleLoginConfigured={isGoogleLoginConfigured}
-            />
+            <HeaderSignInLink />
           </div>
           </div>
         </header>
@@ -355,15 +276,14 @@ export default function LoginClient({
               in one dashboard.
             </p>
 
-            <div
-              id="signin"
-              className="mt-8 flex scroll-mt-24 flex-col gap-3 sm:flex-row sm:items-center"
-            >
-              <SignInForm
-                onSubmit={onSubmit}
-                isGoogleLoginConfigured={isGoogleLoginConfigured}
-                compact
-              />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <a
+                href="/signin"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100"
+              >
+                Sign in or create account
+                <ArrowRight className="h-4 w-4" />
+              </a>
               <a
                 href="#platform"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-800 shadow-sm transition hover:border-pink-300 hover:text-pink-600 dark:border-white/12 dark:bg-transparent dark:text-white/82 dark:hover:border-white/25 dark:hover:bg-white/8 dark:hover:text-white"
@@ -760,11 +680,13 @@ export default function LoginClient({
               and functions in one operational workspace.
             </p>
           </div>
-          <SignInForm
-            onSubmit={onSubmit}
-            isGoogleLoginConfigured={isGoogleLoginConfigured}
-            compact
-          />
+          <a
+            href="/signin"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-slate-950 px-5 text-sm font-semibold text-white shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100"
+          >
+            Sign in or create account
+            <ArrowRight className="h-4 w-4" />
+          </a>
         </div>
       </section>
 
@@ -832,7 +754,7 @@ export default function LoginClient({
                 SDK
               </a>
               <a
-                href="#signin"
+                href="/signin"
                 className="transition hover:text-slate-950 dark:hover:text-white"
               >
                 Sign in
@@ -849,7 +771,7 @@ export default function LoginClient({
               </span>
               <span className="flex items-center gap-2">
                 <KeyRound className="h-4 w-4" />
-                Google OAuth
+                Email auth
               </span>
               <span className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />

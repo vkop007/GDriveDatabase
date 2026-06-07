@@ -5,8 +5,8 @@ import {
   APP_SESSION_COOKIE,
   getBaseUrlFromHeaders,
   getGoogleRedirectUri,
-  type AppSession,
 } from "@/lib/gdrive/google-oauth";
+import { parseAppSessionCookie } from "@/lib/auth/app-session";
 import { getCurrentDriveConnection } from "@/lib/gdrive/drive-connection-store";
 
 export const dynamic = "force-dynamic";
@@ -15,16 +15,6 @@ import AccountDriveSettings from "../../../components/settings/AccountDriveSetti
 import BackupSettings from "../../../components/settings/BackupSettings";
 import { Settings } from "lucide-react";
 
-function parseAppSession(value?: string) {
-  if (!value) return null;
-
-  try {
-    return JSON.parse(value) as AppSession;
-  } catch {
-    return null;
-  }
-}
-
 export default async function SettingsPage() {
   const cookieStore = await cookies();
   const headerStore = await headers();
@@ -32,7 +22,7 @@ export default async function SettingsPage() {
     getApiKey(),
     getCurrentDriveConnection(),
   ]);
-  const user = parseAppSession(cookieStore.get(APP_SESSION_COOKIE)?.value);
+  const user = parseAppSessionCookie(cookieStore.get(APP_SESSION_COOKIE)?.value);
   const driveClientId = driveConnection?.clientId || null;
   const driveProjectId = driveConnection?.projectId || null;
   const hasCredentials = Boolean(

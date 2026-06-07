@@ -1,12 +1,9 @@
-import { authenticateWithGoogle } from "./actions";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { codeToHtml } from "shiki";
 import LoginClient from "@/components/LoginClient";
-import {
-  APP_SESSION_COOKIE,
-  isGoogleOAuthConfigured,
-} from "@/lib/gdrive/google-oauth";
+import { APP_SESSION_COOKIE } from "@/lib/gdrive/google-oauth";
+import { parseAppSessionCookie } from "@/lib/auth/app-session";
 
 const landingSdkExample = `import { GDatabase } from "gdatabase";
 
@@ -26,7 +23,7 @@ const rows = await db
 
 export default async function Home() {
   const cookieStore = await cookies();
-  const session = cookieStore.get(APP_SESSION_COOKIE)?.value;
+  const session = parseAppSessionCookie(cookieStore.get(APP_SESSION_COOKIE)?.value);
 
   if (session) {
     redirect("/dashboard");
@@ -37,11 +34,5 @@ export default async function Home() {
     theme: "vesper",
   });
 
-  return (
-    <LoginClient
-      onSubmit={authenticateWithGoogle}
-      isGoogleLoginConfigured={isGoogleOAuthConfigured()}
-      sdkCodeHtml={sdkCodeHtml}
-    />
-  );
+  return <LoginClient sdkCodeHtml={sdkCodeHtml} />;
 }

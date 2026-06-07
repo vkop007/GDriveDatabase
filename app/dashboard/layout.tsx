@@ -5,6 +5,7 @@ import DashboardLayoutWrapper from "../../components/DashboardLayout";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { type AppSession, APP_SESSION_COOKIE } from "@/lib/gdrive/google-oauth";
+import { parseAppSessionCookie } from "@/lib/auth/app-session";
 import { hasCurrentDriveConnection } from "@/lib/gdrive/drive-connection-store";
 
 export default async function DashboardLayout({
@@ -19,12 +20,7 @@ export default async function DashboardLayout({
     redirect("/");
   }
 
-  let user: AppSession = { email: "Google account" };
-  try {
-    user = JSON.parse(appSession) as AppSession;
-  } catch {
-    user = { email: "Google account" };
-  }
+  const user: AppSession = parseAppSessionCookie(appSession) ?? { email: "Account" };
 
   const hasDriveConnection = await hasCurrentDriveConnection();
   const treeData = hasDriveConnection ? await getDatabaseNavTree() : [];

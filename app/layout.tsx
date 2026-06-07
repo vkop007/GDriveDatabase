@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "GDrive Database",
-  description: "A Drive-native database workspace with Google sign-in.",
+  description: "A Drive-native database workspace with email login and Google Drive sync.",
 };
 
 export default function RootLayout({

@@ -49,6 +49,7 @@ export async function ensureTursoSchema() {
               email TEXT,
               name TEXT,
               picture TEXT,
+              password_hash TEXT,
               created_at TEXT NOT NULL,
               updated_at TEXT NOT NULL
             )
@@ -93,7 +94,19 @@ export async function ensureTursoSchema() {
       ],
       "write"
     )
-    .then(() => undefined);
+    .then(async () => {
+      const db = getTursoClient();
+      if (!db) return;
+
+      try {
+        await db.execute("ALTER TABLE users ADD COLUMN password_hash TEXT");
+      } catch (error) {
+        const message = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+        if (!message.includes("duplicate column") && !message.includes("already exists")) {
+          throw error;
+        }
+      }
+    });
 
   await schemaInit;
   return true;

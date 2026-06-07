@@ -6,6 +6,7 @@ import {
   GOOGLE_TOKEN_COOKIE,
   type AppSession,
 } from "./google-oauth";
+import { parseAppSessionCookie } from "@/lib/auth/app-session";
 import { decryptJson, encryptJson } from "@/lib/storage/encryption";
 import { ensureTursoSchema, getTursoClient } from "@/lib/storage/turso";
 
@@ -57,11 +58,7 @@ export const getCurrentAppSession = cache(async function getCurrentAppSession() 
 
   if (!sessionValue) return null;
 
-  try {
-    return JSON.parse(sessionValue) as AppSession;
-  } catch {
-    return null;
-  }
+  return parseAppSessionCookie(sessionValue);
 });
 
 async function getLegacyCookieConnection() {
@@ -228,7 +225,7 @@ export async function saveDriveConnection(
 
   const currentSession = await getCurrentAppSession();
   const session: AppSession = currentSession ?? {
-    email: pending?.userEmail || "Google account",
+    email: pending?.userEmail || "Drive account",
     name: pending?.userName ?? undefined,
     picture: pending?.userPicture ?? undefined,
     sub: pending?.userId,
