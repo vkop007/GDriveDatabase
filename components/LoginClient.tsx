@@ -293,7 +293,7 @@ export default function LoginClient({
 
       <section
         id="platform"
-        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(253,242,248,0.72)_52%,rgba(236,253,245,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(253,242,248,0.72)_52%,rgba(236,253,245,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d] dark:bg-none"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-end">
@@ -333,7 +333,7 @@ export default function LoginClient({
 
       <section
         id="workflow"
-        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(240,249,255,0.76)_50%,rgba(255,247,237,0.66)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[#080a10]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(255,255,255,0.96)_0%,rgba(240,249,255,0.76)_50%,rgba(255,247,237,0.66)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[#080a10] dark:bg-none"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-end">
@@ -381,7 +381,7 @@ export default function LoginClient({
 
       <section
         id="features"
-        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(238,242,255,0.72)_48%,rgba(253,242,248,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d]"
+        className="scroll-mt-24 border-b border-slate-200 bg-[linear-gradient(135deg,rgba(248,250,252,0.94)_0%,rgba(238,242,255,0.72)_48%,rgba(253,242,248,0.70)_100%)] transition-colors duration-300 dark:border-white/10 dark:bg-[#07080d] dark:bg-none"
       >
         <div className="mx-auto max-w-[22rem] px-5 py-16 sm:max-w-7xl sm:px-8 md:py-[4.5rem] lg:px-10">
           <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
