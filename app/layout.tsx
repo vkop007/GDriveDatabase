@@ -18,6 +18,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "GDrive Database",
   description: "A Drive-native database workspace with email login and Google Drive sync.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-icon.png", type: "image/png", sizes: "180x180" }],
+    shortcut: ["/favicon.ico"],
+  },
+  manifest: "/manifest.webmanifest",
 };
 
 export default function RootLayout({
