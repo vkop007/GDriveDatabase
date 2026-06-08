@@ -44,6 +44,7 @@ This repository is the hosted dashboard/API app. It uses:
 - Turso/libSQL for users and encrypted Google Drive OAuth credentials.
 - Google Drive as the actual document/file storage for each connected user.
 - User-owned Google OAuth credentials pasted from the dashboard settings page.
+- The published [`gdatabase`](https://www.npmjs.com/package/gdatabase) npm package for external database calls.
 
 ### 1. Prerequisites
 
@@ -51,6 +52,7 @@ This repository is the hosted dashboard/API app. It uses:
 - npm or Bun.
 - A Turso account/database.
 - A Google Cloud project for Drive OAuth.
+- A Google account that can create Google Cloud OAuth credentials.
 
 ### 2. Install Dependencies
 
@@ -89,7 +91,7 @@ Do not commit `.env`. If `ENCRYPTION_KEY` changes later, previously stored Drive
 
 ### 4. Set Up Turso
 
-Create a Turso database from the Turso dashboard or CLI.
+Create a Turso database from the Turso dashboard or CLI. Turso stores app users, API keys, encrypted OAuth credentials, and refresh tokens. Your actual database rows/files still live in the connected user's Google Drive.
 
 CLI example:
 
@@ -114,27 +116,122 @@ No manual migration command is needed. The app creates/updates these tables auto
 
 ### 5. Set Up Google Drive OAuth
 
-Google credentials are not global app login credentials. Each app user connects their own Google Drive from `Dashboard -> Settings -> Connect Drive`.
+Google credentials are not app login credentials. Users sign in to GDrive Database with email/password, then each user connects their own Google Drive from `Dashboard -> Settings -> Connect Drive`.
 
-Create the OAuth client:
+You need one Google Cloud OAuth client for each Google Drive account/project you want to connect. The app accepts the downloaded OAuth JSON and stores the `client_id`, `client_secret`, and `project_id` encrypted in Turso.
+
+#### 5.1 Create or Select a Google Cloud Project
 
 1. Open [Google Cloud Console](https://console.cloud.google.com/).
-2. Create or select a project.
-3. Enable **Google Drive API**.
-4. Enable **Google Apps Script API** if you will use Functions/Apps Script features.
-5. Configure the OAuth consent screen.
-6. While in testing mode, add your Google account under test users.
-7. Go to **APIs & Services -> Credentials -> Create Credentials -> OAuth client ID**.
-8. Choose **Web application**.
-9. Add authorized redirect URIs:
+2. Click the project selector at the top.
+3. Create a new project, or select an existing project.
+4. Keep the project ID handy. It will look like `my-project-123456`.
+
+#### 5.2 Enable Required Google APIs
+
+Open **APIs & Services -> Library** in the same project and enable:
+
+| API | Required for |
+| --- | --- |
+| **Google Drive API** | Creating folders, tables, row files, bucket files, and reading Drive storage. |
+| **Google Apps Script API** | Functions, backups, script creation/deployment, and script execution metadata. |
+
+Direct links:
+
+- [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com)
+- [Google Apps Script API](https://console.cloud.google.com/apis/library/script.googleapis.com)
+
+CLI equivalent:
+
+```bash
+gcloud services enable drive.googleapis.com script.googleapis.com \
+  --project your-google-cloud-project-id
+```
+
+If you do not plan to use Functions/Backups yet, the dashboard can still run with Drive API only, but enabling Apps Script API now avoids errors later when you open the Functions page.
+
+#### 5.3 Configure OAuth Consent Screen
+
+Open **APIs & Services -> OAuth consent screen**.
+
+For development:
+
+1. Choose **External** unless you are using a Google Workspace organization and want **Internal**.
+2. Fill app name, support email, and developer contact email.
+3. Add yourself under **Test users** while the app is in testing mode.
+4. Save and continue.
+
+The app requests these scopes when a user connects Drive:
+
+```text
+https://www.googleapis.com/auth/drive
+https://www.googleapis.com/auth/drive.file
+https://www.googleapis.com/auth/script.projects
+https://www.googleapis.com/auth/script.deployments
+https://www.googleapis.com/auth/script.processes
+https://www.googleapis.com/auth/script.metrics
+https://www.googleapis.com/auth/script.scriptapp
+email
+profile
+```
+
+For personal development, testing mode with your own Google account is enough. For a public production app, Google may require OAuth verification because Drive and Apps Script scopes are sensitive/restricted.
+
+#### 5.4 Create OAuth Client ID
+
+Open **APIs & Services -> Credentials -> Create Credentials -> OAuth client ID**.
+
+Use these settings:
+
+| Field | Value |
+| --- | --- |
+| Application type | `Web application` |
+| Name | Anything clear, for example `GDrive Database Local` |
+| Authorized JavaScript origins | `http://localhost:3000` locally, and your production origin later |
+| Authorized redirect URIs | Must include the exact callback URL shown below |
+
+Local redirect URI:
 
 ```text
 http://localhost:3000/oauth2callback
+```
+
+Production redirect URI:
+
+```text
 https://your-production-domain.com/oauth2callback
 ```
 
-10. Download the OAuth client JSON.
-11. Start the app, sign in with email/password, open Settings, click **Connect Drive**, paste the JSON, and authorize Google.
+The redirect URI must exactly match `NEXT_PUBLIC_BASE_URL + /oauth2callback`. A missing slash, different port, or different domain will cause a Google `redirect_uri_mismatch` error.
+
+After creating the OAuth client:
+
+1. Click the download icon for the OAuth client.
+2. Open the downloaded JSON file.
+3. It should look similar to:
+
+```json
+{
+  "web": {
+    "client_id": "xxxxx.apps.googleusercontent.com",
+    "project_id": "your-project-id",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "client_secret": "GOCSPX-xxxxx",
+    "redirect_uris": ["http://localhost:3000/oauth2callback"]
+  }
+}
+```
+
+#### 5.5 Connect Drive Inside GDrive Database
+
+1. Start this app.
+2. Create/sign in to an email/password account.
+3. Open **Dashboard -> Settings**.
+4. Confirm the **Google OAuth Redirect URI** shown on the page matches the URI in Google Cloud.
+5. Click **Connect Drive**.
+6. Paste the OAuth JSON, or manually fill Client ID, Client Secret, and Project ID.
+7. Click **Connect Google Drive** and approve the requested Google permissions.
 
 The pasted JSON must contain:
 
@@ -143,6 +240,12 @@ The pasted JSON must contain:
 - `project_id`
 
 The app encrypts the client secret and OAuth tokens in Turso.
+
+If Functions or Backups show Apps Script permission/API errors:
+
+- Confirm **Google Apps Script API** is enabled in the same Google Cloud project.
+- Open [Apps Script Settings](https://script.google.com/home/usersettings) with the same Google account and make sure the Apps Script API setting is enabled if Google prompts for it.
+- Wait 1-2 minutes after enabling APIs, then reconnect Drive or retry the function action.
 
 ### 6. Run Locally
 
@@ -190,6 +293,9 @@ https://your-app.vercel.app/oauth2callback
 
 - **Email login disabled:** check `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`, and `ENCRYPTION_KEY`.
 - **Google redirect mismatch:** make sure `NEXT_PUBLIC_BASE_URL` exactly matches the domain in Google Cloud and the redirect URI ends with `/oauth2callback`.
+- **Google says app is not verified:** keep OAuth consent screen in testing mode and add your Google account as a test user, or complete Google verification for public users.
+- **Drive API has not been used:** enable Google Drive API in the same project as the OAuth client, wait a minute, then retry.
+- **Apps Script API has not been used:** enable Google Apps Script API in the same project and retry after propagation.
 - **Drive credentials cannot decrypt:** `ENCRYPTION_KEY` changed after credentials were saved. Reconnect Drive or restore the old key.
 - **OAuth app still in testing:** add the Google account as a test user in the OAuth consent screen.
 - **Port already in use:** stop the old Next dev server or run on another port with `PORT=3001 npm run dev`.
@@ -197,7 +303,18 @@ https://your-app.vercel.app/oauth2callback
 
 ## SDK Usage
 
-Install the client package in an app that will call this hosted dashboard/API:
+Use the published [`gdatabase`](https://www.npmjs.com/package/gdatabase) npm package when another app needs to call your hosted GDrive Database API.
+
+Before writing code:
+
+1. Run this dashboard/API app locally or deploy it.
+2. Sign in to the dashboard.
+3. Connect Google Drive from **Dashboard -> Settings**.
+4. Create a database and table in the dashboard.
+5. Generate an API key from **Dashboard -> Settings -> API Access**.
+6. Copy your database ID and table ID from the dashboard URL or table page.
+
+Install the client package in the app that will call your database:
 
 ```bash
 npm install gdatabase
@@ -212,34 +329,49 @@ bun add gdatabase
 import { GDatabase } from "gdatabase";
 
 const db = new GDatabase(
-  "YOUR_API_KEY", // Generated from Dashboard -> Settings -> API Access
-  "http://localhost:3000" // Your dashboard/API URL
+  process.env.GDATABASE_API_KEY!, // Generated from Dashboard -> Settings -> API Access
+  "http://localhost:3000" // Your GDrive Database app URL
 );
 ```
 
-### Database & Tables
+For production, use your deployed URL:
 
 ```typescript
-// List items
-const items = await db.database("my-db").table("my-table").list();
+const db = new GDatabase(
+  process.env.GDATABASE_API_KEY!,
+  "https://your-app.vercel.app"
+);
+```
 
-// Create item
-await db.database("my-db").table("my-table").create({
-  title: "New Item",
+### Database Calls
+
+```typescript
+const databaseId = "your-database-id";
+const tableId = "your-table-id";
+const table = db.database(databaseId).table(tableId);
+
+// List rows
+const rows = await table.list();
+
+// Create a row
+const created = await table.create({
+  title: "New item",
   status: "active",
 });
 
-// Get item
-const item = await db.database("my-db").table("my-table").get("doc-id");
+// Read one row
+const row = await table.get(created.$id);
 
-// Update item
-await db.database("my-db").table("my-table").update("doc-id", {
+// Update one row
+await table.update(created.$id, {
   status: "completed",
 });
 
-// Delete item
-await db.database("my-db").table("my-table").delete("doc-id");
+// Delete one row
+await table.delete(created.$id);
 ```
+
+Keep API keys on the server. Do not expose `GDATABASE_API_KEY` in browser-side code unless you intentionally want public write access to that API key.
 
 ### Schema Management
 

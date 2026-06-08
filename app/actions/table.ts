@@ -115,140 +115,182 @@ export async function getTableData(fileId: string) {
   return (await response.json()) as TableFile;
 }
 
-export async function updateTableSchema(formData: FormData) {
-  const fileId = formData.get("fileId") as string;
-  const key = formData.get("key") as string;
-  const type = formData.get("type") as ColumnDefinition["type"];
-  const required = formData.get("required") === "on";
-  const isArray = formData.get("array") === "on";
-  const defaultValue = formData.get("default") as string;
-  const relationTableId = formData.get("relationTableId") as string;
+export async function updateTableSchema(formData: FormData): Promise<{
+  success: boolean;
+  error?: string;
+  message?: string;
+}> {
+  try {
+    const fileId = formData.get("fileId")?.toString() ?? "";
+    const databaseId = formData.get("databaseId")?.toString() ?? "";
+    const key = formData.get("key")?.toString().trim() ?? "";
+    const type = formData.get("type") as ColumnDefinition["type"] | null;
+    const required = formData.get("required") === "on";
+    const isArray = formData.get("array") === "on";
+    const defaultValueInput = formData.get("default");
+    const defaultValue =
+      typeof defaultValueInput === "string" && defaultValueInput.length > 0
+        ? defaultValueInput
+        : undefined;
+    const relationTableId = formData.get("relationTableId")?.toString() ?? "";
 
-  // Parse validation rules from form data
-  const validationMinLength = formData.get("validation_minLength") as string;
-  const validationMaxLength = formData.get("validation_maxLength") as string;
-  const validationPattern = formData.get("validation_pattern") as string;
-  const validationEmail = formData.get("validation_email") === "on";
-  const validationUrl = formData.get("validation_url") === "on";
-  const validationEnum = formData.get("validation_enum") as string;
-  const validationMin = formData.get("validation_min") as string;
-  const validationMax = formData.get("validation_max") as string;
-  const validationMessage = formData.get("validation_message") as string;
-
-  if (!fileId || !key || !type) {
-    throw new Error("Missing parameters");
-  }
-
-  // Use FRESH data for schema updates
-  const table = await getFreshTableData(fileId);
-
-  // Check if column already exists
-  if (table.schema.some((c) => c.key === key)) {
-    throw new Error("Column already exists");
-  }
-
-  // Build validation object if any rules are set
-  let validation: import("../../types").ValidationRules | undefined;
-  if (
-    validationMinLength ||
-    validationMaxLength ||
-    validationPattern ||
-    validationEmail ||
-    validationUrl ||
-    validationEnum ||
-    validationMin ||
-    validationMax ||
-    validationMessage
-  ) {
-    validation = {};
-
-    if (validationMinLength) {
-      validation.minLength = parseInt(validationMinLength, 10);
+    if (!fileId || !key || !type) {
+      return { success: false, error: "Missing column key or type." };
     }
-    if (validationMaxLength) {
-      validation.maxLength = parseInt(validationMaxLength, 10);
-    }
-    if (validationPattern) {
-      validation.pattern = validationPattern;
-    }
-    if (validationEmail) {
-      validation.email = true;
-    }
-    if (validationUrl) {
-      validation.url = true;
-    }
-    if (validationEnum) {
-      validation.enum = validationEnum
-        .split(",")
-        .map((v) => v.trim())
-        .filter((v) => v.length > 0);
-    }
-    if (validationMin) {
-      validation.min = parseInt(validationMin, 10);
-    }
-    if (validationMax) {
-      validation.max = parseInt(validationMax, 10);
-    }
-    if (validationMessage) {
-      validation.message = validationMessage;
-    }
-  }
 
-  // ... inside updateTableSchema ...
-  const validationUnique = formData.get("unique") === "on";
+    const supportedTypes: ColumnDefinition["type"][] = [
+      "string",
+      "integer",
+      "boolean",
+      "datetime",
+      "relation",
+      "storage",
+    ];
 
-  // ... (validation parsing) ...
+    if (!supportedTypes.includes(type)) {
+      return { success: false, error: "Unsupported column type." };
+    }
 
-  const newColumn: ColumnDefinition = {
-    key,
-    type,
-    required,
-    array: isArray,
-    relationTableId: type === "relation" ? relationTableId : undefined,
-    default: defaultValue || undefined,
-    validation,
-    unique: validationUnique,
-  };
+    if (type === "relation" && !relationTableId) {
+      return { success: false, error: "Select a relation table first." };
+    }
 
-  table.schema.push(newColumn);
+    // Parse validation rules from form data
+    const validationMinLength = formData
+      .get("validation_minLength")
+      ?.toString();
+    const validationMaxLength = formData
+      .get("validation_maxLength")
+      ?.toString();
+    const validationPattern = formData.get("validation_pattern")?.toString();
+    const validationEmail = formData.get("validation_email") === "on";
+    const validationUrl = formData.get("validation_url") === "on";
+    const validationEnum = formData.get("validation_enum")?.toString();
+    const validationMin = formData.get("validation_min")?.toString();
+    const validationMax = formData.get("validation_max")?.toString();
+    const validationMessage = formData.get("validation_message")?.toString();
 
-  // Update all existing documents with default value if provided
-  if (defaultValue !== undefined) {
-    table.documents.forEach((doc) => {
-      if (doc[key] === undefined) {
-        doc[key] = defaultValue;
+    // Use FRESH data for schema updates
+    const table = await getFreshTableData(fileId);
+
+    // Check if column already exists
+    if (
+      table.schema.some(
+        (column) => column.key.toLowerCase() === key.toLowerCase(),
+      )
+    ) {
+      return { success: false, error: `Column "${key}" already exists.` };
+    }
+
+    // Build validation object if any rules are set
+    let validation: import("../../types").ValidationRules | undefined;
+    if (
+      validationMinLength ||
+      validationMaxLength ||
+      validationPattern ||
+      validationEmail ||
+      validationUrl ||
+      validationEnum ||
+      validationMin ||
+      validationMax ||
+      validationMessage
+    ) {
+      validation = {};
+
+      if (validationMinLength) {
+        validation.minLength = parseInt(validationMinLength, 10);
       }
-    });
-  }
+      if (validationMaxLength) {
+        validation.maxLength = parseInt(validationMaxLength, 10);
+      }
+      if (validationPattern) {
+        validation.pattern = validationPattern;
+      }
+      if (validationEmail) {
+        validation.email = true;
+      }
+      if (validationUrl) {
+        validation.url = true;
+      }
+      if (validationEnum) {
+        validation.enum = validationEnum
+          .split(",")
+          .map((v) => v.trim())
+          .filter((v) => v.length > 0);
+      }
+      if (validationMin) {
+        validation.min = parseInt(validationMin, 10);
+      }
+      if (validationMax) {
+        validation.max = parseInt(validationMax, 10);
+      }
+      if (validationMessage) {
+        validation.message = validationMessage;
+      }
+    }
 
-  await saveTableContent(fileId, table);
+    const validationUnique = formData.get("unique") === "on";
 
-  // Rebuild index if unique
-  if (validationUnique) {
-    // Need databaseId
-    const databaseId = await getParentId(fileId);
+    const newColumn: ColumnDefinition = {
+      key,
+      type,
+      required,
+      array: isArray,
+      relationTableId: type === "relation" ? relationTableId : undefined,
+      default: defaultValue,
+      validation,
+      unique: validationUnique,
+    };
+
+    table.schema.push(newColumn);
+
+    // Update all existing documents with default value if provided
+    if (defaultValue !== undefined) {
+      table.documents.forEach((doc) => {
+        if (doc[key] === undefined) {
+          doc[key] = defaultValue;
+        }
+      });
+    }
+
+    await saveTableContent(fileId, table);
+
+    // Rebuild index if unique
+    if (validationUnique) {
+      const parentDatabaseId = databaseId || (await getParentId(fileId));
+      if (parentDatabaseId) {
+        const { rebuildIndex } = await import("../../lib/indexing");
+        const indexFileId = await rebuildIndex(
+          parentDatabaseId,
+          fileId,
+          key,
+          table.documents,
+        );
+
+        // Update schema with the new indexFileId
+        const colIndex = table.schema.findIndex((c) => c.key === key);
+        if (colIndex !== -1) {
+          table.schema[colIndex].indexFileId = indexFileId;
+          await saveTableContent(fileId, table);
+        }
+      }
+    }
+
     if (databaseId) {
-      // Should exist
-      const { rebuildIndex } = await import("../../lib/indexing");
-      const indexFileId = await rebuildIndex(
-        databaseId,
-        fileId,
-        key,
-        table.documents,
-      );
-
-      // Update schema with the new indexFileId
-      const colIndex = table.schema.findIndex((c) => c.key === key);
-      if (colIndex !== -1) {
-        table.schema[colIndex].indexFileId = indexFileId;
-        await saveTableContent(fileId, table);
-      }
+      revalidatePath(`/dashboard/database/${databaseId}/table/${fileId}`);
     }
+    revalidatePath(`/dashboard/table/${fileId}`);
+    revalidateTag(`table-data-${fileId}`, { expire: 0 });
+    revalidateTag("database-tree", { expire: 0 });
+    return { success: true, message: `Column "${key}" added.` };
+  } catch (error) {
+    console.error("Error updating table schema:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to update schema.",
+    };
   }
-
-  revalidatePath(`/dashboard/table/${fileId}`);
-  revalidateTag(`table-data-${fileId}`, { expire: 0 });
-  revalidateTag("database-tree", { expire: 0 });
 }
 
 export async function deleteColumn(formData: FormData) {
