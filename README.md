@@ -22,6 +22,12 @@
   <img src="https://img.shields.io/badge/TypeScript-Ready-blue.svg" alt="TypeScript" />
 </p>
 
+<p align="center">
+  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvkop007%2FGDriveDatabase&env=NEXT_PUBLIC_BASE_URL,TURSO_DATABASE_URL,TURSO_AUTH_TOKEN,ENCRYPTION_KEY,AUTH_SECRET">
+    <img src="https://vercel.com/button" alt="Deploy with Vercel" />
+  </a>
+</p>
+
 ---
 
 A modern NoSQL database solution powered by Google Drive. Store, query, and manage your data with a simple SDK and beautiful dashboard. Zero infrastructure. Infinite possibilities.
@@ -268,7 +274,17 @@ To use the SDK or external API routes, open **Dashboard -> Settings -> API Acces
 
 ### 7. Production Deployment
 
-For Vercel:
+#### 🚀 1-Click Deploy to Vercel
+
+You can deploy this project directly to Vercel with a single click. Vercel will automatically fork/clone the repository, set up the project, and prompt you to input the required environment variables:
+
+<p align="left">
+  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvkop007%2FGDriveDatabase&env=NEXT_PUBLIC_BASE_URL,TURSO_DATABASE_URL,TURSO_AUTH_TOKEN,ENCRYPTION_KEY,AUTH_SECRET">
+    <img src="https://vercel.com/button" alt="Deploy with Vercel" />
+  </a>
+</p>
+
+#### Manual Deployment on Vercel:
 
 1. Import the repository into Vercel.
 2. Add these environment variables to the Vercel project:

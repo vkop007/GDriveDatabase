@@ -1,0 +1,22 @@
+# Handle line endings automatically for files detected as text
+# and force all text files to have LF line endings upon checkin.
+* text=auto eol=lf
+
+# Explicitly declare text files to always have LF line endings
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.mjs text eol=lf
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
