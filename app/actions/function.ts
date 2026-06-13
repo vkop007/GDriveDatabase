@@ -31,11 +31,11 @@ interface FunctionsRegistry {
 }
 
 // Get or create the functions registry file
-async function getOrCreateRegistry(): Promise<{
+async function getOrCreateRegistry(authParam?: any): Promise<{
   registryId: string;
   registry: FunctionsRegistry;
 }> {
-  const systemFolderId = await getOrCreateSystemFolder();
+  const systemFolderId = await getOrCreateSystemFolder(authParam);
   const files = await operations.listOperations.listFilesInFolder(
     systemFolderId
   );
@@ -54,7 +54,7 @@ async function getOrCreateRegistry(): Promise<{
   }
 
   // Create new registry
-  const { tokens, clientId, clientSecret, projectId } = await getAuth();
+  const { tokens, clientId, clientSecret, projectId } = authParam || await getAuth();
   const driveService = initDriveService(
     {
       client_id: clientId,
@@ -80,8 +80,8 @@ async function getOrCreateRegistry(): Promise<{
 }
 
 // Save registry
-async function saveRegistry(registryId: string, registry: FunctionsRegistry) {
-  const { tokens, clientId, clientSecret, projectId } = await getAuth();
+async function saveRegistry(registryId: string, registry: FunctionsRegistry, authParam?: any) {
+  const { tokens, clientId, clientSecret, projectId } = authParam || await getAuth();
   const driveService = initDriveService(
     {
       client_id: clientId,
@@ -97,9 +97,9 @@ async function saveRegistry(registryId: string, registry: FunctionsRegistry) {
 /**
  * List all user-created functions
  */
-export async function listFunctions(): Promise<FunctionInfo[]> {
+export async function listFunctions(authParam?: any): Promise<FunctionInfo[]> {
   try {
-    const { tokens, clientId, clientSecret, projectId } = await getAuth();
+    const { tokens, clientId, clientSecret, projectId } = authParam || await getAuth();
     initDriveService(
       {
         client_id: clientId,
@@ -110,7 +110,7 @@ export async function listFunctions(): Promise<FunctionInfo[]> {
       tokens
     );
 
-    const { registry } = await getOrCreateRegistry();
+    const { registry } = await getOrCreateRegistry(authParam);
     return registry.functions;
   } catch (error) {
     console.error("Error listing functions:", error);
@@ -460,9 +460,9 @@ function saveLogs(logs, result, error, startTime) {
 /**
  * Get a single function by ID
  */
-export async function getFunction(id: string): Promise<FunctionInfo | null> {
+export async function getFunction(id: string, authParam?: any): Promise<FunctionInfo | null> {
   try {
-    const { tokens, clientId, clientSecret, projectId } = await getAuth();
+    const { tokens, clientId, clientSecret, projectId } = authParam || await getAuth();
     initDriveService(
       {
         client_id: clientId,
@@ -473,7 +473,7 @@ export async function getFunction(id: string): Promise<FunctionInfo | null> {
       tokens
     );
 
-    const { registry } = await getOrCreateRegistry();
+    const { registry } = await getOrCreateRegistry(authParam);
     return registry.functions.find((f) => f.id === id) || null;
   } catch (error) {
     console.error("Error getting function:", error);
