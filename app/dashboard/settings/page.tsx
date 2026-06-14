@@ -1,6 +1,6 @@
 import { cookies, headers } from "next/headers";
 import { getApiKey, connectDriveWithGoogle } from "../../actions";
-import { disconnectDrive } from "../../actions/user";
+import { disconnectDrive, logout } from "../../actions/user";
 import {
   APP_SESSION_COOKIE,
   getBaseUrlFromHeaders,
@@ -65,6 +65,7 @@ export default async function SettingsPage() {
           }}
           connectDriveAction={connectDriveWithGoogle}
           disconnectDriveAction={disconnectDrive}
+          logoutAction={logout}
         />
         <ApiSettings initialApiKey={apiKey} />
         <BackupSettings />
