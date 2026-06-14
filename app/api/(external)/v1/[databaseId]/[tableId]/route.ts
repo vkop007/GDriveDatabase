@@ -133,3 +133,38 @@ export async function POST(
     return externalApiErrorResponse(error);
   }
 }
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ databaseId: string; tableId: string }> }
+) {
+  const authResult = await requireExternalApiAuth(req);
+  if ("response" in authResult) return authResult.response;
+
+  try {
+    const { driveService } = authResult.auth;
+    const { databaseId, tableId } = await params;
+
+    // Verify database and table exist and are accessible
+    const tableResult = await requireExternalTable(
+      authResult.auth,
+      databaseId,
+      tableId
+    );
+    if ("response" in tableResult) return tableResult.response;
+
+    console.log(`[API] Deleting table '${tableId}' in database '${databaseId}'...`);
+    await driveService.deleteFile(tableId);
+
+    // Revalidate relevant Next.js tags if necessary
+    const { revalidateTag } = await import("next/cache");
+    revalidateTag(`collections-${databaseId}`, { expire: 0 });
+    revalidateTag("database-nav-tree", { expire: 0 });
+    revalidateTag("database-tree", { expire: 0 });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return externalApiErrorResponse(error);
+  }
+}
+

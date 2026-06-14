@@ -363,8 +363,20 @@ const db = new GDatabase(
 
 ```typescript
 const databaseId = "your-database-id";
+const dbClient = db.database(databaseId);
+
+// Create a new table
+await dbClient.createTable("my-table", [
+  { key: "title", type: "string", required: true },
+  { key: "status", type: "string", default: "active" }
+]);
+
+// List all tables
+const tables = await dbClient.listTables();
+console.log(tables); // [{ id: "...", name: "my-table" }]
+
 const tableId = "your-table-id";
-const table = db.database(databaseId).table(tableId);
+const table = dbClient.table(tableId);
 
 // List rows
 const rows = await table.list();
@@ -385,6 +397,9 @@ await table.update(created.$id, {
 
 // Delete one row
 await table.delete(created.$id);
+
+// Delete the table
+await dbClient.deleteTable(tableId);
 ```
 
 Keep API keys on the server. Do not expose `GDATABASE_API_KEY` in browser-side code unless you intentionally want public write access to that API key.
@@ -624,6 +639,9 @@ const result2 = await functions.runById("function-id", { key: "value" });
 ### DatabaseClient
 
 - `table(tableId: string)` - Access a table
+- `listTables()` - List all tables in the database
+- `createTable(name: string, schema?: ColumnDefinition[])` - Create a new table
+- `deleteTable(tableId: string)` - Delete a table
 
 ### TableClient
 
