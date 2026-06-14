@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Unplug,
   User,
+  LogOut,
 } from "lucide-react";
 import type { AppSession } from "@/lib/gdrive/google-oauth";
 import DriveSetupClient from "../DriveSetupClient";
@@ -33,6 +34,7 @@ type DriveConnection = {
 type AccountDriveSettingsProps = {
   connectDriveAction: ServerFormAction;
   disconnectDriveAction: ServerFormAction;
+  logoutAction: ServerFormAction;
   drive: DriveConnection;
   user: AppSession | null;
 };
@@ -93,6 +95,7 @@ function DetailRow({
 export default function AccountDriveSettings({
   connectDriveAction,
   disconnectDriveAction,
+  logoutAction,
   drive,
   user,
 }: AccountDriveSettingsProps) {
@@ -185,6 +188,20 @@ export default function AccountDriveSettings({
               value="Separate OAuth credentials"
             />
           </div>
+
+          {user && (
+            <div className="mt-6 border-t border-slate-200 pt-6 dark:border-neutral-800">
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-red-500/25 bg-red-500/10 px-5 text-sm font-semibold text-red-600 transition hover:bg-red-500/15 dark:text-red-300"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </button>
+              </form>
+            </div>
+          )}
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm shadow-slate-900/5 dark:border-neutral-800 dark:bg-neutral-950 dark:shadow-none">
